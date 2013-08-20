@@ -12,9 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-/**
+ *
  * @emails jeffmo@fb.com javascript@lists.facebook.com
  */
 
@@ -137,8 +135,7 @@ describe('es6-classes', function() {
 
         var expected = [
           'for(var Bar____Key in Bar){' +
-            'if(Bar.hasOwnProperty(Bar____Key)' +
-               '&&Bar____Key!=="_metaprototype"){' +
+            'if(Bar.hasOwnProperty(Bar____Key)){' +
               'Foo[Bar____Key]=Bar[Bar____Key];' +
             '}' +
           '}' +
@@ -199,8 +196,7 @@ describe('es6-classes', function() {
         var expected = [
           'var ____Class0=mixin(Bar, Baz);' +
           'for(var ____Class0____Key in ____Class0){' +
-            'if(____Class0.hasOwnProperty(____Class0____Key)' +
-               '&&____Class0____Key!=="_metaprototype"){' +
+            'if(____Class0.hasOwnProperty(____Class0____Key)){' +
               'Foo[____Class0____Key]=____Class0[____Class0____Key];' +
             '}' +
           '}' +
@@ -955,19 +951,6 @@ describe('es6-classes', function() {
         expect(fooInst.protoFn()).toBe(true);
         expect(Foo.staticFn()).toBe(true);
       });
-
-      // TODO: Remove this test once the Class module is dead
-      it('does not copy `_metaprototype` static prop from parent', function() {
-        var code = transform([
-          'function Parent(){}',
-          'Parent._metaprototype = "metaproto";',
-          'class Child extends Parent {}'
-        ].join('\n'));
-
-        eval(code);
-
-        expect(Child._metaprototype).toBe(undefined);
-      });
     });
   });
 
@@ -1045,8 +1028,7 @@ describe('es6-classes', function() {
         var expected = [
           'var Foo = (function(){' +
           'for(var Bar____Key in Bar){' +
-            'if(Bar.hasOwnProperty(Bar____Key)' +
-               '&&Bar____Key!=="_metaprototype"){' +
+            'if(Bar.hasOwnProperty(Bar____Key)){' +
               '____Class0[Bar____Key]=Bar[Bar____Key];' +
             '}' +
           '}' +
@@ -1108,8 +1090,7 @@ describe('es6-classes', function() {
           'var Foo = (function(){' +
           'var ____Class1=mixin(Bar, Baz);' +
           'for(var ____Class1____Key in ____Class1){' +
-            'if(____Class1.hasOwnProperty(____Class1____Key)' +
-               '&&____Class1____Key!=="_metaprototype"){' +
+            'if(____Class1.hasOwnProperty(____Class1____Key)){' +
               '____Class0[____Class1____Key]=____Class1[____Class1____Key];' +
             '}' +
           '}' +

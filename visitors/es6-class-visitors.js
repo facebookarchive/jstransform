@@ -240,11 +240,14 @@ function _renderClassBody(traverse, node, path, state) {
     }
 
     var keyName = superClass.name + '____Key';
+    var keyNameDeclarator = '';
+    if (!utils.identWithinLexicalScope(keyName, state)) {
+      keyNameDeclarator = 'var ';
+      utils.declareIdentInLocalScope(keyName, state);
+    }
     utils.append(
-      'for(var ' + keyName + ' in ' + superClass.name + '){' +
-        'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')' +
-            // TODO: Remove this once the Class module is dead
-            '&&' + keyName + '!=="_metaprototype"){' +
+      'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
+        'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
           className + '[' + keyName + ']=' +
             superClass.name + '[' + keyName + '];' +
         '}' +
@@ -253,11 +256,14 @@ function _renderClassBody(traverse, node, path, state) {
     );
 
     var superProtoIdentStr = SUPER_PROTO_IDENT_PREFIX + superClass.name;
-    utils.append(
-      'var ' + superProtoIdentStr + '=' + superClass.name + '===null?' +
-      'null:' + superClass.name + '.prototype;',
-      state
-    );
+    if (!utils.identWithinLexicalScope(superProtoIdentStr, state)) {
+      utils.append(
+        'var ' + superProtoIdentStr + '=' + superClass.name + '===null?' +
+        'null:' + superClass.name + '.prototype;',
+        state
+      );
+      utils.declareIdentInLocalScope(superProtoIdentStr, state);
+    }
 
     utils.append(
       className + '.prototype=Object.create(' + superProtoIdentStr + ');',

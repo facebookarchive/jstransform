@@ -373,6 +373,10 @@ function identInLocalScope(identName, state) {
   return state.localScope.identifiers[identName] !== undefined;
 }
 
+function declareIdentInLocalScope(identName, state) {
+  state.localScope.identifiers[identName] = true;
+}
+
 /**
  * Apply the given analyzer function to the current node. If the analyzer
  * doesn't return false, traverse each child of the current node using the given
@@ -443,6 +447,7 @@ exports.catchup = catchup;
 exports.catchupWhiteSpace = catchupWhiteSpace;
 exports.containsChildOfType = containsChildOfType;
 exports.createState = createState;
+exports.declareIdentInLocalScope = declareIdentInLocalScope;
 exports.getDocblock = getDocblock;
 exports.identWithinLexicalScope = identWithinLexicalScope;
 exports.identInLocalScope = identInLocalScope;
