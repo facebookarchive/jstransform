@@ -16,6 +16,8 @@
  * @emails jeffmo@fb.com javascript@lists.facebook.com
  */
 
+require('mock-modules').autoMockOff();
+
 describe('jstransform', function() {
   var transformFn;
   var Syntax = require('esprima-fb').Syntax;

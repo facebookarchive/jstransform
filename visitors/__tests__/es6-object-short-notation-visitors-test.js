@@ -20,6 +20,8 @@
 
 /*jshint evil:true*/
 
+require('mock-modules').autoMockOff();
+
 describe('es6-object-short-notation-visitors', function() {
   var transformFn;
   var visitors;

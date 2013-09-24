@@ -18,6 +18,8 @@
 
 /*jshint evil:true*/
 
+require('mock-modules').autoMockOff();
+
 describe('es6-classes', function() {
   var transformFn;
   var visitors;

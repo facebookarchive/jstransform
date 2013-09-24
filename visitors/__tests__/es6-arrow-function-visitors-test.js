@@ -20,6 +20,8 @@
 
 /*jshint evil:true*/
 
+require('mock-modules').autoMockOff();
+
 describe('es6ArrowFunctionsTransform', function() {
   var transformFn;
   var visitors;
