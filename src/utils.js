@@ -236,22 +236,42 @@ function catchup(end, state, contentTransformer) {
 }
 
 /**
- * Applies `catchup` but passing in a function that removes any non-whitespace
- * characters.
+ * Removes all non-whitespace characters
  */
-var re = /(\S)/g;
+var reNonWhite = /(\S)/g;
 function stripNonWhite(value) {
-  return value.replace(re, function() {
+  return value.replace(reNonWhite, function() {
     return '';
   });
 }
 
 /**
- * Catches up as `catchup` but turns each non-white character into a space.
+ * Catches up as `catchup` but removes all non-whitespace characters.
  */
 function catchupWhiteSpace(end, state) {
   catchup(end, state, stripNonWhite);
 }
+
+/**
+ * Removes all non-newline characters
+ */
+var reNonNewline = /[^\n]/g;
+function stripNonNewline(value) {
+  return value.replace(reNonNewline, function() {
+    return '';
+  });
+}
+
+/**
+ * Catches up as `catchup` but removes all non-newline characters.
+ *
+ * Equivalent to appending as many newlines as there are in the original source
+ * between the current position and `end`.
+ */
+function catchupNewlines(end, state) {
+  catchup(end, state, stripNonNewline);
+}
+
 
 /**
  * Same as catchup but does not touch the buffer
@@ -445,6 +465,7 @@ function containsChildOfType(node, type) {
 exports.append = append;
 exports.catchup = catchup;
 exports.catchupWhiteSpace = catchupWhiteSpace;
+exports.catchupNewlines = catchupNewlines;
 exports.containsChildOfType = containsChildOfType;
 exports.createState = createState;
 exports.declareIdentInLocalScope = declareIdentInLocalScope;
