@@ -364,9 +364,10 @@ function visitPrivateIdentifier(traverse, node, path, state) {
 }
 visitPrivateIdentifier.test = function(node, path, state) {
   if (node.type === Syntax.Identifier && _shouldMungeIdentifier(node, state)) {
-    // Always munge properties of MemberExpressions
+    // Always munge non-computed properties of MemberExpressions
     // (a la preventing access of properties of unowned objects)
-    if (path[0].type === Syntax.MemberExpression && path[0].object !== node) {
+    if (path[0].type === Syntax.MemberExpression && path[0].object !== node
+        && path[0].computed === false) {
       return true;
     }
 

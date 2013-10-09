@@ -782,6 +782,24 @@ describe('es6-classes', function() {
         expect(fooInst.getOuterBar()).toBe('outer');
       });
 
+      it('does not munge outer-declared private vars when used to calculate ' +
+         'a computed member expression', function() {
+        var code = transform([
+          'var _privateObjKey = "pvt";',
+          'var outerDataStore = {pvt: 42};',
+          'class Foo {',
+          '  getStuff() {',
+          '    return outerDataStore[_privateObjKey];',
+          '  }',
+          '}'
+        ].join('\n'));
+
+        eval(code);
+
+        var fooInst = new Foo();
+        expect(fooInst.getStuff()).toBe(42);
+      });
+
       it('properly handles private vars declared in inner scope', function() {
         var code = transform([
           'var _bar = {_private: 42};',
