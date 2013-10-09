@@ -38,6 +38,7 @@
  * }.bind(this));
  *
  */
+var restParamVisitors = require('./es6-rest-param-visitors');
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
@@ -56,7 +57,9 @@ function visitArrowFunction(traverse, node, path, state) {
     ? renderStatementBody
     : renderExpressionBody;
 
+  path.unshift(node);
   renderBody(traverse, node, path, state);
+  path.shift();
 
   // Bind the function only if `this` value is used
   // inside it or inside any sub-expression.
@@ -87,7 +90,14 @@ function isParensFreeSingleParam(node, state) {
 function renderExpressionBody(traverse, node, path, state) {
   // Wrap simple expression bodies into a block
   // with explicit return statement.
-  utils.append('{return ', state);
+  utils.append('{', state);
+  if (node.rest) {
+    utils.append(
+      restParamVisitors.renderRestParamSetup(node),
+      state
+    );
+  }
+  utils.append('return ', state);
   renderStatementBody(traverse, node, path, state);
   utils.append(';}', state);
 }
