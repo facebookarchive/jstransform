@@ -1,6 +1,6 @@
 {
   "name": "jstransform",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple AST visitor-based JS transformer",
   "contributors": [
     {"name": "Jeff Morrison", "email": "jeffmo@fb.com"}
