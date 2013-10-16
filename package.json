@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "base62": "0.1.1",
-    "esprima-fb": "1001.1001.1000-dev-harmony-fb",
+    "esprima-fb": "1001.1001.2000-dev-harmony-fb",
     "source-map": "0.1.8"
   },
   "licenses": [
