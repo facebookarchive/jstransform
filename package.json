@@ -1,6 +1,6 @@
 {
   "name": "jstransform",
-  "version": "1.0.1",
+  "version": "2.0.1",
   "description": "A simple AST visitor-based JS transformer",
   "contributors": [
     {"name": "Jeff Morrison", "email": "jeffmo@fb.com"}
@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "base62": "0.1.1",
-    "esprima-fb": "1001.1001.2000-dev-harmony-fb",
+    "esprima-fb": "2001.1001.0000-dev-harmony-fb",
     "source-map": "0.1.8"
   },
   "licenses": [
