@@ -26,11 +26,7 @@
  * AST tree, and returns the resulting output.
  */
 var esprima = require('esprima-fb');
-
-var createState = require('./utils').createState;
-var catchup = require('./utils').catchup;
-var updateState = require('./utils').updateState;
-var analyzeAndTraverse = require('./utils').analyzeAndTraverse;
+var utils = require('./utils');
 
 var Syntax = esprima.Syntax;
 
@@ -80,11 +76,11 @@ function traverse(node, path, state) {
            && node.body[0].expression.value === 'use strict';
 
       if (node.type === Syntax.Program) {
-        state = updateState(state, {
+        state = utils.updateState(state, {
           scopeIsStrict: scopeIsStrict
         });
       } else {
-        state = updateState(state, {
+        state = utils.updateState(state, {
           localScope: {
             parentNode: parentNode,
             parentScope: state.localScope,
@@ -121,7 +117,7 @@ function traverse(node, path, state) {
     }
 
     if (_nodeIsBlockScopeBoundary(node, parentNode)) {
-      state = updateState(state, {
+      state = utils.updateState(state, {
         localScope: {
           parentNode: parentNode,
           parentScope: state.localScope,
@@ -138,16 +134,16 @@ function traverse(node, path, state) {
 
   // Only catchup() before and after traversing a child node
   function traverser(node, path, state) {
-    node.range && catchup(node.range[0], state);
+    node.range && utils.catchup(node.range[0], state);
     traverse(node, path, state);
-    node.range && catchup(node.range[1], state);
+    node.range && utils.catchup(node.range[1], state);
   }
 
-  analyzeAndTraverse(walker, traverser, node, path, state);
+  utils.analyzeAndTraverse(walker, traverser, node, path, state);
 }
 
 function collectClosureIdentsAndTraverse(node, path, state) {
-  analyzeAndTraverse(
+  utils.analyzeAndTraverse(
     visitLocalClosureIdentifiers,
     collectClosureIdentsAndTraverse,
     node,
@@ -157,7 +153,7 @@ function collectClosureIdentsAndTraverse(node, path, state) {
 }
 
 function collectBlockIdentsAndTraverse(node, path, state) {
-  analyzeAndTraverse(
+  utils.analyzeAndTraverse(
     visitLocalBlockIdentifiers,
     collectBlockIdentsAndTraverse,
     node,
@@ -225,7 +221,7 @@ function transform(visitors, source, options) {
     e.message = 'Parse Error: ' + e.message;
     throw e;
   }
-  var state = createState(source, ast, options);
+  var state = utils.createState(source, ast, options);
   state.g.visitors = visitors;
 
   if (options.sourceMap) {
@@ -234,7 +230,7 @@ function transform(visitors, source, options) {
   }
 
   traverse(ast, [], state);
-  catchup(source.length, state);
+  utils.catchup(source.length, state);
 
   var ret = {code: state.g.buffer};
   if (options.sourceMap) {
