@@ -30,7 +30,7 @@ function extract(contents) {
 
 
 var commentStartRe = /^\/\*\*?/;
-var commentEndRe = /\*\/$/;
+var commentEndRe = /\*+\/$/;
 var wsRe = /[\t ]+/g;
 var stringStartRe = /(\r?\n|^) *\*/g;
 var multilineRe = /(?:^|\r?\n) *(@[^\r\n]*?) *\r?\n *([^@\r\n\s][^@\r\n]+?) *\r?\n/g;
