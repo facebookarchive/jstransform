@@ -17,17 +17,26 @@
 /*jslint node:true*/
 
 /**
- * Desugars ES6 rest parameters into ES3 arguments slicing.
+ * Desugars ES6 spread operator into ES5 (and ES3 with ES5-shim) equivalent expression
  *
- * function printf(template, ...args) {
- *   args.forEach(...);
- * };
+ * [1, 2, 3, ...[4, 5]] 
+ * is transformed into an expression equivalent to :
+ * [1, 2, 3, 4, 5]
+ * 
+ * myFunction(...[1, 2]) 
+ * is transformed in an expression equivalent to :
+ * myFunction(1, 2)
  *
- * function printf(template) {
- *   var args = [].slice.call(arguments, 1);
- *   args.forEach(...);
- * };
+ * myObject.myMethod(…[1, 2]) 
+ * is transformed in an expression equivalent to :
+ * myObject.myMethod(1, 2)
+ * 
+ * new MyClass(...[1, 2]) 
+ * is transformed in an expression equivalent to :
+ * new MyClass(1, 2) 
+ * 
  *
+ * works only with arrays (no 'iterable object')
  */
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
