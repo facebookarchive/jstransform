@@ -34,10 +34,16 @@ var utils = require('../src/utils');
 
 var spreadTemplate = '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })(';
 
-function visitArrayWithSpreadElement(traverse, node, path, state){
-  utils.append('Array.prototype.concat.apply([],', state);
-  utils.catchup(node.range[0], state);
-  node.elements.forEach(function (node) {
+function hasSpread(elements) {
+  return elements &&
+    elements.some(function (node) {
+      return node.type === Syntax.SpreadElement;
+    });
+}
+
+
+function insertElementsWithSpread(elements, state) {
+  elements.forEach(function (node) {
     utils.catchup(node.range[0], state);
     if (node.type === Syntax.SpreadElement) {
       utils.append(spreadTemplate, state);
@@ -48,18 +54,54 @@ function visitArrayWithSpreadElement(traverse, node, path, state){
       utils.catchup(node.range[1], state);
     }
   });
+}
+
+function visitArrayWithSpreadElement(traverse, node, path, state) {
+  utils.append('Array.prototype.concat.apply([],', state);
+  utils.catchup(node.range[0], state);
+  insertElementsWithSpread(node.elements, state);
   utils.catchup(node.range[1], state);
   utils.append(')', state);
 }
 
-visitArrayWithSpreadElement.test = function (node, path, state) {
-  return node.type === Syntax.ArrayExpression &&
-    node.elements &&
-    node.elements.some(function (node) {
-      return node.type === Syntax.SpreadElement;
-    });
+visitArrayWithSpreadElement.test = function (node) {
+  return node.type === Syntax.ArrayExpression && hasSpread(node.elements);
+};
+
+
+function visitFunctionCallWithSpreadElement(traverse, node, path, state) {
+  //console.log(JSON.stringify(node, null, 4));
+  if (node.callee.type === Syntax.MemberExpression) {
+    var thisIdent = '_this' + (Math.random() * 1e9 >>> 0);
+    utils.append('(function() { var ' + thisIdent + ' = ', state);
+    utils.catchup(node.callee.object.range[1], state);
+    utils.append('; return '+ thisIdent , state);
+    utils.catchup(node.callee.range[1], state);
+    utils.append('.apply('+ thisIdent + ', Array.prototype.concat.apply([],', state);
+  } else {
+    utils.catchup(node.callee.range[1], state);
+    utils.append('.apply(undefined, Array.prototype.concat.apply([],', state);
+  }
+  utils.catchup(node.arguments[0].range[0], state, function (content) {
+    //todo too much simplist here we will replace all '(' in comments also
+    return content.replace(/\(/g, '[');
+  });
+  insertElementsWithSpread(node.arguments, state);
+  utils.catchup(node.range[1], state, function (content) {
+    //todo too much simplist here we will replace all ')' in comments also
+    return content.replace(/\)/g, ']');
+  });
+  utils.append('))', state);
+  if (node.callee.type === Syntax.MemberExpression) {
+    utils.append('})()',state);
+  }
+}
+
+visitFunctionCallWithSpreadElement.test = function (node) {
+  return node.type === Syntax.CallExpression && hasSpread(node.arguments);
 };
 
 exports.visitorList = [
-  visitArrayWithSpreadElement
+  visitArrayWithSpreadElement,
+  visitFunctionCallWithSpreadElement
 ];
