@@ -160,6 +160,41 @@ describe('es6-spread-operator-visitors', function() {
    
     
   });
+  
+  
+  describe('within new  expression', function () {
+    
+    function MyClass(a, b) {
+      this.a = a;
+      this.b = b;
+    }
+    
+    
+    it('should pass spread array as arguments of the construtor, and produce an object instance of called function', function () {
+      var result = eval(transform('new MyClass(...[1, 2])'));
+      expect(result).toEqual({
+        a: 1,
+        b: 2
+      });
+      expect(result instanceof MyClass).toBe(true);
+    });
+    
+    
+    it('should ouput the following code source', function () {
+      var transformedCode = transform('new MyClass(...[1, 2])');
+      transformedCode = transformedCode.replace(/_result\d*/g, '_result');
+      transformedCode = transformedCode.replace(/_class\d*/g, '_class');
+      expect(transformedCode).toBe([
+        '(function() { var _class = MyClass, _result = Object.create(_class.prototype);',
+        '_class.apply(_result, Array.prototype.concat.apply([],[',
+        '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([1, 2])]));',
+        'return _result;',
+        '})()'
+      ].join(''));
+    });
+   
+    
+  });
 });
 
 

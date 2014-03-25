@@ -42,6 +42,10 @@ function hasSpread(elements) {
 }
 
 
+function randomInt() {
+  return  Math.random() * 1e9 >>> 0;
+}
+
 function insertElementsWithSpread(elements, state) {
   elements.forEach(function (node) {
     utils.catchup(node.range[0], state);
@@ -70,9 +74,8 @@ visitArrayWithSpreadElement.test = function (node) {
 
 
 function visitFunctionCallWithSpreadElement(traverse, node, path, state) {
-  //console.log(JSON.stringify(node, null, 4));
   if (node.callee.type === Syntax.MemberExpression) {
-    var thisIdent = '_this' + (Math.random() * 1e9 >>> 0);
+    var thisIdent = '_this' + randomInt();
     utils.append('(function() { var ' + thisIdent + ' = ', state);
     utils.catchup(node.callee.object.range[1], state);
     utils.append('; return '+ thisIdent , state);
@@ -101,7 +104,34 @@ visitFunctionCallWithSpreadElement.test = function (node) {
   return node.type === Syntax.CallExpression && hasSpread(node.arguments);
 };
 
+
+function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
+  var classIdent = '_class' + randomInt(),
+      resultIdent = '_result' + randomInt();
+   
+  utils.move(node.range[0] + 4 , state); //remove 'new '
+  utils.append('(function() { var ' + classIdent + ' = ', state);
+  utils.catchup(node.callee.range[1], state);
+  utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype);', state);
+  utils.append( classIdent + '.apply('+ resultIdent + ', Array.prototype.concat.apply([],', state);
+  utils.catchup(node.arguments[0].range[0], state, function (content) {
+    //todo too much simplist here we will replace all '(' in comments also
+    return content.replace(/\(/g, '[');
+  });
+  insertElementsWithSpread(node.arguments, state);
+  utils.catchup(node.range[1], state, function (content) {
+    //todo too much simplist here we will replace all ')' in comments also
+    return content.replace(/\)/g, ']');
+  });
+  utils.append('));return ' + resultIdent + ';})()', state);
+}
+
+visitNewExpressionWithSpreadElement.test = function (node) {
+  return node.type === Syntax.NewExpression && hasSpread(node.arguments);
+};
+
 exports.visitorList = [
   visitArrayWithSpreadElement,
-  visitFunctionCallWithSpreadElement
+  visitFunctionCallWithSpreadElement,
+  visitNewExpressionWithSpreadElement
 ];
