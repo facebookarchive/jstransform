@@ -22,10 +22,13 @@
 /* global describe, beforeEach, expect, it*/
 
 
-describe('es6-property-method-assignment', function() {
+//those test cases have been inspired by google traceur ones :
+// https://github.com/google/traceur-compiler/blob/master/test/feature/PropertyMethodAssignment/PropertyMethodAssignment.js
+
+describe('es6-property-method-assignment-visitors', function() {
   var code;
   beforeEach(function() {
-    var visitors = require('../es6-property-method-assignment').visitorList;
+    var visitors = require('../es6-property-method-assignment-visitors').visitorList;
     var transformFn = require('../../src/jstransform').transform;
     code = transformFn(visitors, [
       '(function () {',
@@ -46,7 +49,7 @@ describe('es6-property-method-assignment', function() {
       '   false() {},',
       '   function() {},',
       '   var() {},',
-      '   \'class\'() {}',  // NodeJS incorrectly flags {class: ...} as an error.
+      '   \'class\'() {}',
       ' };',
       '})();'
     ].join('\n')).code;
@@ -54,22 +57,22 @@ describe('es6-property-method-assignment', function() {
 
   
   function expectMethod(object, name) {
-    expect(object.hasOwnProperty(name)).toBe(true);
     var descriptor = Object.getOwnPropertyDescriptor(object, name);
-    expect(typeof descriptor).toBe('object');
-    expect(descriptor.enumerable).toBe(true);
-    expect(typeof object[name]).toBe('function');
-    // IE does not have a name property on functions.
-    expect(object[name].name === '' || object[name].name === undefined).toBe(true);
+    descriptor.value = typeof descriptor.value;
+    expect(descriptor).toEqual({
+      value: 'function',
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
   }
   
-  // Functional tests.
-
   it('should transform property method assignment', function () {
    
-    var object = eval(code);
+    var object = eval(code),
+        keys = Object.keys(object);
     
-    expect(Object.keys(object)).toEqual([
+    expect(keys).toEqual([
       '42',
       'x',
       'f',
@@ -82,6 +85,7 @@ describe('es6-property-method-assignment', function() {
       'var',
       'class'
     ]);
+    
    
     expectMethod(object, 'f');
     expectMethod(object, 'g');
@@ -102,7 +106,7 @@ describe('es6-property-method-assignment', function() {
   });
   
   
-  it('should transform property method assignment', function () {
+  it('should output the following code source', function () {
    
     expect(code).toEqual([
       '(function () {',
@@ -123,7 +127,7 @@ describe('es6-property-method-assignment', function() {
       '   false: function() {},',
       '   function: function() {},',
       '   var: function() {},',
-      '   \'class\': function() {}',  // NodeJS incorrectly flags {class: ...} as an error.
+      '   \'class\': function() {}',
       ' };',
       '})();'
     ].join('\n'));

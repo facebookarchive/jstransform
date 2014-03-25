@@ -16,15 +16,14 @@
 
 
 /**
- * Desugars ES6 Object Literal short notations into ES3 full notation.
+ * Desugars ES6 Property method assignment into ES3 full notation.
  *
- * // Easier return values.
- * function foo(x, y) {
- *   return {x, y}; // {x: x, y: y}
- * };
- *
- * // Destrucruting.
- * function init({port, ip, coords: {x, y}}) { ... }
+ * // Simplify way to declare methods
+ * var myObject = {
+ *   greet() {
+ *     alert('Hello world');
+ *   }
+ * }
  *
  */
 var Syntax = require('esprima-fb').Syntax;
