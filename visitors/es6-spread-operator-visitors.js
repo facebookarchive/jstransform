@@ -94,12 +94,12 @@ function visitFunctionCallWithSpreadElement(traverse, node, path, state) {
     utils.append('.apply(undefined, Array.prototype.concat.apply([],', state);
   }
   utils.catchup(node.arguments[0].range[0], state, function (content) {
-    //todo too much simplist here we will replace all '(' in comments also
+    // TODO: too much simplist here we will replace all '(' in comments also
     return content.replace(/\(/g, '[');
   });
   insertElementsWithSpread(node.arguments, state);
   utils.catchup(node.range[1], state, function (content) {
-    //todo too much simplist here we will replace all ')' in comments also
+    // TODO: too much simplist here we will replace all ')' in comments also
     return content.replace(/\)/g, ']');
   });
   utils.append('))', state);
@@ -124,12 +124,12 @@ function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
   utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype);', state);
   utils.append( classIdent + '.apply('+ resultIdent + ', Array.prototype.concat.apply([],', state);
   utils.catchup(node.arguments[0].range[0], state, function (content) {
-    //todo too much simplist here we will replace all '(' in comments also
+    // TODO: too much simplist here we will replace all '(' in comments also
     return content.replace(/\(/g, '[');
   });
   insertElementsWithSpread(node.arguments, state);
   utils.catchup(node.range[1], state, function (content) {
-    //todo too much simplist here we will replace all ')' in comments also
+    // TODO: too much simplist here we will replace all ')' in comments also
     return content.replace(/\)/g, ']');
   });
   utils.append('));return ' + resultIdent + ';})()', state);
