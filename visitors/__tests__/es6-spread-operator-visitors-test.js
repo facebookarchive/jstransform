@@ -192,6 +192,19 @@ describe('es6-spread-operator-visitors', function() {
         '})()'
       ].join(''));
     });
+    
+    it('should keep new lines and comments', function () {
+      var transformedCode = transform('/*hello world*/ new  /*hello*/\nMyClass(\n /*comments*/ ...[1//comment\n, 2])');
+      transformedCode = transformedCode.replace(/_result\d*/g, '_result');
+      transformedCode = transformedCode.replace(/_class\d*/g, '_class');
+      expect(transformedCode).toBe([
+        '/*hello world*/  /*hello*/\n(function() { var _class = MyClass, _result = Object.create(_class.prototype);',
+        '_class.apply(_result, Array.prototype.concat.apply([],[\n /*comments*/ ',
+        '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([1//comment\n, 2])]));',
+        'return _result;',
+        '})()'
+      ].join(''));
+    });
    
     
   });

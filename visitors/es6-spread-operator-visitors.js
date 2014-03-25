@@ -41,7 +41,6 @@ function hasSpread(elements) {
     });
 }
 
-
 function randomInt() {
   return  Math.random() * 1e9 >>> 0;
 }
@@ -60,7 +59,7 @@ function insertElementsWithSpread(elements, state) {
   });
 }
 
-function visitArrayWithSpreadElement(traverse, node, path, state) {
+function visitArrayExpressionWithSpreadElement(traverse, node, path, state) {
   utils.append('Array.prototype.concat.apply([],', state);
   utils.catchup(node.range[0], state);
   insertElementsWithSpread(node.elements, state);
@@ -68,7 +67,7 @@ function visitArrayWithSpreadElement(traverse, node, path, state) {
   utils.append(')', state);
 }
 
-visitArrayWithSpreadElement.test = function (node) {
+visitArrayExpressionWithSpreadElement.test = function (node) {
   return node.type === Syntax.ArrayExpression && hasSpread(node.elements);
 };
 
@@ -110,6 +109,7 @@ function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
       resultIdent = '_result' + randomInt();
    
   utils.move(node.range[0] + 4 , state); //remove 'new '
+  utils.catchup(node.callee.range[0], state);
   utils.append('(function() { var ' + classIdent + ' = ', state);
   utils.catchup(node.callee.range[1], state);
   utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype);', state);
@@ -131,7 +131,7 @@ visitNewExpressionWithSpreadElement.test = function (node) {
 };
 
 exports.visitorList = [
-  visitArrayWithSpreadElement,
+  visitArrayExpressionWithSpreadElement,
   visitFunctionCallWithSpreadElement,
   visitNewExpressionWithSpreadElement
 ];
