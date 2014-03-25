@@ -70,7 +70,7 @@ describe('es6-spread-operator-visitors', function() {
         '[1, 2, ...[3, 4]]',
         [
           'Array.prototype.concat.apply([],[1, 2, ',
-          '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([3, 4])])'
+          '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])])'
         ].join(''));
     });
     
@@ -83,7 +83,7 @@ describe('es6-spread-operator-visitors', function() {
         ].join('\n'),
         [
           'Array.prototype.concat.apply([],[1, 2,',
-          '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([3,',
+          '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3,',
           ' 4])])'
         ].join('\n'));
     });
@@ -107,7 +107,7 @@ describe('es6-spread-operator-visitors', function() {
         [
           'returnArgs.apply(undefined, ',
           'Array.prototype.concat.apply([],[1, 2,',
-          '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([3, 4])]))'
+          '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])]))'
         ].join(''));
     });
     
@@ -123,7 +123,7 @@ describe('es6-spread-operator-visitors', function() {
         [
           'returnArgs.apply(undefined, Array.prototype.concat.apply([],  /*comments*/[',
           ' 1, 2,',
-          ' (function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([3, 4])',
+          ' (function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])',
           ']))'
         ].join('\n'));
     });
@@ -154,7 +154,7 @@ describe('es6-spread-operator-visitors', function() {
       expect(transformedCode).toBe([
         '(function() { var _this = object; return _this.returnArgsAndThis',
         '.apply(_this, Array.prototype.concat.apply([],[1, 2, ',
-        '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([3, 4])]))})()'
+        '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])]))})()'
       ].join(''));
     });
    
@@ -187,7 +187,7 @@ describe('es6-spread-operator-visitors', function() {
       expect(transformedCode).toBe([
         '(function() { var _class = MyClass, _result = Object.create(_class.prototype);',
         '_class.apply(_result, Array.prototype.concat.apply([],[',
-        '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([1, 2])]));',
+        '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([1, 2])]));',
         'return _result;',
         '})()'
       ].join(''));
@@ -200,7 +200,7 @@ describe('es6-spread-operator-visitors', function() {
       expect(transformedCode).toBe([
         '/*hello world*/  /*hello*/\n(function() { var _class = MyClass, _result = Object.create(_class.prototype);',
         '_class.apply(_result, Array.prototype.concat.apply([],[\n /*comments*/ ',
-        '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })([1//comment\n, 2])]));',
+        '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([1//comment\n, 2])]));',
         'return _result;',
         '})()'
       ].join(''));

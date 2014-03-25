@@ -32,7 +32,7 @@
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
-var spreadTemplate = '(function(v) { return Array.isArray(v)? v : !function () { throw new TypeError(v + \' is not an array\'); }() })(';
+var spreadTemplate = '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })(';
 
 function hasSpread(elements) {
   return elements &&
