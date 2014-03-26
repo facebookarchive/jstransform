@@ -33,5 +33,7 @@ module.exports = {
   callExpressionEnd: '))',
   
   closureStart: '(function() { ',
-  closureEnd: '})()'
+  closureEnd: '})()',
+  
+  newExpressionFuncResultCheck: '; if (typeof funcResult !== \'undefined\') { return funcResult }'
 };

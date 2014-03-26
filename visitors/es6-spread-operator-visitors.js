@@ -128,7 +128,9 @@ function visitFunctionCallWithSpreadElement(traverse, node, path, state) {
   utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
   insertElementsWithSpread(node.arguments, state);
   utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
+  
   utils.append(spreadTemplates.callExpressionEnd, state);
+  
   if (node.callee.type === Syntax.MemberExpression) {
     utils.append(spreadTemplates.closureEnd, state);
   }
@@ -148,18 +150,15 @@ function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
   utils.append(spreadTemplates.closureStart, state);
   utils.append('var ' + classIdent + ' = ', state);
   utils.catchup(node.callee.range[1], state);
-  utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype);', state);
-  utils.append(classIdent + spreadTemplates.callExpressionBegin(resultIdent), state);
+  utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype), ', state);
+  utils.append('funcResult = ' + classIdent + spreadTemplates.callExpressionBegin(resultIdent), state);
   utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
   insertElementsWithSpread(node.arguments, state);
   utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
-  utils.append([
-    spreadTemplates.callExpressionEnd,
-    ';return ',
-    resultIdent,
-    ';',
-    spreadTemplates.closureEnd
-  ].join(''), state);
+  utils.append(spreadTemplates.callExpressionEnd, state);
+  utils.append(spreadTemplates.newExpressionFuncResultCheck, state);
+  utils.append('; return ' + resultIdent + ';', state);
+  utils.append(spreadTemplates.closureEnd, state);
 }
 
 visitNewExpressionWithSpreadElement.test = function (node) {

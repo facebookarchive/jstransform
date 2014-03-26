@@ -199,6 +199,9 @@ describe('es6-spread-operator-visitors', function() {
       this.b = b;
     }
     
+    function FakeClass(a) {
+      return a;
+    }
     
     it('should pass spread array as arguments of the construtor, and produce an object instance of called function', function () {
       var result = eval(transform('new MyClass(...[1, 2])'));
@@ -209,6 +212,11 @@ describe('es6-spread-operator-visitors', function() {
       expect(result instanceof MyClass).toBe(true);
     });
     
+    it('should return the function return value if the function has one', function () {
+      expect(eval(transform('new FakeClass(...[1, 2])'))).toBe(1);
+      expect(eval(transform('new FakeClass(...[null])'))).toBe(null);
+    });
+    
     
     it('should ouput the following code source', function () {
       var transformedCode = transform('new MyClass(...[1, 2])');
@@ -216,28 +224,28 @@ describe('es6-spread-operator-visitors', function() {
       transformedCode = transformedCode.replace(/_class\d*/g, '_class');
       expect(transformedCode).toBe([
         spreadTemplates.closureStart,
-          'var _class = MyClass, _result = Object.create(_class.prototype);',
-          '_class', spreadTemplates.callExpressionBegin('_result'),
+          'var _class = MyClass, _result = Object.create(_class.prototype)',
+          ', funcResult = _class', spreadTemplates.callExpressionBegin('_result'),
           '[',
             spreadTemplates.spreadLiteralBegin, '[1, 2]', spreadTemplates.spreadLiteralEnd,
           ']',
-          spreadTemplates.callExpressionEnd, ';',
-        'return _result;',
+          spreadTemplates.callExpressionEnd,
+        spreadTemplates.newExpressionFuncResultCheck,
+        '; return _result;',
         spreadTemplates.closureEnd
       ].join(''));
     });
     
     it('should keep new lines and comments', function () {
-      var transformedCode = transform('/*hello world*/ new  /*hello*/\nMyClass(\n /*comments*/ ...[1//comment\n, 2])');
+      var transformedCode = transform('/*hello world (*/ new  /*hello*/\nMyClass(\n /*comments*/ ...[1//comment\n, 2])');
       transformedCode = transformedCode.replace(/_result\d*/g, '_result');
       transformedCode = transformedCode.replace(/_class\d*/g, '_class');
       expect(transformedCode).toBe([
-        '/*hello world*/  /*hello*/\n(function() { var _class = MyClass, _result = Object.create(_class.prototype);',
-        '_class.apply(_result, Array.prototype.concat.apply([],[\n /*comments*/ ',
-        '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([1//comment\n, 2])]));',
-        'return _result;',
-        '})()'
-      ].join(''));
+        '/*hello world (*/  /*hello*/',
+        '(function() { var _class = MyClass, _result = Object.create(_class.prototype), funcResult = _class.apply(_result, Array.prototype.concat.apply([],[',
+        ' /*comments*/ (function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([1//comment',
+        ', 2])])); if (typeof funcResult !== \'undefined\') { return funcResult }; return _result;})()'
+      ].join('\n'));
     });
    
     
