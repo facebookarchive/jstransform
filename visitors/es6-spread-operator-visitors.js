@@ -53,6 +53,39 @@ function generateIdent(base) {
   return base + (Math.random() * 1e9 >>> 0);
 }
 
+function replaceInNonComments(search, replace) {
+  return function (source) {
+    var result = '', inBlockComment = false, inLineComment = false;
+    while (source) {
+      var char = source.charAt(0);
+      source = source.substr(1);
+      if (inBlockComment) {
+        if (char === '*' && source.charAt(0) === '/') {
+            inBlockComment = false;
+        }
+      } else if (inLineComment) {
+        if (char === '\n') {
+            inLineComment = false;
+        }
+      } else if (char === '/') {
+        var next = source.charAt(0);
+        if (next === '*') {
+            inBlockComment = true;
+        } else if (next === '/') {
+            inLineComment = true;
+        }
+      }
+      
+      if(char === search && !inBlockComment && !inLineComment) {
+          result += replace;
+      } else {
+          result += char;
+      }
+    }
+    return result;
+  };
+}
+
 function insertElementsWithSpread(elements, state) {
   elements.forEach(function (node) {
     utils.catchup(node.range[0], state);
@@ -92,15 +125,9 @@ function visitFunctionCallWithSpreadElement(traverse, node, path, state) {
   utils.catchup(node.callee.range[1], state);
   utils.append(spreadTemplates.callExpressionBegin(thisIdent), state);
   
-  utils.catchup(node.arguments[0].range[0], state, function (content) {
-    // TODO: too much simplist here we will replace all '(' in comments also
-    return content.replace(/\(/g, '[');
-  });
+  utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
   insertElementsWithSpread(node.arguments, state);
-  utils.catchup(node.range[1], state, function (content) {
-    // TODO: too much simplist here we will replace all ')' in comments also
-    return content.replace(/\)/g, ']');
-  });
+  utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
   utils.append(spreadTemplates.callExpressionEnd, state);
   if (node.callee.type === Syntax.MemberExpression) {
     utils.append(spreadTemplates.closureEnd, state);
@@ -123,15 +150,9 @@ function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
   utils.catchup(node.callee.range[1], state);
   utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype);', state);
   utils.append(classIdent + spreadTemplates.callExpressionBegin(resultIdent), state);
-  utils.catchup(node.arguments[0].range[0], state, function (content) {
-    // TODO: too much simplist here we will replace all '(' in comments also
-    return content.replace(/\(/g, '[');
-  });
+  utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
   insertElementsWithSpread(node.arguments, state);
-  utils.catchup(node.range[1], state, function (content) {
-    // TODO: too much simplist here we will replace all ')' in comments also
-    return content.replace(/\)/g, ']');
-  });
+  utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
   utils.append([
     spreadTemplates.callExpressionEnd,
     ';return ',

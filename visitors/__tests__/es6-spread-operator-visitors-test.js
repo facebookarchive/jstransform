@@ -137,6 +137,20 @@ describe('es6-spread-operator-visitors', function() {
           ']'+ spreadTemplates.callExpressionEnd
         ].join('\n'));
     });
+    
+    it('should keep intact comments with \'(\' && \')\' ', function () {
+      expectTransform(
+        [
+          'returnArgs  /*comments (*/( 1, 2,',
+          '...[3, 4] //comments )',
+          ')'
+        ].join('\n'),
+        [
+          'returnArgs' + spreadTemplates.callExpressionBegin() + '  /*comments (*/[ 1, 2,',
+          spreadTemplates.spreadLiteralBegin + '[3, 4]' + spreadTemplates.spreadLiteralEnd + ' //comments )',
+          ']'+ spreadTemplates.callExpressionEnd
+        ].join('\n'));
+    });
   });
   
   
