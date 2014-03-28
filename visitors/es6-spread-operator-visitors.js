@@ -40,6 +40,10 @@
  */
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
+var fs = require('fs');
+var path = require('path');
+var runtimeCode = fs.readFileSync(path.join(__dirname, 'es6-spread-operator-runtime.js'), 'utf-8');
+var runtime = '____JSTRANSFORM_SPREAD_RUNTIME____';
 
 function hasSpread(elements) {
   return elements &&
@@ -89,7 +93,7 @@ function insertElementsWithSpread(elements, state) {
   elements.forEach(function (node) {
     utils.catchup(node.range[0], state);
     if (node.type === Syntax.SpreadElement) {
-      utils.append('(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })(', state);
+      utils.append(runtime + '.assertSpreadElement(', state);
       utils.move(node.range[0] + 3, state); // remove ...
       utils.catchup(node.range[1], state);
       utils.append(')', state);
@@ -100,13 +104,9 @@ function insertElementsWithSpread(elements, state) {
 }
 
 
-var fs = require('fs'),
-    path = require('path'),
-    runtime = fs.readFileSync(path.join(__dirname, 'es6-spread-operator-runtime.js'), 'utf-8');
-
 function visitProgram(traverse, node, path, state) {
   if (state.g.opts.includeSpreadRuntime) {
-    utils.append(runtime, state);
+    utils.append(runtimeCode, state);
   }
 }
 visitProgram.test = function(node) {

@@ -49,34 +49,34 @@ describe('es6-spread-operator-visitors', function() {
     });
     
     it('should not be included otherwise', function () {
-       expectTransform('', '');
+       expectTransform('', '', {});
     });
   });
   
 
   describe('within array', function () {
     it('should create an array concatanation of each object in array, and each parameters ', function () {
-       expect(eval(transform('[1, 2, ...[3, 4]]'))).toEqual([1, 2, 3, 4]);
+       expect(eval(transform('[1, 2, ...[3, 4]]', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4]);
     });
     
     it('should works with only spread', function () {
-        expect(eval(transform('[...[1, 2]]'))).toEqual([1, 2]);
+        expect(eval(transform('[...[1, 2]]', { includeSpreadRuntime: true }))).toEqual([1, 2]);
     });
     
     it('should throws an error if spread a non object ', function () {
        expect(function () {
-         eval(transform('[1, 2, ...{ a: 5 }'));
+         eval(transform('[1, 2, ...{ a: 5 }', { includeSpreadRuntime: true }));
        }).toThrow();
     });
     
     it('should throws an error if passing a non array', function () {
        expect(function () {
-         eval(transform('[1, 2, ...{ a: 5 }'));
+         eval(transform('[1, 2, ...{ a: 5 }', { includeSpreadRuntime: true }));
        }).toThrow();
     });
     
     it('should accept anything that resolve to an array', function () {
-      expect(eval(transform('[1, 2, ...(function () { return [3, 4] })()]'))).toEqual([1, 2, 3, 4]);
+      expect(eval(transform('[1, 2, ...(function () { return [3, 4] })()]', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4]);
     });
     
     it('should ouput the following code source', function () {
@@ -86,7 +86,7 @@ describe('es6-spread-operator-visitors', function() {
           'Array.prototype.concat.apply([],',
           '[',
             '1, 2, ',
-            '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])',
+            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
           ']',
           ')',
         ].join(''));
@@ -101,7 +101,7 @@ describe('es6-spread-operator-visitors', function() {
         ].join('\n'),
         [
           'Array.prototype.concat.apply([],[1 /*mycomments*/, 2,',
-          '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3,',
+          '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3,',
           ' 4])])'
         ].join('\n'));
     });
@@ -116,7 +116,7 @@ describe('es6-spread-operator-visitors', function() {
     
     
     it('should pass spread array as parameters  ', function () {
-      expect(eval(transform('returnArgs(1, 2, ...[3, 4])'))).toEqual([1, 2, 3, 4]);
+      expect(eval(transform('returnArgs(1, 2, ...[3, 4])', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4]);
     });
    
     it('should ouput the following code source', function () {
@@ -127,7 +127,7 @@ describe('es6-spread-operator-visitors', function() {
           '.apply(undefined, Array.prototype.concat.apply([],',
           '[',
             '1, 2,',
-            '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])',
+            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
           ']',
           '))'
         ].join(''));
@@ -145,7 +145,7 @@ describe('es6-spread-operator-visitors', function() {
         [
           'returnArgs.apply(undefined, Array.prototype.concat.apply([],  /*comments*/[',
           ' 1, 2,',
-          ' (function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])',
+          ' ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
           ']))'
         ].join('\n'));
     });
@@ -159,7 +159,7 @@ describe('es6-spread-operator-visitors', function() {
         ].join('\n'),
         [
           'returnArgs.apply(undefined, Array.prototype.concat.apply([],  /*comments (*/[ 1, 2,',
-          '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4]) //comments )',
+          '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4]) //comments )',
           ']))'
         ].join('\n'));
     });
@@ -176,11 +176,11 @@ describe('es6-spread-operator-visitors', function() {
     
     
     it('should keep the \'this\' context in case of method call ', function () {
-      expect(eval(transform('object.returnArgsAndThis(1, 2, ...[3, 4])'))).toEqual([1, 2, 3, 4, object]);
+      expect(eval(transform('object.returnArgsAndThis(1, 2, ...[3, 4])', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4, object]);
     });
     
     it('should keep the \'this\' context in case of computed method call ', function () {
-      expect(eval(transform('object[\'return\'+\'ArgsAndThis\'](1, 2, ...[3, 4])'))).toEqual([1, 2, 3, 4, object]);
+      expect(eval(transform('object[\'return\'+\'ArgsAndThis\'](1, 2, ...[3, 4])', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4, object]);
     });
     
     
@@ -192,7 +192,7 @@ describe('es6-spread-operator-visitors', function() {
           'var _this = object; ',
           'return _this.returnArgsAndThis.apply(_this, Array.prototype.concat.apply([],[',
             '1, 2,',
-            '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([3, 4])',
+            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
           ']))',
         '})()'
       ].join(''));
@@ -214,7 +214,7 @@ describe('es6-spread-operator-visitors', function() {
     }
     
     it('should pass spread array as arguments of the construtor, and produce an object instance of called function', function () {
-      var result = eval(transform('new MyClass(...[1, 2])'));
+      var result = eval(transform('new MyClass(...[1, 2])', { includeSpreadRuntime: true }));
       expect(result).toEqual({
         a: 1,
         b: 2
@@ -223,8 +223,8 @@ describe('es6-spread-operator-visitors', function() {
     });
     
     it('should return the function return value if the function has one', function () {
-      expect(eval(transform('new FakeClass(...[1, 2])'))).toBe(1);
-      expect(eval(transform('new FakeClass(...[null])'))).toBe(null);
+      expect(eval(transform('new FakeClass(...[1, 2])', { includeSpreadRuntime: true }))).toBe(1);
+      expect(eval(transform('new FakeClass(...[null])', { includeSpreadRuntime: true }))).toBe(null);
     });
     
     
@@ -237,7 +237,7 @@ describe('es6-spread-operator-visitors', function() {
           'var _class = MyClass, _result = Object.create(_class.prototype)',
           ', funcResult = _class.apply(_result, Array.prototype.concat.apply([],',
           '[',
-            '(function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([1, 2])',
+            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1, 2])',
           ']',
           '))',
         '; if (typeof funcResult !== \'undefined\') { return funcResult }',
@@ -253,7 +253,7 @@ describe('es6-spread-operator-visitors', function() {
       expect(transformedCode).toBe([
         '/*hello world (*/  /*hello*/',
         '(function() { var _class = MyClass, _result = Object.create(_class.prototype), funcResult = _class.apply(_result, Array.prototype.concat.apply([],[',
-        ' /*comments*/ (function(array) { if (Array.isArray(array)) { return array }; throw new TypeError(array + \' is not an array\'); })([1//comment',
+        ' /*comments*/ ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1//comment',
         ', 2])])); if (typeof funcResult !== \'undefined\') { return funcResult }; return _result;})()'
       ].join('\n'));
     });
