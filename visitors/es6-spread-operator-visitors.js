@@ -99,6 +99,20 @@ function insertElementsWithSpread(elements, state) {
   });
 }
 
+
+var fs = require('fs'),
+    path = require('path'),
+    runtime = fs.readFileSync(path.join(__dirname, 'es6-spread-operator-runtime.js'), 'utf-8');
+
+function visitProgram(traverse, node, path, state) {
+  if (state.g.opts.includeSpreadRuntime) {
+    utils.append(runtime, state);
+  }
+}
+visitProgram.test = function(node) {
+  return node.type === Syntax.Program;
+};
+
 function visitArrayExpressionWithSpreadElement(traverse, node, path, state) {
   utils.append('Array.prototype.concat.apply([],', state);
   insertElementsWithSpread(node.elements, state);
@@ -165,6 +179,7 @@ visitNewExpressionWithSpreadElement.test = function (node) {
 };
 
 exports.visitorList = [
+  visitProgram,
   visitArrayExpressionWithSpreadElement,
   visitFunctionCallWithSpreadElement,
   visitNewExpressionWithSpreadElement

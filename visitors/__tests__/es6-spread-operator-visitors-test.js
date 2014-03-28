@@ -24,6 +24,9 @@
 
 
 describe('es6-spread-operator-visitors', function() {
+  var fs = require('fs'), path = require('path'),
+      runtime = fs.readFileSync(path.join(__dirname, '..', 'es6-spread-operator-runtime.js'), 'utf-8');
+  
   var visitors,
       transformFn;
   
@@ -32,13 +35,23 @@ describe('es6-spread-operator-visitors', function() {
     transformFn = require('../../src/jstransform').transform;
   });
   
-  function transform(code) {
-    return transformFn(visitors, code).code;
+  function transform(code, options) {
+    return transformFn(visitors, code, options).code;
   }
 
-  function expectTransform(code, result) {
-    expect(transform(code)).toEqual(result);
+  function expectTransform(code, result, options) {
+    expect(transform(code, options)).toEqual(result);
   }
+  
+  describe('runtime', function () {
+    it('should be included if the options \'includeSpreadRuntime \' is set to true ', function () {
+       expectTransform('', runtime, { includeSpreadRuntime: true });
+    });
+    
+    it('should not be included otherwise', function () {
+       expectTransform('', '');
+    });
+  });
   
 
   describe('within array', function () {
