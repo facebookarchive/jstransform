@@ -52,13 +52,13 @@ describe('es6-spread-operator-visitors', function() {
     
     it('should throws an error if spread a non object ', function () {
        expect(function () {
-         eval(transform('[1, 2, ...{ a: 5 }'));
+         eval(transform('[1, 2, ...undefined]'));
        }).toThrow();
     });
     
     it('should throws an error if passing a non array', function () {
        expect(function () {
-         eval(transform('[1, 2, ...{ a: 5 }'));
+         eval(transform('[1, 2, ...{ a: 5 }]'));
        }).toThrow();
     });
     
