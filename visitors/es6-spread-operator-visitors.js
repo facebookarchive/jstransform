@@ -155,23 +155,15 @@ visitFunctionCallWithSpreadElement.test = function (node) {
 
 
 function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
-  var classIdent = generateIdent('_class'),
-      resultIdent = generateIdent('_result');
-   
   utils.move(node.range[0] + 4 , state); //remove 'new '
   utils.catchup(node.callee.range[0], state);
-  utils.append('(function() { ', state);
-  utils.append('var ' + classIdent + ' = ', state);
+  utils.append(runtime + '.executeNewExpression(', state);
   utils.catchup(node.callee.range[1], state);
-  utils.append(', ' + resultIdent + ' = Object.create(' + classIdent + '.prototype), ', state);
-  utils.append('funcResult = ' + classIdent + '.apply(' + resultIdent + ', Array.prototype.concat.apply([],', state);
+  utils.append(', Array.prototype.concat.apply([],', state);
   utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
   insertElementsWithSpread(node.arguments, state);
   utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
   utils.append('))', state);
-  utils.append('; if (typeof funcResult !== \'undefined\') { return funcResult }', state);
-  utils.append('; return ' + resultIdent + ';', state);
-  utils.append('})()', state);
 }
 
 visitNewExpressionWithSpreadElement.test = function (node) {

@@ -7,9 +7,16 @@
       }
       throw new TypeError(array + ' is not an array');
   }
+    
+  function executeNewExpression(func, args) {
+    var result = Object.create(func.prototype);
+    var funcResult = func.apply(result, args);
+    return typeof funcResult === 'undefined' ? result : funcResult;
+  }
   
   global.____JSTRANSFORM_SPREAD_RUNTIME____ = {
-    assertSpreadElement: assertSpreadElement
+    assertSpreadElement: assertSpreadElement,
+    executeNewExpression: executeNewExpression
   };
 })((function () {
   if (typeof window !== 'undefined') {

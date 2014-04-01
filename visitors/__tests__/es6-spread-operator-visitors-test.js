@@ -215,6 +215,7 @@ describe('es6-spread-operator-visitors', function() {
     
     it('should pass spread array as arguments of the construtor, and produce an object instance of called function', function () {
       var result = eval(transform('new MyClass(...[1, 2])', { includeSpreadRuntime: true }));
+      console.log(transform('new MyClass(...[1, 2])', { includeSpreadRuntime: true }));
       expect(result).toEqual({
         a: 1,
         b: 2
@@ -233,16 +234,11 @@ describe('es6-spread-operator-visitors', function() {
       transformedCode = transformedCode.replace(/_result\d*/g, '_result');
       transformedCode = transformedCode.replace(/_class\d*/g, '_class');
       expect(transformedCode).toBe([
-        '(function() { ',
-          'var _class = MyClass, _result = Object.create(_class.prototype)',
-          ', funcResult = _class.apply(_result, Array.prototype.concat.apply([],',
-          '[',
+        '____JSTRANSFORM_SPREAD_RUNTIME____.executeNewExpression(MyClass, ',
+          'Array.prototype.concat.apply([],[',
             '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1, 2])',
-          ']',
-          '))',
-        '; if (typeof funcResult !== \'undefined\') { return funcResult }',
-        '; return _result;',
-        '})()'
+          '])',
+        ')'
       ].join(''));
     });
     
@@ -252,13 +248,11 @@ describe('es6-spread-operator-visitors', function() {
       transformedCode = transformedCode.replace(/_class\d*/g, '_class');
       expect(transformedCode).toBe([
         '/*hello world (*/  /*hello*/',
-        '(function() { var _class = MyClass, _result = Object.create(_class.prototype), funcResult = _class.apply(_result, Array.prototype.concat.apply([],[',
+        '____JSTRANSFORM_SPREAD_RUNTIME____.executeNewExpression(MyClass, Array.prototype.concat.apply([],[',
         ' /*comments*/ ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1//comment',
-        ', 2])])); if (typeof funcResult !== \'undefined\') { return funcResult }; return _result;})()'
+        ', 2])]))'
       ].join('\n'));
     });
-   
-    
   });
 });
 
