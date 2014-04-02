@@ -215,7 +215,6 @@ describe('es6-spread-operator-visitors', function() {
     
     it('should pass spread array as arguments of the construtor, and produce an object instance of called function', function () {
       var result = eval(transform('new MyClass(...[1, 2])', { includeSpreadRuntime: true }));
-      console.log(transform('new MyClass(...[1, 2])', { includeSpreadRuntime: true }));
       expect(result).toEqual({
         a: 1,
         b: 2
