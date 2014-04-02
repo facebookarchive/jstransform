@@ -1,4 +1,3 @@
-/*global window, self */
 (function (global) {
   
   function assertSpreadElement(array) {
