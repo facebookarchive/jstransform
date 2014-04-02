@@ -87,11 +87,8 @@ describe('es6-spread-operator-visitors', function() {
       expectTransform(
         '[1, 2, ...[3, 4]]',
         [
-          'Array.prototype.concat.apply([],',
-          '[',
-            '1, 2, ',
-            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
-          ']',
+          'Array.prototype.concat.call(',
+            '[1, 2], ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
           ')',
         ].join(''));
     });
@@ -104,9 +101,9 @@ describe('es6-spread-operator-visitors', function() {
          ' 4]]'
         ].join('\n'),
         [
-          'Array.prototype.concat.apply([],[1 /*mycomments*/, 2,',
+          'Array.prototype.concat.call([1 /*mycomments*/, 2],',
           '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3,',
-          ' 4])])'
+          ' 4]))'
         ].join('\n'));
     });
   });
@@ -119,20 +116,16 @@ describe('es6-spread-operator-visitors', function() {
     }
     
     
-    it('should pass spread array as parameters  ', function () {
+    it('should pass spread array as parameters', function () {
       expect(eval(transform('returnArgs(1, 2, ...[3, 4])', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4]);
     });
    
     it('should ouput the following code source', function () {
       expectTransform(
-        'returnArgs(1, 2,...[3, 4])',
+        'returnArgs(1, 2, ...[3, 4])',
         [
-          'returnArgs',
-          '.apply(undefined, Array.prototype.concat.apply([],',
-          '[',
-            '1, 2,',
-            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
-          ']',
+          'returnArgs.apply(undefined, Array.prototype.concat.call(',
+            '[1, 2], ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
           '))'
         ].join(''));
     });
@@ -147,10 +140,10 @@ describe('es6-spread-operator-visitors', function() {
           ')'
         ].join('\n'),
         [
-          'returnArgs.apply(undefined, Array.prototype.concat.apply([],  /*comments*/[',
-          ' 1, 2,',
+          'returnArgs.apply(undefined,   /*comments*/Array.prototype.concat.call(',
+          ' [1, 2],',
           ' ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
-          ']))'
+          '))'
         ].join('\n'));
     });
     
@@ -162,9 +155,9 @@ describe('es6-spread-operator-visitors', function() {
           ')'
         ].join('\n'),
         [
-          'returnArgs.apply(undefined, Array.prototype.concat.apply([],  /*comments (*/[ 1, 2,',
+          'returnArgs.apply(undefined,   /*comments (*/Array.prototype.concat.call( [1, 2],',
           '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4]) //comments )',
-          ']))'
+          '))'
         ].join('\n'));
     });
   });
@@ -194,10 +187,9 @@ describe('es6-spread-operator-visitors', function() {
       expect(transformedCode).toBe([
         '(function() { ',
           'var _this = object; ',
-          'return _this.returnArgsAndThis.apply(_this, Array.prototype.concat.apply([],[',
-            '1, 2,',
-            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
-          ']))',
+          'return _this.returnArgsAndThis.apply(_this, Array.prototype.concat.call(',
+            '[1, 2],____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([3, 4])',
+          '))',
         '})()'
       ].join(''));
     });
@@ -238,9 +230,7 @@ describe('es6-spread-operator-visitors', function() {
       transformedCode = transformedCode.replace(/_class\d*/g, '_class');
       expect(transformedCode).toBe([
         '____JSTRANSFORM_SPREAD_RUNTIME____.executeNewExpression(MyClass, ',
-          'Array.prototype.concat.apply([],[',
-            '____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1, 2])',
-          '])',
+          'Array.prototype.concat.call(____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1, 2]))',
         ')'
       ].join(''));
     });
@@ -251,9 +241,9 @@ describe('es6-spread-operator-visitors', function() {
       transformedCode = transformedCode.replace(/_class\d*/g, '_class');
       expect(transformedCode).toBe([
         '/*hello world (*/  /*hello*/',
-        '____JSTRANSFORM_SPREAD_RUNTIME____.executeNewExpression(MyClass, Array.prototype.concat.apply([],[',
+        '____JSTRANSFORM_SPREAD_RUNTIME____.executeNewExpression(MyClass, Array.prototype.concat.call(',
         ' /*comments*/ ____JSTRANSFORM_SPREAD_RUNTIME____.assertSpreadElement([1//comment',
-        ', 2])]))'
+        ', 2])))'
       ].join('\n'));
     });
   });

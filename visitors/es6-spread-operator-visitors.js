@@ -90,17 +90,29 @@ function replaceInNonComments(search, replace) {
 }
 
 function insertElementsWithSpread(elements, state) {
+  var insideBrackets = false;
   elements.forEach(function (node) {
-    utils.catchup(node.range[0], state);
     if (node.type === Syntax.SpreadElement) {
+      if (insideBrackets) {
+        utils.append(']', state);
+        insideBrackets = false;
+      }
+      utils.catchup(node.range[0], state);
       utils.append(runtime + '.assertSpreadElement(', state);
       utils.move(node.range[0] + 3, state); // remove ...
       utils.catchup(node.range[1], state);
       utils.append(')', state);
     } else {
+      if (!insideBrackets) {
+        utils.append('[', state);
+        insideBrackets = true;
+      }
       utils.catchup(node.range[1], state);
     }
   });
+  if (insideBrackets) {
+    utils.append(']', state);
+  }
 }
 
 
@@ -114,10 +126,10 @@ visitProgram.test = function(node) {
 };
 
 function visitArrayExpressionWithSpreadElement(traverse, node, path, state) {
-  utils.append('Array.prototype.concat.apply([],', state);
+  utils.catchup(node.elements[0].range[0], state,
+                replaceInNonComments('[', 'Array.prototype.concat.call('));
   insertElementsWithSpread(node.elements, state);
-  utils.catchup(node.range[1], state);
-  utils.append(')', state);
+  utils.catchup(node.range[1], state, replaceInNonComments(']', ')'));
 }
 
 visitArrayExpressionWithSpreadElement.test = function (node) {
@@ -136,13 +148,13 @@ function visitFunctionCallWithSpreadElement(traverse, node, path, state) {
   }
   
   utils.catchup(node.callee.range[1], state);
-  utils.append('.apply(' + thisIdent + ', Array.prototype.concat.apply([],', state);
+  utils.append('.apply(' + thisIdent + ', ', state);
   
-  utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
+  utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', 'Array.prototype.concat.call('));
   insertElementsWithSpread(node.arguments, state);
-  utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
+  utils.catchup(node.range[1], state);
   
-  utils.append('))', state);
+  utils.append(')', state);
   
   if (node.callee.type === Syntax.MemberExpression) {
     utils.append('})()', state);
@@ -159,11 +171,10 @@ function visitNewExpressionWithSpreadElement(traverse, node, path, state) {
   utils.catchup(node.callee.range[0], state);
   utils.append(runtime + '.executeNewExpression(', state);
   utils.catchup(node.callee.range[1], state);
-  utils.append(', Array.prototype.concat.apply([],', state);
-  utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', '['));
+  utils.catchup(node.arguments[0].range[0], state, replaceInNonComments('(', ', Array.prototype.concat.call('));
   insertElementsWithSpread(node.arguments, state);
-  utils.catchup(node.range[1], state, replaceInNonComments(')', ']'));
-  utils.append('))', state);
+  utils.catchup(node.range[1], state);
+  utils.append(')', state);
 }
 
 visitNewExpressionWithSpreadElement.test = function (node) {
