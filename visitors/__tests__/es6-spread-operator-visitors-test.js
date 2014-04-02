@@ -79,6 +79,10 @@ describe('es6-spread-operator-visitors', function() {
       expect(eval(transform('[1, 2, ...(function () { return [3, 4] })()]', { includeSpreadRuntime: true }))).toEqual([1, 2, 3, 4]);
     });
     
+    it('it should not spread elements without spread operator', function () {
+       expect(eval(transform('[[1,2], ...[3, 4]]', { includeSpreadRuntime: true }))).toEqual([[1, 2], 3, 4]);
+    });
+    
     it('should ouput the following code source', function () {
       expectTransform(
         '[1, 2, ...[3, 4]]',
