@@ -29,7 +29,7 @@ describe('es6-object-short-notation-visitors', function() {
   beforeEach(function() {
     require('mock-modules').dumpCache();
     visitors = require('../es6-object-short-notation-visitors').visitorList;
-    transformFn = require('../../jstransform').transform;
+    transformFn = require('../../src/jstransform').transform;
   });
 
   function transform(code) {

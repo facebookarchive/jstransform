@@ -18,16 +18,12 @@
 /*jslint node: true*/
 "use strict";
 
-/**
- * Syntax transfomer for javascript. Takes the source in, spits the source
- * out.
- *
- * Parses input source with esprima, applies the given list of visitors to the
- * AST tree, and returns the resulting output.
- */
 var esprima = require('esprima-fb');
 var utils = require('./utils');
 
+var getBoundaryNode = utils.getBoundaryNode;
+var declareIdentInScope = utils.declareIdentInLocalScope;
+var initScopeMetadata = utils.initScopeMetadata;
 var Syntax = esprima.Syntax;
 
 /**
@@ -90,7 +86,7 @@ function traverse(node, path, state) {
         });
 
         // All functions have an implicit 'arguments' object in scope
-        state.localScope.identifiers['arguments'] = true;
+        declareIdentInScope('arguments', initScopeMetadata(node), state);
 
         // Include function arg identifiers in the scope boundaries of the
         // function
@@ -99,7 +95,9 @@ function traverse(node, path, state) {
           for (var i = 0; i < parentNode.params.length; i++) {
             param = parentNode.params[i];
             if (param.type === Syntax.Identifier) {
-              state.localScope.identifiers[param.name] = true;
+              declareIdentInScope(
+                param.name, initScopeMetadata(parentNode), state
+              );
             }
           }
         }
@@ -107,7 +105,9 @@ function traverse(node, path, state) {
         // Named FunctionExpressions scope their name within the body block of
         // themselves only
         if (parentNode.type === Syntax.FunctionExpression && parentNode.id) {
-          state.localScope.identifiers[parentNode.id.name] = true;
+          var metaData =
+            initScopeMetadata(parentNode, path.parentNodeslice, parentNode);
+          declareIdentInScope(parentNode.id.name, metaData, state);
         }
       }
 
@@ -126,7 +126,9 @@ function traverse(node, path, state) {
       });
 
       if (parentNode.type === Syntax.CatchClause) {
-        state.localScope.identifiers[parentNode.param.name] = true;
+        declareIdentInScope(
+          parentNode.param.name, initScopeMetadata(parentNode), state
+        );
       }
       collectBlockIdentsAndTraverse(node, path, state);
     }
@@ -163,7 +165,7 @@ function collectBlockIdentsAndTraverse(node, path, state) {
 }
 
 function visitLocalClosureIdentifiers(node, path, state) {
-  var identifiers = state.localScope.identifiers;
+  var metaData;
   switch (node.type) {
     case Syntax.FunctionExpression:
       // Function expressions don't get their names (if there is one) added to
@@ -173,12 +175,15 @@ function visitLocalClosureIdentifiers(node, path, state) {
     case Syntax.ClassExpression:
     case Syntax.FunctionDeclaration:
       if (node.id) {
-        identifiers[node.id.name] = true;
+        metaData = initScopeMetadata(getBoundaryNode(path), path.slice(), node);
+        declareIdentInScope(node.id.name, metaData, state);
       }
       return false;
     case Syntax.VariableDeclarator:
+      // Variables have function-local scope
       if (path[0].kind === 'var') {
-        identifiers[node.id.name] = true;
+        metaData = initScopeMetadata(getBoundaryNode(path), path.slice(), node);
+        declareIdentInScope(node.id.name, metaData, state);
       }
       break;
   }
@@ -200,6 +205,8 @@ function walker(node, path, state) {
   }
 }
 
+var _astCache = {};
+
 /**
  * Applies all available transformations to the source
  * @param {array} visitors
@@ -209,15 +216,16 @@ function walker(node, path, state) {
  */
 function transform(visitors, source, options) {
   options = options || {};
-
   var ast;
   try {
-    ast = esprima.parse(source, {
-      comment: true,
-      loc: true,
-      range: true
-    });
-  } catch (e) {
+    var cachedAst = _astCache[source];
+    ast = cachedAst ||
+      (_astCache[source] = esprima.parse(source, {
+        comment: true,
+        loc: true,
+        range: true
+      }));
+    } catch (e) {
     e.message = 'Parse Error: ' + e.message;
     throw e;
   }

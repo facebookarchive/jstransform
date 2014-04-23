@@ -27,7 +27,7 @@ describe('es6-classes', function() {
   beforeEach(function() {
     require('mock-modules').dumpCache();
     visitors = require('../es6-class-visitors').visitorList;
-    transformFn = require('../../jstransform').transform;
+    transformFn = require('../../src/jstransform').transform;
   });
 
   function transform(code, opts) {

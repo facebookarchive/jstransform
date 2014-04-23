@@ -25,10 +25,18 @@ var base62 = require('base62');
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
+var declareIdentInLocalScope = utils.declareIdentInLocalScope;
+var initScopeMetadata = utils.initScopeMetadata;
+
 var SUPER_PROTO_IDENT_PREFIX = '____SuperProtoOf';
 
 var _anonClassUUIDCounter = 0;
 var _mungedSymbolMaps = {};
+
+function resetSymbols() {
+  _anonClassUUIDCounter = 0;
+  _mungedSymbolMaps = {};
+}
 
 /**
  * Used to generate a unique class for use with code-gens for anonymous class
@@ -174,16 +182,12 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   utils.move(methodNode.key.range[1], state);
 
   var params = node.params;
-  var paramName;
   if (params.length > 0) {
     for (var i = 0; i < params.length; i++) {
       utils.catchup(node.params[i].range[0], state);
-      paramName = params[i].name;
-      if (_shouldMungeIdentifier(params[i], state)) {
-        paramName = _getMungedName(params[i].name, state);
-      }
-      utils.append(paramName, state);
-      utils.move(params[i].range[1], state);
+      path.unshift(node);
+      traverse(params[i], path, state);
+      path.shift();
     }
   } else {
     utils.append('(', state);
@@ -209,6 +213,27 @@ function visitClassFunctionExpression(traverse, node, path, state) {
 visitClassFunctionExpression.test = function(node, path, state) {
   return node.type === Syntax.FunctionExpression
          && path[0].type === Syntax.MethodDefinition;
+};
+
+function visitClassMethodParam(traverse, node, path, state) {
+  var paramName = node.name;
+  if (_shouldMungeIdentifier(node, state)) {
+    paramName = _getMungedName(node.name, state);
+  }
+  utils.append(paramName, state);
+  utils.move(node.range[1], state);
+}
+visitClassMethodParam.test = function(node, path, state) {
+  if (!path[0] || !path[1]) {
+    return;
+  }
+
+  var parentFuncExpr = path[0];
+  var parentClassMethod = path[1];
+
+  return parentFuncExpr.type === Syntax.FunctionExpression
+         && parentClassMethod.type === Syntax.MethodDefinition
+         && node.type === Syntax.Identifier;
 };
 
 /**
@@ -243,7 +268,7 @@ function _renderClassBody(traverse, node, path, state) {
     var keyNameDeclarator = '';
     if (!utils.identWithinLexicalScope(keyName, state)) {
       keyNameDeclarator = 'var ';
-      utils.declareIdentInLocalScope(keyName, state);
+      declareIdentInLocalScope(keyName, initScopeMetadata(node), state);
     }
     utils.append(
       'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
@@ -262,7 +287,7 @@ function _renderClassBody(traverse, node, path, state) {
         'null:' + superClass.name + '.prototype;',
         state
       );
-      utils.declareIdentInLocalScope(superProtoIdentStr, state);
+      declareIdentInLocalScope(superProtoIdentStr, initScopeMetadata(node), state);
     }
 
     utils.append(
@@ -467,11 +492,14 @@ visitSuperMemberExpression.test = function(node, path, state) {
          && node.object.name === 'super';
 };
 
+exports.resetSymbols = resetSymbols;
+
 exports.visitorList = [
   visitClassDeclaration,
   visitClassExpression,
   visitClassFunctionExpression,
   visitClassMethod,
+  visitClassMethodParam,
   visitPrivateIdentifier,
   visitSuperCallExpression,
   visitSuperMemberExpression

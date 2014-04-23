@@ -16,6 +16,8 @@
 
 
 /*jslint node: true*/
+var Syntax = require('esprima-fb').Syntax;
+var leadingIndentRegexp = /(^|\n)( {2}|\t)/g;
 
 /**
  * A `state` object represents the state of the parser. It has "local" and
@@ -67,6 +69,11 @@ function createState(source, rootNode, transformOptions) {
      */
     scopeIsStrict: null,
     /**
+     * Indentation offset
+     * @type {Number}
+     */
+    indentBy: 0,
+    /**
      * Global state (not affected by updateState)
      * @type {Object}
      */
@@ -95,11 +102,6 @@ function createState(source, rootNode, transformOptions) {
        * @type {String}
        */
       buffer: '',
-      /**
-       * Indentation offset (only negative offset is supported now)
-       * @type {Number}
-       */
-      indentBy: 0,
       /**
        * Source that is being transformed
        * @type {String}
@@ -332,8 +334,15 @@ function append(str, state) {
  * @return {string}
  */
 function updateIndent(str, state) {
-  for (var i = 0; i < -state.g.indentBy; i++) {
-    str = str.replace(/(^|\n)( {2}|\t)/g, '$1');
+  var indentBy = state.indentBy;
+  if (indentBy < 0) {
+    for (var i = 0; i < -indentBy; i++) {
+      str = str.replace(leadingIndentRegexp, '$1');
+    }
+  } else {
+    for (var i = 0; i < indentBy; i++) {
+      str = str.replace(leadingIndentRegexp, '$1$2$2');
+    }
   }
   return str;
 }
@@ -345,11 +354,11 @@ function updateIndent(str, state) {
  *   "  foo.bar()"
  *         ^
  *       start
- *   indent will be 2
+ *   indent will be "  "
  *
  * @param  {number} start
  * @param  {object} state
- * @return {number}
+ * @return {string}
  */
 function indentBefore(start, state) {
   var end = start;
@@ -393,8 +402,30 @@ function identInLocalScope(identName, state) {
   return state.localScope.identifiers[identName] !== undefined;
 }
 
-function declareIdentInLocalScope(identName, state) {
-  state.localScope.identifiers[identName] = true;
+/**
+ * @param {object} boundaryNode
+ * @param {?array} path
+ * @return {?object} node
+ */
+function initScopeMetadata(boundaryNode, path, node) {
+  return {
+    boundaryNode: boundaryNode,
+    bindingPath: path,
+    bindingNode: node
+  };
+}
+
+function declareIdentInLocalScope(identName, metaData, state) {
+  state.localScope.identifiers[identName] = {
+    boundaryNode: metaData.boundaryNode,
+    path: metaData.path,
+    node: metaData.node,
+    state: Object.create(state)
+  };
+}
+
+function getLexicalBindingMetadata(identName, state) {
+  return state.localScope.identifiers[identName];
 }
 
 /**
@@ -410,8 +441,6 @@ function declareIdentInLocalScope(identName, state) {
  * @param {object} state
  */
 function analyzeAndTraverse(analyzer, traverser, node, path, state) {
-  var key, child;
-
   if (node.type) {
     if (analyzer(node, path, state) === false) {
       return;
@@ -419,19 +448,62 @@ function analyzeAndTraverse(analyzer, traverser, node, path, state) {
     path.unshift(node);
   }
 
-  for (key in node) {
-    // skip obviously wrong attributes
-    if (key === 'range' || key === 'loc') {
-      continue;
-    }
+  getOrderedChildren(node).forEach(function(child) {
+    traverser(child, path, state);
+  });
+
+  node.type && path.shift();
+}
+
+/**
+ * It is crucial that we traverse in order, or else catchup() on a later
+ * node that is processed out of order can move the buffer past a node
+ * that we haven't handled yet, preventing us from modifying that node.
+ *
+ * This can happen when a node has multiple properties containing children.
+ * For example, XJSElement nodes have `openingElement`, `closingElement` and
+ * `children`. If we traverse `openingElement`, then `closingElement`, then
+ * when we get to `children`, the buffer has already caught up to the end of
+ * the closing element, after the children.
+ *
+ * This is basically a Schwartzian transform. Collects an array of children,
+ * each one represented as [child, startIndex]; sorts the array by start
+ * index; then traverses the children in that order.
+ */
+function getOrderedChildren(node) {
+  var queue = [];
+  for (var key in node) {
     if (node.hasOwnProperty(key)) {
-      child = node[key];
-      if (typeof child === 'object' && child !== null) {
-        traverser(child, path, state);
-      }
+      enqueueNodeWithStartIndex(queue, node[key]);
     }
   }
-  node.type && path.shift();
+  queue.sort(function(a, b) { return a[1] - b[1]; });
+  return queue.map(function(pair) { return pair[0]; });
+}
+
+/**
+ * Helper function for analyzeAndTraverse which queues up all of the children
+ * of the given node.
+ *
+ * Children can also be found in arrays, so we basically want to merge all of
+ * those arrays together so we can sort them and then traverse the children
+ * in order.
+ *
+ * One example is the Program node. It contains `body` and `comments`, both
+ * arrays. Lexographically, comments are interspersed throughout the body
+ * nodes, but esprima's AST groups them together.
+ */
+function enqueueNodeWithStartIndex(queue, node) {
+  if (typeof node !== 'object' || node === null) {
+    return;
+  }
+  if (node.range) {
+    queue.push([node, node.range[0]]);
+  } else if (Array.isArray(node)) {
+    for (var ii = 0; ii < node.length; ii++) {
+      enqueueNodeWithStartIndex(queue, node[ii]);
+    }
+  }
 }
 
 /**
@@ -462,6 +534,23 @@ function containsChildOfType(node, type) {
   return foundMatchingChild;
 }
 
+var scopeTypes = {};
+scopeTypes[Syntax.FunctionExpression] = true;
+scopeTypes[Syntax.FunctionDeclaration] = true;
+scopeTypes[Syntax.Program] = true;
+
+function getBoundaryNode(path) {
+  for (var ii = 0; ii < path.length; ++ii) {
+    if (scopeTypes[path[ii].type]) {
+      return path[ii];
+    }
+  }
+  throw new Error(
+    'Expected to find a node with one of the following types in path:\n' +
+    JSON.stringify(Object.keys(scopeTypes))
+  );
+}
+
 exports.append = append;
 exports.catchup = catchup;
 exports.catchupWhiteSpace = catchupWhiteSpace;
@@ -469,11 +558,16 @@ exports.catchupNewlines = catchupNewlines;
 exports.containsChildOfType = containsChildOfType;
 exports.createState = createState;
 exports.declareIdentInLocalScope = declareIdentInLocalScope;
+exports.getBoundaryNode = getBoundaryNode;
 exports.getDocblock = getDocblock;
+exports.getLexicalBindingMetadata = getLexicalBindingMetadata;
+exports.initScopeMetadata = initScopeMetadata;
 exports.identWithinLexicalScope = identWithinLexicalScope;
 exports.identInLocalScope = identInLocalScope;
 exports.indentBefore = indentBefore;
 exports.move = move;
+exports.scopeTypes = scopeTypes;
 exports.updateIndent = updateIndent;
 exports.updateState = updateState;
 exports.analyzeAndTraverse = analyzeAndTraverse;
+exports.getOrderedChildren = getOrderedChildren;

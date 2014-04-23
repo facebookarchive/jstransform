@@ -29,7 +29,7 @@ describe('es6ArrowFunctionsTransform', function() {
   beforeEach(function() {
     require('mock-modules').dumpCache();
     visitors = require('../es6-arrow-function-visitors').visitorList;
-    transformFn = require('../../jstransform').transform;
+    transformFn = require('../../src/jstransform').transform;
   });
 
   function transform(code) {
@@ -107,6 +107,12 @@ describe('es6ArrowFunctionsTransform', function() {
     // 0 params, expression.
     expectTransform(
       '() => this.value;',
+      'function()  {return this.value;}.bind(this);'
+    );
+
+    // 0 params, expression wrapped in parens
+    expectTransform(
+      '() => (this.value);',
       'function()  {return this.value;}.bind(this);'
     );
 
@@ -201,6 +207,17 @@ describe('es6ArrowFunctionsTransform', function() {
       '',
       '     ',
       '   {return x;};'
+    ].join('\n'));
+
+    // Preserve line numbers with parens around expression.
+    expectTransform([
+      '(x) => (',
+      '  x',
+      ');'
+    ].join('\n'), [
+      'function(x)  ',
+      '  {return x;}',
+      ';'
     ].join('\n'));
 
     // Preserve typechecker annotation.

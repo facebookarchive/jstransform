@@ -13,7 +13,7 @@ describe('ES6 Template Visitor', function() {
   beforeEach(function() {
     require('mock-modules').dumpCache();
     visitors = require('../es6-template-visitors').visitorList;
-    transformFn = require('../../jstransform').transform;
+    transformFn = require('../../src/jstransform').transform;
   });
 
   function transform(code) {

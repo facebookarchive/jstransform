@@ -34,7 +34,7 @@ describe('es6-rest-param-visitors', () => {
     arrowFuncVisitors = require('../es6-arrow-function-visitors').visitorList;
     classVisitors = require('../es6-class-visitors').visitorList;
     restParamVisitors = require('../es6-rest-param-visitors').visitorList;
-    transformFn = require('../../jstransform').transform;
+    transformFn = require('../../src/jstransform').transform;
 
     visitorSet =
       arrowFuncVisitors

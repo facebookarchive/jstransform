@@ -19,7 +19,7 @@
 /**
  * Desugars ES6 Arrow functions to ES3 function expressions.
  * If the function contains `this` expression -- automatically
- * binds the funciton to current value of `this`.
+ * binds the function to current value of `this`.
  *
  * Single parameter, simple expression:
  *
@@ -66,6 +66,8 @@ function visitArrowFunction(traverse, node, path, state) {
   if (utils.containsChildOfType(node.body, Syntax.ThisExpression)) {
     utils.append('.bind(this)', state);
   }
+
+  utils.catchupWhiteSpace(node.range[1], state);
 
   return false;
 }

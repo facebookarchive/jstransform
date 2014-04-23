@@ -366,4 +366,41 @@ describe('jstransform', function() {
       ].join('\n'));
     });
   });
+
+  describe('visitors', function() {
+    it('should visit nodes in order', function() {
+      var source = [
+        '// Foo comment',
+        'function foo() {}',
+        '',
+        '// Bar comment',
+        'function bar() {}'
+      ].join('\n');
+
+      var actualNodes = [];
+
+      function visitFunction(traverse, node, path, state) {
+        actualNodes.push([node.id.name, node.range[0]]);
+      }
+      visitFunction.test = function(node, path, state) {
+        return node.type === Syntax.FunctionDeclaration;
+      };
+
+      function visitComments(traverse, node, path, state) {
+        actualNodes.push([node.value, node.range[0]]);
+      }
+      visitComments.test = function(node, path, state) {
+        return node.type === 'Line';
+      };
+
+      transformFn([visitComments, visitFunction], source);
+
+      expect(actualNodes).toEqual([
+        [' Foo comment', 0],
+        ['foo', 15],
+        [' Bar comment', 34],
+        ['bar', 49]
+      ]);
+    });
+  });
 });
