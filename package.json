@@ -1,9 +1,12 @@
 {
   "name": "jstransform",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "A simple AST visitor-based JS transformer",
   "contributors": [
-    {"name": "Jeff Morrison", "email": "jeffmo@fb.com"}
+    {
+      "name": "Jeff Morrison",
+      "email": "jeffmo@fb.com"
+    }
   ],
   "main": "src/jstransform",
   "repository": {
@@ -22,7 +25,10 @@
     "source-map": "0.1.31"
   },
   "licenses": [
-    {"type": "Apache-2.0", "url": "http://www.apache.org/licenses/LICENSE-2.0"}
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
   ],
   "engines": {
     "node": ">=0.8.8"
