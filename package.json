@@ -19,7 +19,7 @@
   "dependencies": {
     "base62": "0.1.1",
     "esprima-fb": "~3001.1.0-dev-harmony-fb",
-    "source-map": "0.1.8"
+    "source-map": "0.1.31"
   },
   "licenses": [
     {"type": "Apache-2.0", "url": "http://www.apache.org/licenses/LICENSE-2.0"}
