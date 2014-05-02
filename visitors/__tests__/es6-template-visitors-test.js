@@ -86,6 +86,7 @@ describe('ES6 Template Visitor', function() {
     expectTransform('`foo ${bar}`', '("foo " + bar)');
     expectTransform('`${foo} bar`', '(foo + " bar")');
     expectTransform('`${foo} ${bar}`', '(foo + " " + bar)');
+    expectTransform('`${foo}${bar}`', '(foo + bar)');
   });
 
   it('should transform expressions', function() {
