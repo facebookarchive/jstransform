@@ -34,7 +34,7 @@
     "node": ">=0.8.8"
   },
   "devDependencies": {
-    "jest-cli": "^0.1.5"
+    "jest-cli": "0.1.5"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/jestPreprocessor.js"
