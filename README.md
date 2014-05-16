@@ -1,4 +1,4 @@
-# JSTransform
+# JSTransform [![Build Status](https://travis-ci.org/facebook/jstransform.svg?branch=master)](https://travis-ci.org/facebook/jstransform)
 
 A simple utility for pluggable JS syntax transforms using the esprima parser.
 
