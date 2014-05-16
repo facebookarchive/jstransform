@@ -18,14 +18,13 @@
 
 /*jshint evil:true*/
 
-require('mock-modules').autoMockOff();
+jest.autoMockOff();
 
 describe('es6-classes', function() {
   var transformFn;
   var visitors;
 
   beforeEach(function() {
-    require('mock-modules').dumpCache();
     visitors = require('../es6-class-visitors').visitorList;
     transformFn = require('../../src/jstransform').transform;
   });
@@ -350,7 +349,11 @@ describe('es6-classes', function() {
           'class Child extends Parent {}'
         ].join('\n'));
 
-        eval(code);
+        var exports = new Function(
+          code + 'return {Child: Child, Parent: Parent};'
+        )();
+        var Child = exports.Child;
+        var Parent = exports.Parent;
 
         expect(Child.protoProp).toBe(undefined);
         expect(Child.staticProp).toBe('staticProp');
@@ -371,7 +374,11 @@ describe('es6-classes', function() {
           'class Child extends true ? Parent1 : Parent2 {}'
         ].join('\n'));
 
-        eval(code);
+        var exports = new Function(
+          code + 'return {Parent1: Parent1, Child: Child};'
+        )();
+        var Child = exports.Child;
+        var Parent1 = exports.Parent1;
 
         expect(Child.protoProp).toBe(undefined);
         expect(Child.staticProp).toBe('staticProp');
@@ -394,7 +401,7 @@ describe('es6-classes', function() {
           'class Child extends Parent {}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child('a', 'b');
         expect(childInst.p1).toBe('a');
@@ -407,7 +414,7 @@ describe('es6-classes', function() {
           'class Child extends Parent {}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.constructor).toBe(Child);
@@ -430,7 +437,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.p1).toBe('a');
@@ -456,7 +463,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.p1).toBe(undefined);
@@ -487,7 +494,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.counter).toBe(0);
@@ -511,7 +518,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.getChildFoo()).toBe('foobar');
@@ -533,7 +540,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.getChildFoo()).toBe('foobar');
@@ -556,7 +563,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.p1).toBe('a');
@@ -580,7 +587,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         expect(childInst.p1).toBe(undefined);
@@ -712,7 +719,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child('foo', 'bar');
         expect(childInst.foo).toBe('foo');
@@ -776,7 +783,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Foo = new Function(code + 'return Foo;')();
 
         var fooInst = new Foo();
         expect(fooInst.getOuterBar()).toBe('outer');
@@ -794,7 +801,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Foo = new Function(code + 'return Foo;')();
 
         var fooInst = new Foo();
         expect(fooInst.getStuff()).toBe(42);
@@ -827,7 +834,9 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var exports = new Function(code + 'return {_bar: _bar, Foo: Foo};')();
+        var _bar = exports._bar;
+        var Foo = exports.Foo;
 
         var fooInst = new Foo();
         expect(_bar._private).toBe(42);
@@ -906,7 +915,7 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code);
+        var Child = new Function(code + 'return Child;')();
 
         var childInst = new Child();
         childInst.setParentFoo('parent');
@@ -938,8 +947,11 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        eval(code1);
-        eval(code2);
+        var exports = new Function(
+          code1 + code2 + 'return {Parent: Parent, Child: Child};'
+        )();
+        var Parent = exports.Parent;
+        var Child = exports.Child;
 
         var childInst = new Child();
         childInst.setParentFoo('parent');
