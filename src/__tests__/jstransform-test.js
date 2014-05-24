@@ -19,12 +19,16 @@
 require('mock-modules').autoMockOff();
 
 describe('jstransform', function() {
+  var jstransform;
   var transformFn;
+  var utils;
   var Syntax = require('esprima-fb').Syntax;
 
   beforeEach(function() {
     require('mock-modules').dumpCache();
-    transformFn = require('../jstransform').transform;
+    jstransform = require('../jstransform');
+    transformFn = jstransform.transform;
+    utils = jstransform.utils;
   });
 
   function _runVisitor(source, nodeCount, visitor) {
@@ -58,6 +62,10 @@ describe('jstransform', function() {
     visitor.test = visitorTest;
     _runVisitor(source, nodeCount, visitor);
   }
+
+  it('exposes a public utils object', function() {
+    expect(jstransform.utils).toEqual(utils);
+  });
 
   describe('closure scope boundaries', function() {
     it('creates a scope boundary around Program scope', function() {
