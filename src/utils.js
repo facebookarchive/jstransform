@@ -98,6 +98,11 @@ function createState(source, rootNode, transformOptions) {
        */
       position: 0,
       /**
+       * Auxiliary data to be returned by transforms
+       * @type {Object}
+       */
+      extra: {},
+      /**
        * Buffer containing the result
        * @type {String}
        */
