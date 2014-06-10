@@ -44,7 +44,9 @@ describe('es6-classes', function() {
           '  }',
           '}',
           'class B {',
-          '  bar() {}',
+          '  bar() {',
+          '    class C {}',
+          '  }',
           '}'
         ].join('\n');
 
@@ -56,7 +58,9 @@ describe('es6-classes', function() {
           '  ',
           '}',
           'function B(){"use strict";}',
-          '  B.prototype.bar=function() {"use strict";};',
+          '  B.prototype.bar=function() {"use strict";',
+          '    function C(){}',
+          '  };',
           ''
         ].join('\n');
 
