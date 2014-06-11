@@ -142,6 +142,9 @@ function _shouldMungeIdentifier(node, state) {
  * @param {object} state
  */
 function visitClassMethod(traverse, node, path, state) {
+  state = utils.updateState(state, {
+    methodNode: node
+  });
   utils.catchup(node.range[0], state);
   path.unshift(node);
   traverse(node.value, path, state);
@@ -168,14 +171,24 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   if (methodNode.key.name === 'constructor') {
     utils.append('function ' + state.className, state);
   } else {
-    var methodName = methodNode.key.name;
-    if (_shouldMungeIdentifier(methodNode.key, state)) {
-      methodName = _getMungedName(methodName, state);
+    var methodAccessor;
+    var prototypeOrStatic = methodNode.static ? '' : '.prototype';
+
+    if (methodNode.key.type === Syntax.Identifier) {
+      // foo() {}
+      methodAccessor = methodNode.key.name;
+      if (_shouldMungeIdentifier(methodNode.key, state)) {
+        methodAccessor = _getMungedName(methodAccessor, state);
+      }
+      methodAccessor = '.' + methodAccessor;
+    } else if (methodNode.key.type === Syntax.Literal) {
+      // 'foo bar'() {}
+      methodAccessor = '[' + JSON.stringify(methodNode.key.value) + ']';
     }
 
-    var prototypeOrStatic = methodNode.static ? '' : 'prototype.';
     utils.append(
-      state.className + '.' + prototypeOrStatic + methodName + '=function',
+      state.className + prototypeOrStatic +
+      methodAccessor + '=function',
       state
     );
   }
@@ -432,7 +445,17 @@ function visitSuperCallExpression(traverse, node, path, state) {
   var superClassName = state.superClass.name;
 
   if (node.callee.type === Syntax.Identifier) {
-    utils.append(superClassName + '.call(', state);
+    if (_isConstructorMethod(state.methodNode)) {
+      utils.append(superClassName + '.call(', state);
+    } else {
+      var protoProp = SUPER_PROTO_IDENT_PREFIX + superClassName;
+      if (state.methodNode.key.type === Syntax.Identifier) {
+        protoProp += '.' + state.methodNode.key.name;
+      } else if (state.methodNode.key.type === Syntax.Literal) {
+        protoProp += '[' + JSON.stringify(state.methodNode.key.value) + ']';
+      }
+      utils.append(protoProp + ".call(", state);
+    }
     utils.move(node.callee.range[1], state);
   } else if (node.callee.type === Syntax.MemberExpression) {
     utils.append(SUPER_PROTO_IDENT_PREFIX + superClassName, state);
