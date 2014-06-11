@@ -151,7 +151,7 @@ describe('es6-classes', function() {
           '  Foo.prototype.foo=function() {"use strict";',
           '    ',
           '    ',
-          '    Bar.call(this,p1,',
+          '    ____SuperProtoOfBar.foo.call(this,p1,',
           '          p2);',
           '  };',
           '',
@@ -448,17 +448,23 @@ describe('es6-classes', function() {
       it('handles super CallExpressions within proto methods', function() {
         var code = transform([
           'class Parent {',
-          '  constructor(p1, p2) {',
+          '  bar(p1, p2) {',
           '    this.p1 = p1;',
           '    this.p2 = p2;',
+          '  }',
+          '  "baz qux"(p3) {',
+          '    this.p3 = p3;',
           '  }',
           '}',
 
           'class Child extends Parent {',
-          '  constructor() {}',
           '  bar() {',
           '    super("a", "b");',
           '    this.barRan = true;',
+          '  }',
+          '  "baz qux"() {',
+          '    super("c");',
+          '    this["baz qux run"] = true;',
           '  }',
           '}'
         ].join('\n'));
@@ -469,10 +475,18 @@ describe('es6-classes', function() {
         expect(childInst.p1).toBe(undefined);
         expect(childInst.p2).toBe(undefined);
         expect(childInst.barRan).toBe(undefined);
+
         childInst.bar();
         expect(childInst.p1).toBe('a');
         expect(childInst.p2).toBe('b');
         expect(childInst.barRan).toBe(true);
+
+        expect(childInst.p3).toBe(undefined);
+        expect(childInst['baz qux run']).toBe(undefined);
+
+        childInst['baz qux']();
+        expect(childInst.p3).toBe('c');
+        expect(childInst['baz qux run']).toBe(true);
       });
 
       it('handles computed super MemberExpressions',
@@ -1075,7 +1089,7 @@ describe('es6-classes', function() {
           '  ____Class0.prototype.foo=function() {"use strict";',
           '    ',
           '    ',
-          '    Bar.call(this,p1,',
+          '    ____SuperProtoOfBar.foo.call(this,p1,',
           '          p2);',
           '  };',
           '',
