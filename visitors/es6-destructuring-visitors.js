@@ -39,13 +39,14 @@ var restParamVisitors = require('./es6-rest-param-visitors');
 
 function visitStructuredVariable(traverse, node, path, state) {
   // Allocate new temp for the pattern.
-  utils.append(getTmpVar(0) + '=', state);
+  utils.append(getTmpVar(state.localScope.tempVarIndex) + '=', state);
   // Skip the pattern and assign the init to the temp.
   utils.catchupWhiteSpace(node.init.range[0], state);
   traverse(node.init, path, state);
   utils.catchup(node.init.range[1], state);
   // Render the destructured data.
-  utils.append(',' + getDestructuredComponents(node.id, 0), state);
+  utils.append(',' + getDestructuredComponents(node.id, state), state);
+  state.localScope.tempVarIndex++;
   return false;
 }
 
@@ -61,7 +62,8 @@ function isStructuredPattern(node) {
 
 // Main function which does actual recursive destructuring
 // of nested complex structures.
-function getDestructuredComponents(node, tmpIndex) {
+function getDestructuredComponents(node, state) {
+  var tmpIndex = state.localScope.tempVarIndex;
   var components = [];
   var patternItems = getPatternItems(node);
 
@@ -90,8 +92,10 @@ function getDestructuredComponents(node, tmpIndex) {
       );
     } else {
       // Complex sub-structure.
-      components.push(getInitialValue(tmpIndex + 1, accessor) + ',' +
-        getDestructuredComponents(value, tmpIndex + 1));
+      components.push(
+        getInitialValue(++state.localScope.tempVarIndex, accessor) + ',' +
+        getDestructuredComponents(value, state)
+      );
     }
   }
 
@@ -132,12 +136,19 @@ function getTmpVar(index) {
 
 function visitStructuredAssignment(traverse, node, path, state) {
   var exprNode = node.expression;
-  utils.append('var ' + getTmpVar(0) + '=', state);
+  utils.append('var ' + getTmpVar(state.localScope.tempVarIndex) + '=', state);
+
   utils.catchupWhiteSpace(exprNode.right.range[0], state);
   traverse(exprNode.right, path, state);
   utils.catchup(exprNode.right.range[1], state);
-  utils.append(',' + getDestructuredComponents(exprNode.left, 0) + ';', state);
+
+  utils.append(
+    ',' + getDestructuredComponents(exprNode.left, state) + ';',
+    state
+  );
+
   utils.catchupWhiteSpace(node.range[1], state);
+  state.localScope.tempVarIndex++;
   return false;
 }
 
@@ -156,13 +167,25 @@ visitStructuredAssignment.test = function(node, path, state) {
 // function foo({x, y}) { ... }
 // -------------------------------------------------------
 
-// Temp variable allocation index used in params list.
-var paramAllocationIndex = -1;
-
 function visitStructuredParameter(traverse, node, path, state) {
-  utils.append(getTmpVar(++paramAllocationIndex), state);
+  utils.append(getTmpVar(getParamIndex(node, path)), state);
   utils.catchupWhiteSpace(node.range[1], state);
   return true;
+}
+
+function getParamIndex(paramNode, path) {
+  var funcNode = path[0];
+  var tmpIndex = 0;
+  for (var k = 0; k < funcNode.params.length; k++) {
+    var param = funcNode.params[k];
+    if (param === paramNode) {
+      break;
+    }
+    if (isStructuredPattern(param)) {
+      tmpIndex++;
+    }
+  }
+  return tmpIndex;
 }
 
 visitStructuredParameter.test = function(node, path, state) {
@@ -198,9 +221,6 @@ function visitFunctionBodyForStructuredParameter(traverse, node, path, state) {
   return true;
 }
 
-// Temp variable allocation index used in function bodies.
-var funcBodyAllocationIndex = -1;
-
 function renderDestructuredComponents(funcNode, state) {
   var destructuredComponents = [];
 
@@ -208,8 +228,9 @@ function renderDestructuredComponents(funcNode, state) {
     var param = funcNode.params[k];
     if (isStructuredPattern(param)) {
       destructuredComponents.push(
-        getDestructuredComponents(param, ++funcBodyAllocationIndex)
+        getDestructuredComponents(param, state)
       );
+      state.localScope.tempVarIndex++;
     }
   }
 

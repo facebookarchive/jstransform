@@ -194,6 +194,38 @@ describe('es6-destructuring-visitors', function() {
       .toEqual(60);
   });
 
+  // Auto-generated temp vars test.
+  it('should allocate correct temp index', function() {
+    var code = transform([
+      'function foo(x, {y}, {z}) {',
+      '  var {q} = {q: 30};',
+      '  return [$__0, $__1, $__2];',
+      '}'
+    ].join('\n'));
+
+    eval(code);
+
+    expect(foo(1, {y: 10}, {z: 20}))
+      .toEqual([{y: 10}, {z: 20}, {q: 30}]);
+  });
+
+  it('should allocate correct temp nested index', function() {
+    var code = transform([
+      'var foo = function(x, {y}, {z}) {',
+      '  var {q, m: {v}} = {q: 30, m: {v: 40}};',
+      '  var {a} = (function({a}) { return $__0; })({a: 50});',
+      '  return [$__0, $__1, $__2, $__3, a];',
+      '}'
+    ].join('\n'));
+
+    eval(code);
+
+    expect(foo(1, {y: 10}, {z: 20}))
+      .toEqual([{y: 10}, {z: 20}, {q: 30, m: {v: 40}}, {v: 40}, 50]);
+  });
+
+
+
   // Syntax tests.
 
   it('should correctly transform structured patterns', function() {

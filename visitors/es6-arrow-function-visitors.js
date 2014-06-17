@@ -107,7 +107,17 @@ function renderExpressionBody(traverse, node, path, state) {
   }
 
   // Special handling of destructured params.
-  destructuringVisitors.renderDestructuredComponents(node, state);
+  destructuringVisitors.renderDestructuredComponents(
+    node,
+    utils.updateState(state, {
+      localScope: {
+        parentNode: state.parentNode,
+        parentScope: state.parentScope,
+        identifiers: state.identifiers,
+        tempVarIndex: 0
+      }
+    })
+  );
 
   utils.append('return ', state);
   renderStatementBody(traverse, node, path, state);
