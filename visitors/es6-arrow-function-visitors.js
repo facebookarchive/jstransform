@@ -39,6 +39,8 @@
  *
  */
 var restParamVisitors = require('./es6-rest-param-visitors');
+var destructuringVisitors = require('./es6-destructuring-visitors');
+
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
@@ -48,7 +50,7 @@ var utils = require('../src/utils');
 function visitArrowFunction(traverse, node, path, state) {
   // Prologue.
   utils.append('function', state);
-  renderParams(node, state);
+  renderParams(traverse, node, path, state);
 
   // Skip arrow.
   utils.catchupWhiteSpace(node.body.range[0], state);
@@ -72,14 +74,16 @@ function visitArrowFunction(traverse, node, path, state) {
   return false;
 }
 
-function renderParams(node, state) {
+function renderParams(traverse, node, path, state) {
   // To preserve inline typechecking directives, we
   // distinguish between parens-free and paranthesized single param.
   if (isParensFreeSingleParam(node, state) || !node.params.length) {
     utils.append('(', state);
   }
   if (node.params.length !== 0) {
-    utils.catchup(node.params[node.params.length - 1].range[1], state);
+    path.unshift(node);
+    traverse(node.params, path, state);
+    path.unshift();
   }
   utils.append(')', state);
 }
@@ -93,12 +97,18 @@ function renderExpressionBody(traverse, node, path, state) {
   // Wrap simple expression bodies into a block
   // with explicit return statement.
   utils.append('{', state);
+
+  // Special handling of rest param.
   if (node.rest) {
     utils.append(
       restParamVisitors.renderRestParamSetup(node),
       state
     );
   }
+
+  // Special handling of destructured params.
+  destructuringVisitors.renderDestructuredComponents(node, state);
+
   utils.append('return ', state);
   renderStatementBody(traverse, node, path, state);
   utils.append(';}', state);

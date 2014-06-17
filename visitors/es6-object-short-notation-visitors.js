@@ -43,7 +43,8 @@ function visitObjectLiteralShortNotation(traverse, node, path, state) {
 visitObjectLiteralShortNotation.test = function(node, path, state) {
   return node.type === Syntax.Property &&
     node.kind === 'init' &&
-    node.shorthand === true;
+    node.shorthand === true &&
+    path[0].type !== Syntax.ObjectPattern;
 };
 
 exports.visitorList = [

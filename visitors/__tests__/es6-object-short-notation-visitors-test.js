@@ -24,12 +24,20 @@ require('mock-modules').autoMockOff();
 
 describe('es6-object-short-notation-visitors', function() {
   var transformFn;
+
+  var destructuringVisitors;
+  var shortObjectsVisitors;
+
   var visitors;
 
   beforeEach(function() {
     require('mock-modules').dumpCache();
-    visitors = require('../es6-object-short-notation-visitors').visitorList;
     transformFn = require('../../src/jstransform').transform;
+
+    shortObjectsVisitors = require('../es6-object-short-notation-visitors').visitorList;
+    destructuringVisitors = require('../es6-destructuring-visitors').visitorList;
+
+    visitors = shortObjectsVisitors.concat(destructuringVisitors);
   });
 
   function transform(code) {
@@ -53,6 +61,18 @@ describe('es6-object-short-notation-visitors', function() {
     expect(eval(code)).toEqual(5);
   });
 
+  it('should transform work with destructuring and return 10', function() {
+    var code = transform([
+      'var x = 5, y = 5;',
+      '(function({x, y}) {',
+      '  var data = {x, y};',
+      '  return data.x + data.y;',
+      '})({x, y});'
+    ].join('\n'));
+
+    expect(eval(code)).toEqual(10);
+  });
+
   // Source code tests.
   it('should transform simple short notation', function() {
 
@@ -62,30 +82,15 @@ describe('es6-object-short-notation-visitors', function() {
       'function foo(x, y) { return {x:x, y:y}; }'
     );
 
-    // Should transform: short notation in complex object pattern.
-    expectTransform([
-      'function init({name, points: [{x, y}, {z, q}]}) {',
-      '  return function([{data: {value, score}}]) {',
-      '    return {z, q, score, name};',
-      '  };',
-      '}'
-    ].join('\n'), [
-      'function init({name:name, points: [{x:x, y:y}, {z:z, q:q}]}) {',
-      '  return function([{data: {value:value, score:score}}]) {',
-      '    return {z:z, q:q, score:score, name:name};',
-      '  };',
-      '}'
-    ].join('\n'));
-
     // Should preserve lines transforming ugly code.
     expectTransform([
       'function',
       '',
-      'foo    ({',
+      'foo    (',
       '    x,',
       '          y',
       '',
-      '})',
+      ')',
       '',
       '        {',
       ' return         {',
@@ -95,11 +100,11 @@ describe('es6-object-short-notation-visitors', function() {
     ].join('\n'), [
       'function',
       '',
-      'foo    ({',
-      '    x:x,',
-      '          y:y',
+      'foo    (',
+      '    x,',
+      '          y',
       '',
-      '})',
+      ')',
       '',
       '        {',
       ' return         {',
