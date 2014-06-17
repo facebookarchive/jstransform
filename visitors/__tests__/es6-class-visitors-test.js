@@ -22,11 +22,19 @@ jest.autoMockOff();
 
 describe('es6-classes', function() {
   var transformFn;
+  var classVisitors;
+  var arrowFunctionVisitors;
   var visitors;
 
   beforeEach(function() {
-    visitors = require('../es6-class-visitors').visitorList;
+    require('mock-modules').dumpCache();
+
     transformFn = require('../../src/jstransform').transform;
+
+    classVisitors = require('../es6-class-visitors').visitorList;
+    arrowFunctionVisitors = require('../es6-arrow-function-visitors').visitorList;
+
+    visitors = classVisitors.concat(arrowFunctionVisitors);
   });
 
   function transform(code, opts) {
@@ -741,6 +749,23 @@ describe('es6-classes', function() {
 
         var fooInst = new Foo();
         expect(fooInst.bar('a', 'b')('c')).toEqual(['a', 'b', 'c']);
+      });
+
+      it('consistently munges private idents in nested arrow funcs', function() {
+        var code = transform([
+          'class Foo {',
+          '  bar(_p1, p2) {',
+          '    return (_a, b) => {',
+          '      return [_p1, p2, _a, b];',
+          '    };',
+          '  }',
+          '}'
+        ].join('\n'));
+
+        eval(code);
+
+        var fooInst = new Foo();
+        expect(fooInst.bar('a', 'b')('c', 'd')).toEqual(['a', 'b', 'c', 'd']);
       });
 
       it('does not munge dunder-scored properties', function() {

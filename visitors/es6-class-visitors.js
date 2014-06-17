@@ -411,7 +411,8 @@ visitPrivateIdentifier.test = function(node, path, state) {
 
     // Always munge function parameters
     if (path[0].type === Syntax.FunctionExpression
-        || path[0].type === Syntax.FunctionDeclaration) {
+        || path[0].type === Syntax.FunctionDeclaration
+        || path[0].type === Syntax.ArrowFunctionExpression) {
       for (var i = 0; i < path[0].params.length; i++) {
         if (path[0].params[i] === node) {
           return true;
