@@ -76,11 +76,18 @@ function getDestructuredComponents(node, tmpIndex) {
     var accessor = getPatternItemAccessor(node, item, tmpIndex, idx);
     var value = getPatternItemValue(node, item);
 
-    // TODO(dmitrys): implement spread array elements: [a, b, ...r].
     // TODO(dmitrys): implement default values: {x, y=5}
     if (value.type === Syntax.Identifier) {
       // Simple pattern item.
       components.push(value.name + '=' + accessor);
+    } else if (value.type === Syntax.SpreadElement) {
+      // Spread/rest of an array.
+      // TODO(dmitrys): support spread in the middle of a pattern
+      // and also for function param patterns: [x, ...xs, y]
+      components.push(value.argument.name +
+        '=Array.prototype.slice.call(' +
+        getTmpVar(tmpIndex) + ',' + idx + ')'
+      );
     } else {
       // Complex sub-structure.
       components.push(getInitialValue(tmpIndex + 1, accessor) + ',' +

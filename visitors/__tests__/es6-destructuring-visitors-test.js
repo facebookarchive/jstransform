@@ -93,6 +93,17 @@ describe('es6-destructuring-visitors', function() {
     expect(eval(code)).toEqual([1, 3]);
   });
 
+  it('should handle rest elements of an array', function() {
+    var code = transform([
+      'var [x, ...xs] = [1, 2, 3];'
+    ].join('\n'));
+
+    eval(code);
+
+    expect(x).toEqual(1);
+    expect(xs).toEqual([2, 3]);
+  });
+
   it('should swap two variables w/o third using pattern', function() {
     var code = transform([
       'var x = 10, y = 20;',
