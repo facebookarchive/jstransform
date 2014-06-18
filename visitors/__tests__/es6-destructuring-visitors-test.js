@@ -162,7 +162,7 @@ describe('es6-destructuring-visitors', function() {
     eval(code);
 
     var x = 10, y = 20;
-    var foo = new Point({x, y});
+    var foo = new Point({x: x, y: y});
     var data = foo.getData([30, 40]);
 
     expect(data).toBe(100);
