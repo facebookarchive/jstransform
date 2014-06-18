@@ -54,6 +54,11 @@ function createState(source, rootNode, transformOptions) {
      */
     mungeNamespace: '',
     /**
+     * Ref to the node for the current MethodDefinition
+     * @type {Object}
+     */
+    methodNode: null,
+    /**
      * Ref to the node for the FunctionExpression of the enclosing
      * MethodDefinition
      * @type {Object}
