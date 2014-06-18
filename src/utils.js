@@ -249,6 +249,16 @@ function catchup(end, state, contentTransformer) {
 }
 
 /**
+ * Returns original source for an AST node.
+ * @param {object} node
+ * @param {object} state
+ * @return {string}
+ */
+function getNodeSourceText(node, state) {
+  return state.g.source.substring(node.range[0], node.range[1]);
+}
+
+/**
  * Removes all non-whitespace characters
  */
 var reNonWhite = /(\S)/g;
@@ -582,3 +592,4 @@ exports.updateIndent = updateIndent;
 exports.updateState = updateState;
 exports.analyzeAndTraverse = analyzeAndTraverse;
 exports.getOrderedChildren = getOrderedChildren;
+exports.getNodeSourceText = getNodeSourceText;
