@@ -1026,6 +1026,42 @@ describe('es6-classes', function() {
         expect(fooInst.protoFn()).toBe(true);
         expect(Foo.staticFn()).toBe(true);
       });
+
+      // TODO: Support this with an option
+      //       There isn't a simple way to support both this and IE8 at the same
+      //       time, so for now we're not supporting it at all. That said, if
+      //       someone should feel so inclined to build non-ie8 support for it,
+      //       feel free to do so and just make it possible to enable/disable
+      //       this functionality via a transform option
+      it('throws upon encountering getter methods', function() {
+        expect(function() {
+          transform([
+            'class Foo {',
+            '  get title() {',
+            '    return 42;',
+            '  }',
+            '}'
+          ].join('\n'));
+        }).toThrow(
+          'This transform does not support getter methods for ES6 classes. ' +
+          '(line: 2, col: 2)'
+        );
+      });
+
+      it('throws upon encountering setter methods', function() {
+        expect(function() {
+          transform([
+            'class Foo {',
+            '  set title(value) {',
+            '    this._title = value;',
+            '  }',
+            '}'
+          ].join('\n'));
+        }).toThrow(
+          'This transform does not support setter methods for ES6 classes. ' +
+          '(line: 2, col: 2)'
+        );
+      });
     });
   });
 
