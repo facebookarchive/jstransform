@@ -107,19 +107,19 @@ describe('es6ArrowFunctionsTransform', function() {
     // 0 params, expression.
     expectTransform(
       '() => this.value;',
-      'function()  {return this.value;}.bind(this);'
+      '(function()  {return this.value;}.bind(this));'
     );
 
     // 0 params, expression wrapped in parens
     expectTransform(
       '() => (this.value);',
-      'function()  {return this.value;}.bind(this);'
+      '(function()  {return this.value;}.bind(this));'
     );
 
     // 1 param, no-parens, expression, no this.
     expectTransform(
       'x => x * x;',
-      'function(x)  {return x * x;};'
+      '(function(x)  {return x * x;});'
     );
 
     // 1 param, parens, expression, as argument, no this.
@@ -160,7 +160,7 @@ describe('es6ArrowFunctionsTransform', function() {
       ' return         x + y;',
       '};'
     ].join('\n'), [
-      'function(',
+      '(function(',
       '',
       '',
       '    x,',
@@ -172,7 +172,7 @@ describe('es6ArrowFunctionsTransform', function() {
       '',
       '        {',
       ' return         x + y;',
-      '};'
+      '});'
     ].join('\n'));
 
     // Preserve line numbers with single parens-free param ugly code.
@@ -182,10 +182,10 @@ describe('es6ArrowFunctionsTransform', function() {
       '     =>',
       '   x;'
     ].join('\n'), [
-      'function(x)',
+      '(function(x)',
       '',
       '     ',
-      '   {return x;};'
+      '   {return x;});'
     ].join('\n'));
 
     // Preserve line numbers with single parens param ugly code.
@@ -199,14 +199,14 @@ describe('es6ArrowFunctionsTransform', function() {
       '     =>',
       '   x;'
     ].join('\n'), [
-      'function(',
+      '(function(',
       '',
       '   x)',
       '',
       '',
       '',
       '     ',
-      '   {return x;};'
+      '   {return x;});'
     ].join('\n'));
 
     // Preserve line numbers with parens around expression.
@@ -215,15 +215,15 @@ describe('es6ArrowFunctionsTransform', function() {
       '  x',
       ');'
     ].join('\n'), [
-      'function(x)  ',
+      '(function(x)  ',
       '  {return x;}',
-      ';'
+      ');'
     ].join('\n'));
 
     // Preserve typechecker annotation.
     expectTransform(
       '(/*string*/foo, /*bool*/bar) => foo;',
-      'function(/*string*/foo, /*bool*/bar)  {return foo;};'
+      '(function(/*string*/foo, /*bool*/bar)  {return foo;});'
     );
 
   });

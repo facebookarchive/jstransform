@@ -48,7 +48,14 @@ var utils = require('../src/utils');
  * @public
  */
 function visitArrowFunction(traverse, node, path, state) {
-  // Prologue.
+  var notInExpression = (path[0].type === Syntax.ExpressionStatement);
+
+  // Wrap a function into a grouping operator, if it's not
+  // in the expression position.
+  if (notInExpression) {
+    utils.append('(', state);
+  }
+
   utils.append('function', state);
   renderParams(traverse, node, path, state);
 
@@ -70,6 +77,11 @@ function visitArrowFunction(traverse, node, path, state) {
   }
 
   utils.catchupWhiteSpace(node.range[1], state);
+
+  // Close wrapper if not in the expression.
+  if (notInExpression) {
+    utils.append(')', state);
+  }
 
   return false;
 }
