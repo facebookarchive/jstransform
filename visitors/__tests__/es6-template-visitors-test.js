@@ -1,5 +1,5 @@
 /**
- * @emails mroch@fb.com javascript@lists.facebook.com
+ * @emails mroch@fb.com
  */
 
 /*jshint evil:true*/

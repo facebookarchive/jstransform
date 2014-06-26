@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @emails jeffmo@fb.com javascript@lists.facebook.com
+ * @emails jeffmo@fb.com
  */
 
 require('mock-modules').autoMockOff();
