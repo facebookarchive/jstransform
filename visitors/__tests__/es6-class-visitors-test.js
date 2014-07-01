@@ -1027,6 +1027,23 @@ describe('es6-classes', function() {
         expect(Foo.staticFn()).toBe(true);
       });
 
+      it('preserves generators', function() {
+        var code =  transform([
+          'class Foo {',
+          '  static *title() {',
+          '    yield 21;',
+          '  }',
+          '',
+          '  *gen() {',
+          '    yield 42;',
+          '  }',
+          '}'
+        ].join('\n'));
+
+        expect(code).toMatch(/Foo.title\s*=\s*function\*\(/);
+        expect(code).toMatch(/Foo.prototype.gen\s*=\s*function\*\(/);
+      });
+
       it('properly handles getter methods in ES5 compat mode', function() {
         var code =  transform([
           'class Foo {',
