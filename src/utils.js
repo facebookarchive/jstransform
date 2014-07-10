@@ -18,6 +18,7 @@
 /*jslint node: true*/
 var Syntax = require('esprima-fb').Syntax;
 var leadingIndentRegexp = /(^|\n)( {2}|\t)/g;
+var nonWhiteRegexp = /(\S)/g;
 
 /**
  * A `state` object represents the state of the parser. It has "local" and
@@ -258,14 +259,22 @@ function getNodeSourceText(node, state) {
   return state.g.source.substring(node.range[0], node.range[1]);
 }
 
+function replaceNonWhite(value) {
+  return value.replace(nonWhiteRegexp, ' ');
+}
+
 /**
  * Removes all non-whitespace characters
  */
-var reNonWhite = /(\S)/g;
 function stripNonWhite(value) {
-  return value.replace(reNonWhite, function() {
-    return '';
-  });
+  return value.replace(nonWhiteRegexp, '');
+}
+
+/**
+ * Catches up as `catchup` but replaces non-whitespace chars with spaces.
+ */
+function catchupWhiteOut(end, state) {
+  catchup(end, state, replaceNonWhite);
 }
 
 /**
@@ -574,6 +583,7 @@ function getBoundaryNode(path) {
 
 exports.append = append;
 exports.catchup = catchup;
+exports.catchupWhiteOut = catchupWhiteOut;
 exports.catchupWhiteSpace = catchupWhiteSpace;
 exports.catchupNewlines = catchupNewlines;
 exports.containsChildOfType = containsChildOfType;

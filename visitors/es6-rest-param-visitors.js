@@ -42,6 +42,13 @@ function _nodeIsFunctionWithRestParam(node) {
 }
 
 function visitFunctionParamsWithRestParam(traverse, node, path, state) {
+  if (node.parametricType) {
+    utils.catchup(node.parametricType.range[0], state);
+    path.unshift(node);
+    traverse(node.parametricType, path, state);
+    path.shift();
+  }
+
   // Render params.
   if (node.params.length) {
     path.unshift(node);

@@ -200,17 +200,17 @@ function visitClassFunctionExpression(traverse, node, path, state) {
     );
   }
   utils.move(methodNode.key.range[1], state);
+  utils.append('(', state);
 
   var params = node.params;
   if (params.length > 0) {
+    utils.move(params[0].range[0], state);
     for (var i = 0; i < params.length; i++) {
       utils.catchup(node.params[i].range[0], state);
       path.unshift(node);
       traverse(params[i], path, state);
       path.shift();
     }
-  } else {
-    utils.append('(', state);
   }
   utils.append(')', state);
   utils.catchupWhiteSpace(node.body.range[0], state);
