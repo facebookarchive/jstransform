@@ -41,6 +41,7 @@ var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
 var restParamVisitors = require('./es6-rest-param-visitors');
+var restPropertyHelpers = require('./es7-rest-property-helpers');
 
 // -------------------------------------------------------
 // 1. Structured variable declarations.
@@ -85,6 +86,26 @@ function getDestructuredComponents(node, state) {
       continue;
     }
 
+    if (item.type === Syntax.SpreadElement) {
+      // Spread/rest of an array.
+      // TODO(dmitrys): support spread in the middle of a pattern
+      // and also for function param patterns: [x, ...xs, y]
+      components.push(item.argument.name +
+        '=Array.prototype.slice.call(' +
+        getTmpVar(tmpIndex) + ',' + idx + ')'
+      );
+      continue;
+    }
+
+    if (item.type === Syntax.SpreadProperty) {
+      var restExpression = restPropertyHelpers.renderRestExpression(
+        getTmpVar(tmpIndex),
+        patternItems
+      );
+      components.push(item.argument.name + '=' + restExpression);
+      continue;
+    }
+
     // Depending on pattern type (Array or Object), we get
     // corresponding pattern item parts.
     var accessor = getPatternItemAccessor(node, item, tmpIndex, idx);
@@ -94,14 +115,6 @@ function getDestructuredComponents(node, state) {
     if (value.type === Syntax.Identifier) {
       // Simple pattern item.
       components.push(value.name + '=' + accessor);
-    } else if (value.type === Syntax.SpreadElement) {
-      // Spread/rest of an array.
-      // TODO(dmitrys): support spread in the middle of a pattern
-      // and also for function param patterns: [x, ...xs, y]
-      components.push(value.argument.name +
-        '=Array.prototype.slice.call(' +
-        getTmpVar(tmpIndex) + ',' + idx + ')'
-      );
     } else {
       // Complex sub-structure.
       components.push(
