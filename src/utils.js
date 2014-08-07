@@ -466,7 +466,6 @@ function getLexicalBindingMetadata(identName, state) {
  * @param {function} analyzer
  * @param {function} traverser
  * @param {object} node
- * @param {function} visitor
  * @param {array} path
  * @param {object} state
  */

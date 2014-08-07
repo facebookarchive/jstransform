@@ -55,7 +55,6 @@ function _nodeIsBlockScopeBoundary(node, parentNode) {
 
 /**
  * @param {object} node
- * @param {function} visitor
  * @param {array} path
  * @param {object} state
  */
