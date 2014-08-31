@@ -134,7 +134,7 @@ function getPatternItems(node) {
 function getPatternItemAccessor(node, patternItem, tmpIndex, idx) {
   var tmpName = getTmpVar(tmpIndex);
   return node.type === Syntax.ObjectPattern
-    ? tmpName + '.' + patternItem.key.name
+    ? tmpName + ' ? ' + tmpName + '.' + patternItem.key.name + ' : undefined'
     : tmpName + '[' + idx + ']';
 }
 
