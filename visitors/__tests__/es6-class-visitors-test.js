@@ -1027,12 +1027,144 @@ describe('es6-classes', function() {
         expect(Foo.staticFn()).toBe(true);
       });
 
-      // TODO: Support this with an option
-      //       There isn't a simple way to support both this and IE8 at the same
-      //       time, so for now we're not supporting it at all. That said, if
-      //       someone should feel so inclined to build non-ie8 support for it,
-      //       feel free to do so and just make it possible to enable/disable
-      //       this functionality via a transform option
+      it('properly handles getter methods in ES5 compat mode', function() {
+        var code =  transform([
+          'class Foo {',
+          '  get title() {',
+          '    return 42;',
+          '  }',
+          '  get "foo bar"() {',
+          '    return 21;',
+          '  }',
+          '}'
+        ].join('\n'), {es5: true});
+
+        eval(code);
+
+        var fooInst = new Foo();
+        var descriptor =
+          Object.getOwnPropertyDescriptor(Foo.prototype, 'title');
+
+        expect(fooInst.title).toBe(42);
+        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.configurable).toBe(true);
+        expect(fooInst['foo bar']).toBe(21);
+      });
+
+      it('properly handles setter methods in ES5 compat mode', function() {
+        var code =  transform([
+          'class Foo {',
+          '  set title(value) {',
+          '    this.__title = 42;',
+          '  }',
+          '  set "foo bar"(value) {',
+          '    this.__fooBar = 21;',
+          '  }',
+          '}'
+        ].join('\n'), {es5: true});
+
+        eval(code);
+
+        var fooInst = new Foo();
+        fooInst.title = 42;
+        fooInst['foo bar'] = 21;
+        var descriptor =
+          Object.getOwnPropertyDescriptor(Foo.prototype, 'title');
+
+        expect(fooInst.__title).toBe(42);
+        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.configurable).toBe(true);
+        expect(fooInst.__fooBar).toBe(21);
+      });
+
+      it('properly handles getters and setters in ES5 compat mode', function() {
+        var code =  transform([
+          'class Foo {',
+          '  get title() {',
+          '    return this.__title;',
+          '  }',
+          '',
+          '  set title(value) {',
+          '    this.__title = value;',
+          '  }',
+          '}'
+        ].join('\n'), {es5: true});
+
+        eval(code);
+
+        var fooInst = new Foo();
+        var descriptor =
+          Object.getOwnPropertyDescriptor(Foo.prototype, 'title');
+        fooInst.title = 42;
+
+        expect(fooInst.__title).toBe(42);
+        expect(fooInst.title).toBe(42);
+        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.configurable).toBe(true);
+      });
+
+      it('properly handles static and non-static getters and setters ' +
+         'with the same name in ES5 compat mode', function() {
+        var code =  transform([
+          'class Foo {',
+          '  static get title() {',
+          '    return this._title;',
+          '  }',
+          '',
+          '  static set title(value) {',
+          '    this._title = value;',
+          '  }',
+          '',
+          '  get title() {',
+          '    return this.__title;',
+          '  }',
+          '',
+          '  set title(value) {',
+          '    this.__title = value;',
+          '  }',
+          '}'
+        ].join('\n'), {es5: true});
+
+        eval(code);
+
+        var fooInst = new Foo();
+        Foo.title = 21;
+        fooInst.title = 42;
+
+        expect(Foo.title).toBe(21);
+        expect(fooInst.title).toBe(42);
+      });
+
+      it('properly handles private getters and setters in ES5 compat mode',
+          function() {
+        var code =  transform([
+          'class Foo {',
+          '  get title() {',
+          '    return this._private;',
+          '  }',
+          '',
+          '  set title(value) {',
+          '    this._private = value;',
+          '  }',
+          '',
+          '  get _private() {',
+          '    return this.__superPrivate;',
+          '  }',
+          '',
+          '  set _private(value) {',
+          '    this.__superPrivate = value;',
+          '  }',
+          '}'
+        ].join('\n'), {es5: true});
+
+        eval(code);
+
+        var fooInst = new Foo();
+        fooInst.title = 42;
+
+        expect(fooInst.__superPrivate).toBe(42);
+      });
+
       it('throws upon encountering getter methods', function() {
         expect(function() {
           transform([

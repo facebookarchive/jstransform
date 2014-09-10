@@ -142,7 +142,7 @@ function _shouldMungeIdentifier(node, state) {
  * @param {object} state
  */
 function visitClassMethod(traverse, node, path, state) {
-  if (node.kind === 'get' || node.kind === 'set') {
+  if (!state.g.opts.es5 && (node.kind === 'get' || node.kind === 'set')) {
     throw new Error(
       'This transform does not support ' + node.kind + 'ter methods for ES6 ' +
       'classes. (line: ' + node.loc.start.line + ', col: ' +
@@ -170,6 +170,8 @@ visitClassMethod.test = function(node, path, state) {
  */
 function visitClassFunctionExpression(traverse, node, path, state) {
   var methodNode = path[0];
+  var isGetter = methodNode.kind === 'get';
+  var isSetter = methodNode.kind === 'set';
 
   state = utils.updateState(state, {
     methodFuncNode: node
@@ -180,6 +182,7 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   } else {
     var methodAccessor;
     var prototypeOrStatic = methodNode.static ? '' : '.prototype';
+    var objectAccessor = state.className + prototypeOrStatic;
 
     if (methodNode.key.type === Syntax.Identifier) {
       // foo() {}
@@ -187,17 +190,34 @@ function visitClassFunctionExpression(traverse, node, path, state) {
       if (_shouldMungeIdentifier(methodNode.key, state)) {
         methodAccessor = _getMungedName(methodAccessor, state);
       }
-      methodAccessor = '.' + methodAccessor;
+      if (isGetter || isSetter) {
+        methodAccessor = JSON.stringify(methodAccessor);
+      } else {
+        methodAccessor = '.' + methodAccessor;
+      }
     } else if (methodNode.key.type === Syntax.Literal) {
-      // 'foo bar'() {}
-      methodAccessor = '[' + JSON.stringify(methodNode.key.value) + ']';
+      // 'foo bar'() {}  | get 'foo bar'() {} | set 'foo bar'() {}
+      methodAccessor = JSON.stringify(methodNode.key.value);
+      if (!(isGetter || isSetter)) {
+        methodAccessor = '[' + methodAccessor + ']';
+      }
     }
 
-    utils.append(
-      state.className + prototypeOrStatic +
-      methodAccessor + '=function',
-      state
-    );
+    if (isSetter || isGetter) {
+      utils.append(
+        'Object.defineProperty(' +
+          objectAccessor + ',' +
+          methodAccessor + ',' +
+          '{enumerable:true,configurable:true,' +
+          methodNode.kind + ':function',
+        state
+      );
+    } else {
+      utils.append(
+        objectAccessor + methodAccessor + '=function',
+        state
+      );
+    }
   }
   utils.move(methodNode.key.range[1], state);
   utils.append('(', state);
@@ -229,6 +249,9 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   utils.catchup(node.body.range[1], state);
 
   if (methodNode.key.name !== 'constructor') {
+    if (isGetter || isSetter) {
+      utils.append('})', state);
+    }
     utils.append(';', state);
   }
   return false;
