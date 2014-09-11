@@ -64,8 +64,9 @@ Writing a simple custom transform:
  * for using eval.
  */
 var jstransform = require('jstransform');
-var Syntax = require('esprima-fb').Syntax;
 var utils = require('jstransform/src/utils');
+
+var Syntax = jstransform.Syntax;
 
 function visitEvalCallExpressions(traverse, node, path, state) {
   // Appends an alert() call to the output buffer *before* the visited node
