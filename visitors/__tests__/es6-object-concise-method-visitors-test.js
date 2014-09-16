@@ -101,6 +101,26 @@ describe('es6-object-concise-method-visitors', function() {
     );
   });
 
+  it('should preserve generators', function() {
+    // Identifier properties
+    expectTransform(
+      'var foo = {*bar(x) {yield x;}};',
+      'var foo = {bar:function*(x) {yield x;}};'
+    );
+
+    // Literal properties
+    expectTransform(
+      'var foo = {*"abc"(x) {yield x;}, *42(x) {yield x;}};',
+      'var foo = {"abc":function*(x) {yield x;}, 42:function*(x) {yield x;}};'
+    );
+
+    // Dynamic properties
+    expectTransform(
+      'var foo = {*[a+b](x) {yield x;}}',
+      'var foo = {[a+b]:function*(x) {yield x;}}'
+    );
+  });
+
 });
 
 

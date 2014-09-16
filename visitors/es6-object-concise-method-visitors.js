@@ -17,7 +17,7 @@
 /*jslint node:true*/
 
 /**
- * Desugars concise methods of objects to ES3 function expressions.
+ * Desugars concise methods of objects to function expressions.
  *
  * var foo = {
  *   method(x, y) { ... }
@@ -33,8 +33,18 @@ var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
 function visitObjectConciseMethod(traverse, node, path, state) {
+  var isGenerator = node.value.generator;
+  if (isGenerator) {
+    utils.catchupWhiteSpace(node.range[0] + 1, state);
+  }
+  if (node.computed) { // [<expr>]() { ...}
+    utils.catchup(node.key.range[1] + 1, state);
+  }
   utils.catchup(node.key.range[1], state);
-  utils.append(':function', state);
+  utils.append(
+    ':function' + (isGenerator ? '*' : ''),
+    state
+  );
   path.unshift(node);
   traverse(node.value, path, state);
   path.shift();

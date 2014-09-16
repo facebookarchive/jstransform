@@ -214,7 +214,8 @@ function visitClassFunctionExpression(traverse, node, path, state) {
       );
     } else {
       utils.append(
-        objectAccessor + methodAccessor + '=function',
+        objectAccessor +
+        methodAccessor + '=function' + (node.generator ? '*' : ''),
         state
       );
     }
