@@ -40,6 +40,7 @@
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
 
+var reservedWordsHelper = require('./reserved-words-helper');
 var restParamVisitors = require('./es6-rest-param-visitors');
 var restPropertyHelpers = require('./es7-rest-property-helpers');
 
@@ -133,9 +134,15 @@ function getPatternItems(node) {
 
 function getPatternItemAccessor(node, patternItem, tmpIndex, idx) {
   var tmpName = getTmpVar(tmpIndex);
-  return node.type === Syntax.ObjectPattern
-    ? tmpName + '.' + patternItem.key.name
-    : tmpName + '[' + idx + ']';
+  if (node.type === Syntax.ObjectPattern) {
+    if (reservedWordsHelper.isReservedWord(patternItem.key.name)) {
+      return tmpName + '["' + patternItem.key.name + '"]';
+    } else {
+      return tmpName + '.' + patternItem.key.name;
+    }
+  } else {
+    return tmpName + '[' + idx + ']';
+  }
 }
 
 function getPatternItemValue(node, patternItem) {

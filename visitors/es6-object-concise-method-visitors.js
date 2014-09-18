@@ -31,6 +31,7 @@
 
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
+var reservedWordsHelper = require('./reserved-words-helper');
 
 function visitObjectConciseMethod(traverse, node, path, state) {
   var isGenerator = node.value.generator;
@@ -39,7 +40,14 @@ function visitObjectConciseMethod(traverse, node, path, state) {
   }
   if (node.computed) { // [<expr>]() { ...}
     utils.catchup(node.key.range[1] + 1, state);
+  } else if (!state.g.opts.es5 &&
+      reservedWordsHelper.isReservedWord(node.key.name)) {
+    utils.catchup(node.key.range[0], state);
+    utils.append('"', state);
+    utils.catchup(node.key.range[1], state);
+    utils.append('"', state);
   }
+
   utils.catchup(node.key.range[1], state);
   utils.append(
     ':function' + (isGenerator ? '*' : ''),

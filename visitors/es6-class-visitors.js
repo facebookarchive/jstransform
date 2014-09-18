@@ -24,6 +24,7 @@
 var base62 = require('base62');
 var Syntax = require('esprima-fb').Syntax;
 var utils = require('../src/utils');
+var reservedWordsHelper = require('./reserved-words-helper');
 
 var declareIdentInLocalScope = utils.declareIdentInLocalScope;
 var initScopeMetadata = utils.initScopeMetadata;
@@ -192,6 +193,9 @@ function visitClassFunctionExpression(traverse, node, path, state) {
       }
       if (isGetter || isSetter) {
         methodAccessor = JSON.stringify(methodAccessor);
+      } else if (!state.g.opts.es5 &&
+          reservedWordsHelper.isReservedWord(methodAccessor)) {
+        methodAccessor = '[' + JSON.stringify(methodAccessor) + ']';
       } else {
         methodAccessor = '.' + methodAccessor;
       }
