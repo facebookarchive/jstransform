@@ -40,8 +40,7 @@ function visitObjectConciseMethod(traverse, node, path, state) {
   }
   if (node.computed) { // [<expr>]() { ...}
     utils.catchup(node.key.range[1] + 1, state);
-  } else if (!state.g.opts.es5 &&
-      reservedWordsHelper.isReservedWord(node.key.name)) {
+  } else if (reservedWordsHelper.isReservedWord(node.key.name)) {
     utils.catchup(node.key.range[0], state);
     utils.append('"', state);
     utils.catchup(node.key.range[1], state);

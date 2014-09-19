@@ -193,8 +193,7 @@ function visitClassFunctionExpression(traverse, node, path, state) {
       }
       if (isGetter || isSetter) {
         methodAccessor = JSON.stringify(methodAccessor);
-      } else if (!state.g.opts.es5 &&
-          reservedWordsHelper.isReservedWord(methodAccessor)) {
+      } else if (reservedWordsHelper.isReservedWord(methodAccessor)) {
         methodAccessor = '[' + JSON.stringify(methodAccessor) + ']';
       } else {
         methodAccessor = '.' + methodAccessor;
