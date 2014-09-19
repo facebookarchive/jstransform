@@ -1420,4 +1420,22 @@ describe('es6-classes', function() {
       });
     });
   });
+
+  describe('handles reserved words', function() {
+    it('handles reserved words', function() {
+      expect(transform([
+        'class Foo {',
+        '  delete(x, y) {',
+        '    bar();',
+        '  }',
+        '}'
+      ].join('\n'))).toBe([
+        'function Foo(){"use strict";}',
+        '  Foo.prototype["delete"]=function(x, y) {"use strict";',
+        '    bar();',
+        '  };',
+        ''
+      ].join('\n'))
+    });
+  });
 });

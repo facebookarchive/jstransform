@@ -121,6 +121,12 @@ describe('es6-object-concise-method-visitors', function() {
     );
   });
 
+  it('should handle reserved words', function() {
+    expectTransform(
+      '({delete(x) {}})',
+      '({"delete":function(x) {}})'
+    );
+  });
 });
 
 

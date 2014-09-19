@@ -12,6 +12,7 @@ describe('es6-destructuring-visitors', function() {
   var destructuringVisitors;
   var conciseMethodVisitors;
   var shortObjectsVisitors;
+  var reservedWordsVisitors;
   var restParamVisitors;
   var classVisitorsVisitors;
   var arrowFunctionVisitors;
@@ -25,6 +26,7 @@ describe('es6-destructuring-visitors', function() {
     destructuringVisitors = require('../es6-destructuring-visitors').visitorList;
     conciseMethodVisitors = require('../es6-object-concise-method-visitors').visitorList;
     shortObjectsVisitors = require('../es6-object-short-notation-visitors').visitorList;
+    reservedWordsVisitors = require('../reserved-words-visitors').visitorList;
     restParamVisitors = require('../es6-rest-param-visitors').visitorList;
     classVisitorsVisitors = require('../es6-class-visitors').visitorList;
     arrowFunctionVisitors = require('../es6-arrow-function-visitors').visitorList;
@@ -34,7 +36,8 @@ describe('es6-destructuring-visitors', function() {
       shortObjectsVisitors,
       restParamVisitors,
       classVisitorsVisitors,
-      arrowFunctionVisitors
+      arrowFunctionVisitors,
+      reservedWordsVisitors
     );
   });
 
@@ -243,6 +246,12 @@ describe('es6-destructuring-visitors', function() {
     );
   });
 
+  it('should handle reserved words', function() {
+    expectTransform(
+      'var {delete: x} = {delete: 1};',
+      'var $__0=   {"delete": 1},x=$__0["delete"];'
+    );
+  });
 });
 
 
