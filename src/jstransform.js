@@ -251,3 +251,4 @@ function transform(visitors, source, options) {
 }
 
 exports.transform = transform;
+exports.utils = utils;
