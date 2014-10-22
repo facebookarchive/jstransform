@@ -542,16 +542,22 @@ function enqueueNodeWithStartIndex(queue, node) {
  * @param {string} type - node type to lookup.
  */
 function containsChildOfType(node, type) {
+  return containsChildMatching(node, function(node) {
+    return node.type === type;
+  });
+}
+
+function containsChildMatching(node, matcher) {
   var foundMatchingChild = false;
   function nodeTypeAnalyzer(node) {
-    if (node.type === type) {
+    if (matcher(node) === true) {
       foundMatchingChild = true;
       return false;
     }
   }
   function nodeTypeTraverser(child, path, state) {
     if (!foundMatchingChild) {
-      foundMatchingChild = containsChildOfType(child, type);
+      foundMatchingChild = containsChildMatching(child, matcher);
     }
   }
   analyzeAndTraverse(
@@ -585,6 +591,7 @@ exports.catchup = catchup;
 exports.catchupWhiteOut = catchupWhiteOut;
 exports.catchupWhiteSpace = catchupWhiteSpace;
 exports.catchupNewlines = catchupNewlines;
+exports.containsChildMatching = containsChildMatching;
 exports.containsChildOfType = containsChildOfType;
 exports.createState = createState;
 exports.declareIdentInLocalScope = declareIdentInLocalScope;

@@ -72,7 +72,14 @@ function visitArrowFunction(traverse, node, path, state) {
 
   // Bind the function only if `this` value is used
   // inside it or inside any sub-expression.
-  if (utils.containsChildOfType(node.body, Syntax.ThisExpression)) {
+  var containsBindingSyntax =
+    utils.containsChildMatching(node.body, function(node) {
+      return node.type === Syntax.ThisExpression
+             || (node.type === Syntax.Identifier
+                 && node.name === "super");
+    });
+
+  if (containsBindingSyntax) {
     utils.append('.bind(this)', state);
   }
 

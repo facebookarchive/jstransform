@@ -41,7 +41,6 @@ describe('es6ArrowFunctionsTransform', function() {
   }
 
   it('should capture correct this value at different levels', function() {
-
     var code = transform([
       'var foo = {',
       '  createFooGetter: function() {',
@@ -69,6 +68,16 @@ describe('es6ArrowFunctionsTransform', function() {
     );
 
     expect(eval(code)).toEqual([10, 40, 90]);
+  });
+
+  it('binds if any `super` keyword is referenced', function() {
+    var code = transform(
+      'var fn=x=>super;'
+    );
+
+    // We have to do a source text comparison here because `super` is a reserved
+    // keyword (so we can't eval it).
+    expect(code).toEqual('var fn=function(x){return super;}.bind(this);');
   });
 
   it('should filter an array using arrow with two params', function() {
@@ -103,7 +112,6 @@ describe('es6ArrowFunctionsTransform', function() {
   // Syntax tests.
 
   it('should correctly transform arrows', function() {
-
     // 0 params, expression.
     expectTransform(
       '() => this.value;',
@@ -225,7 +233,6 @@ describe('es6ArrowFunctionsTransform', function() {
       '(/*string*/foo, /*bool*/bar) => foo;',
       '(function(/*string*/foo, /*bool*/bar)  {return foo;});'
     );
-
   });
 });
 
