@@ -24,7 +24,7 @@
  *   return {x, y}; // {x: x, y: y}
  * };
  *
- * // Destrucruting.
+ * // Destructuring.
  * function init({port, ip, coords: {x, y}}) { ... }
  *
  */
