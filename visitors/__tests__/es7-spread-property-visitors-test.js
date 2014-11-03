@@ -5,10 +5,11 @@
 /*jshint evil:true*/
 
 require('mock-modules').autoMockOff();
+require('../../../../../static_upstream/polyfill/Object.es6');
 
 describe('es7-spread-property-visitors', function() {
   var transformFn;
-
+  var originalAssign = Object.assign;
   var visitors;
 
   // These are placeholder variables in scope that we can use to assert that a
@@ -38,6 +39,17 @@ describe('es7-spread-property-visitors', function() {
     eval(transform(code));
     return expect(objectAssignMock);
   }
+
+  afterEach(function() {
+    Object.assign = originalAssign;
+  });
+
+  // Polyfill sanity checks
+
+  it('has access to a working Object.assign implementation', function() {
+    expect(typeof Object.assign).toBe('function');
+    expect(Object.assign({ b: 2 }, null, { a: 1 })).toEqual({ a: 1, b: 2 });
+  });
 
   // Semantic tests.
 
@@ -134,4 +146,10 @@ describe('es7-spread-property-visitors', function() {
     );
   });
 
+  it('should silently ignore falsy values', function() {
+    var x = null;
+    var y = { y: 'y' };
+    var obj = { ...x, ...y, ...{ ...false, z: 'z', ...y } };
+    expect(obj).toEqual({ y: 'y', z: 'z' });
+  });
 });
