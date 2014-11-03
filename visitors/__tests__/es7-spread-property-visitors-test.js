@@ -9,9 +9,6 @@ require('mock-modules').autoMockOff();
 describe('es7-spread-property-visitors', function() {
   var transformFn;
 
-  var shortObjectsVisitors;
-  var spreadPropertyVisitors;
-
   var visitors;
 
   // These are placeholder variables in scope that we can use to assert that a
@@ -24,12 +21,7 @@ describe('es7-spread-property-visitors', function() {
     require('mock-modules').dumpCache();
     transformFn = require('../../src/jstransform').transform;
 
-    shortObjectsVisitors = require('../es6-object-short-notation-visitors').visitorList;
-    spreadPropertyVisitors = require('../es7-spread-property-visitors').visitorList;
-
-    visitors = spreadPropertyVisitors.concat(
-      shortObjectsVisitors
-    );
+    visitors = require('../es7-spread-property-visitors').visitorList;
   });
 
   function transform(code) {
@@ -57,7 +49,7 @@ describe('es7-spread-property-visitors', function() {
 
   it('coalesces consecutive properties into a single object', function() {
     expectObjectAssign(
-      'var xyz = { ...x, y: 2, z }'
+      'var xyz = { ...x, y: 2, z: z }'
     ).toBeCalledWith({}, x, { y: 2, z: z });
 
   });
