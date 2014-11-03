@@ -586,6 +586,14 @@ function getBoundaryNode(path) {
   );
 }
 
+function getTempVar(tempVarIndex) {
+  return '$__' + tempVarIndex;
+}
+
+function getTempVarWithValue(tempVarIndex, tempVarValue) {
+  return getTempVar(tempVarIndex) + '=' + tempVarValue;
+}
+
 exports.append = append;
 exports.catchup = catchup;
 exports.catchupWhiteOut = catchupWhiteOut;
@@ -609,3 +617,5 @@ exports.updateState = updateState;
 exports.analyzeAndTraverse = analyzeAndTraverse;
 exports.getOrderedChildren = getOrderedChildren;
 exports.getNodeSourceText = getNodeSourceText;
+exports.getTempVar = getTempVar;
+exports.getTempVarWithValue = getTempVarWithValue;

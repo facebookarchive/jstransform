@@ -75,24 +75,16 @@ visitFunctionParamsWithRestParam.test = function(node, path, state) {
   return _nodeIsFunctionWithRestParam(node);
 };
 
-function getInitialValue(index, value) {
-  return getTmpVar(index) + '=' + value;
-}
-
-function getTmpVar(index) {
-  return '$__' + index;
-}
-
 function renderRestParamSetup(functionNode, state) {
   var idx = state.localScope.tempVarIndex++;
   var len = state.localScope.tempVarIndex++;
 
   return 'for (var ' + functionNode.rest.name + '=[],' +
-    getInitialValue(idx, functionNode.params.length) + ',' +
-    getInitialValue(len, 'arguments.length') + ';' +
-    getTmpVar(idx) + '<' + getTmpVar(len) + ';' +
-    getTmpVar(idx) + '++) ' +
-    functionNode.rest.name + '.push(arguments[' + getTmpVar(idx) + ']);';
+    utils.getTempVarWithValue(idx, functionNode.params.length) + ',' +
+    utils.getTempVarWithValue(len, 'arguments.length') + ';' +
+    utils.getTempVar(idx) + '<' +  utils.getTempVar(len) + ';' +
+    utils.getTempVar(idx) + '++) ' +
+    functionNode.rest.name + '.push(arguments[' + utils.getTempVar(idx) + ']);';
 }
 
 function visitFunctionBodyWithRestParam(traverse, node, path, state) {
