@@ -69,7 +69,11 @@ function visitObjectLiteralSpread(traverse, node, path, state) {
     }
   }
 
-  utils.catchup(node.range[1] - 1, state);
+  // Strip any non-whitespace between the last item and the end.
+  // We only catch up on whitespace so that we ignore any trailing commas which
+  // are stripped out for IE8 support. Unfortunately, this also strips out any
+  // trailing comments.
+  utils.catchupWhiteSpace(node.range[1] - 1, state);
 
   // Skip the trailing }
   utils.move(node.range[1], state);

@@ -94,6 +94,20 @@ describe('es7-spread-property-visitors', function() {
     );
   });
 
+  it('should remove trailing commas after properties', function() {
+    expectTransform(
+      'let xyz = { ...x, y: 1, }',
+      'let xyz = Object.assign({}, x, {y: 1 })'
+    );
+  });
+
+  it('should remove trailing commas after spread', function() {
+    expectTransform(
+      'let xyz = { x: 1, ...y, }',
+      'let xyz = Object.assign({ x: 1}, y )'
+    );
+  });
+
   // Don't transform
 
   it('should not transform destructuring assignment', function() {
