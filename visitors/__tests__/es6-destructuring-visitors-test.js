@@ -68,6 +68,18 @@ describe('es6-destructuring-visitors', function() {
     expect(eval(code)).toEqual([20, 10]);
   });
 
+  it('should should not redeclare vars with assignment expression', function() {
+    var code = transform([
+      'var x = 10, y = 20;',
+      '(function() {',
+      '  [x, y] = [y, x];',
+      '})();',
+      '([x, y]);'
+    ].join('\n'));
+
+    expect(eval(code)).toEqual([20, 10]);
+  });
+
   it('should handle object pattern assignment expression', function() {
     var code = transform([
       'var x = 10, y = 20;',

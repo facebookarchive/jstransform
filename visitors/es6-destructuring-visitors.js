@@ -175,7 +175,7 @@ function visitStructuredAssignment(traverse, node, path, state) {
   utils.catchup(exprNode.right.range[1], state);
 
   utils.append(
-    ',' + getDestructuredComponents(exprNode.left, state) + ';',
+    ';' + getDestructuredComponents(exprNode.left, state) + ';',
     state
   );
 
