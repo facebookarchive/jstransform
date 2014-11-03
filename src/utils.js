@@ -448,8 +448,8 @@ function initScopeMetadata(boundaryNode, path, node) {
 function declareIdentInLocalScope(identName, metaData, state) {
   state.localScope.identifiers[identName] = {
     boundaryNode: metaData.boundaryNode,
-    path: metaData.path,
-    node: metaData.node,
+    path: metaData.bindingPath,
+    node: metaData.bindingNode,
     state: Object.create(state)
   };
 }
