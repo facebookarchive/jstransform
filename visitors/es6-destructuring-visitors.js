@@ -245,7 +245,7 @@ function visitFunctionBodyForStructuredParameter(traverse, node, path, state) {
 
   if (funcNode.rest) {
     utils.append(
-      restParamVisitors.renderRestParamSetup(funcNode),
+      restParamVisitors.renderRestParamSetup(funcNode, state),
       state
     );
   }

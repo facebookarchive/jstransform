@@ -17,16 +17,20 @@
 /*jslint node:true*/
 
 /**
- * Desugars ES6 rest parameters into ES3 arguments slicing.
+ * Desugars ES6 rest parameters into an ES3 arguments array.
  *
  * function printf(template, ...args) {
  *   args.forEach(...);
- * };
+ * }
+ *
+ * We could use `Array.prototype.slice.call`, but that usage of arguments causes
+ * functions to be deoptimized in V8, so instead we use a for-loop.
  *
  * function printf(template) {
- *   var args = [].slice.call(arguments, 1);
+ *   for (var args = [], $__0 = 1, $__1 = arguments.length; $__0 < $__1; $__0++)
+ *     args.push(arguments[$__0]);
  *   args.forEach(...);
- * };
+ * }
  *
  */
 var Syntax = require('esprima-fb').Syntax;
@@ -71,17 +75,30 @@ visitFunctionParamsWithRestParam.test = function(node, path, state) {
   return _nodeIsFunctionWithRestParam(node);
 };
 
-function renderRestParamSetup(functionNode) {
-  return 'var ' + functionNode.rest.name + '=Array.prototype.slice.call(' +
-           'arguments,' +
-           functionNode.params.length +
-         ');';
+function getInitialValue(index, value) {
+  return getTmpVar(index) + '=' + value;
+}
+
+function getTmpVar(index) {
+  return '$__' + index;
+}
+
+function renderRestParamSetup(functionNode, state) {
+  var idx = state.localScope.tempVarIndex++;
+  var len = state.localScope.tempVarIndex++;
+
+  return 'for (var ' + functionNode.rest.name + '=[],' +
+    getInitialValue(idx, functionNode.params.length) + ',' +
+    getInitialValue(len, 'arguments.length') + ';' +
+    getTmpVar(idx) + '<' + getTmpVar(len) + ';' +
+    getTmpVar(idx) + '++) ' +
+    functionNode.rest.name + '.push(arguments[' + getTmpVar(idx) + ']);';
 }
 
 function visitFunctionBodyWithRestParam(traverse, node, path, state) {
   utils.catchup(node.range[0] + 1, state);
   var parentNode = path[0];
-  utils.append(renderRestParamSetup(parentNode), state);
+  utils.append(renderRestParamSetup(parentNode, state), state);
   return true;
 }
 
