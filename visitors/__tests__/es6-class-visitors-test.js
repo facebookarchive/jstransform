@@ -1438,4 +1438,26 @@ describe('es6-classes', function() {
       ].join('\n'))
     });
   });
+
+  describe('preserve newlines', function() {
+    it('preserve newlines', function() {
+      expect(transform([
+        'class Foo {',
+        '  A',
+        '   (',
+        '     x, y) {',
+        '    bar();',
+        '  }',
+        '}'
+      ].join('\n'))).toBe([
+        'function Foo(){"use strict";}',
+        '  Foo.prototype.A=function(',
+        '',
+        'x, y) {"use strict";',
+        '    bar();',
+        '  };',
+        ''
+      ].join('\n'))
+    });
+  });
 });

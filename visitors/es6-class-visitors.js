@@ -228,7 +228,7 @@ function visitClassFunctionExpression(traverse, node, path, state) {
 
   var params = node.params;
   if (params.length > 0) {
-    utils.move(params[0].range[0], state);
+    utils.catchupNewlines(params[0].range[0], state);
     for (var i = 0; i < params.length; i++) {
       utils.catchup(node.params[i].range[0], state);
       path.unshift(node);
