@@ -5,7 +5,7 @@
 /*jshint evil:true*/
 
 require('mock-modules').autoMockOff();
-require('../../../../../static_upstream/polyfill/Object.es6');
+require('../../polyfill/Object.es6');
 
 describe('es7-spread-property-visitors', function() {
   var transformFn;
