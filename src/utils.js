@@ -448,8 +448,8 @@ function initScopeMetadata(boundaryNode, path, node) {
 function declareIdentInLocalScope(identName, metaData, state) {
   state.localScope.identifiers[identName] = {
     boundaryNode: metaData.boundaryNode,
-    path: metaData.path,
-    node: metaData.node,
+    path: metaData.bindingPath,
+    node: metaData.bindingNode,
     state: Object.create(state)
   };
 }
@@ -586,6 +586,14 @@ function getBoundaryNode(path) {
   );
 }
 
+function getTempVar(tempVarIndex) {
+  return '$__' + tempVarIndex;
+}
+
+function getTempVarWithValue(tempVarIndex, tempVarValue) {
+  return getTempVar(tempVarIndex) + '=' + tempVarValue;
+}
+
 exports.append = append;
 exports.catchup = catchup;
 exports.catchupWhiteOut = catchupWhiteOut;
@@ -609,3 +617,5 @@ exports.updateState = updateState;
 exports.analyzeAndTraverse = analyzeAndTraverse;
 exports.getOrderedChildren = getOrderedChildren;
 exports.getNodeSourceText = getNodeSourceText;
+exports.getTempVar = getTempVar;
+exports.getTempVarWithValue = getTempVarWithValue;

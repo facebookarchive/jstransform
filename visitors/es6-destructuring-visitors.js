@@ -53,7 +53,7 @@ var restPropertyHelpers = require('./es7-rest-property-helpers');
 
 function visitStructuredVariable(traverse, node, path, state) {
   // Allocate new temp for the pattern.
-  utils.append(getTmpVar(state.localScope.tempVarIndex) + '=', state);
+  utils.append(utils.getTempVar(state.localScope.tempVarIndex) + '=', state);
   // Skip the pattern and assign the init to the temp.
   utils.catchupWhiteSpace(node.init.range[0], state);
   traverse(node.init, path, state);
@@ -93,14 +93,14 @@ function getDestructuredComponents(node, state) {
       // and also for function param patterns: [x, ...xs, y]
       components.push(item.argument.name +
         '=Array.prototype.slice.call(' +
-        getTmpVar(tmpIndex) + ',' + idx + ')'
+        utils.getTempVar(tmpIndex) + ',' + idx + ')'
       );
       continue;
     }
 
     if (item.type === Syntax.SpreadProperty) {
       var restExpression = restPropertyHelpers.renderRestExpression(
-        getTmpVar(tmpIndex),
+        utils.getTempVar(tmpIndex),
         patternItems
       );
       components.push(item.argument.name + '=' + restExpression);
@@ -119,8 +119,8 @@ function getDestructuredComponents(node, state) {
     } else {
       // Complex sub-structure.
       components.push(
-        getInitialValue(++state.localScope.tempVarIndex, accessor) + ',' +
-        getDestructuredComponents(value, state)
+        utils.getTempVarWithValue(++state.localScope.tempVarIndex, accessor) +
+        ',' + getDestructuredComponents(value, state)
       );
     }
   }
@@ -133,14 +133,16 @@ function getPatternItems(node) {
 }
 
 function getPatternItemAccessor(node, patternItem, tmpIndex, idx) {
-  var tmpName = getTmpVar(tmpIndex);
+  var tmpName = utils.getTempVar(tmpIndex);
   if (node.type === Syntax.ObjectPattern) {
     if (reservedWordsHelper.isReservedWord(patternItem.key.name)) {
       return tmpName + '["' + patternItem.key.name + '"]';
-    } else {
+    } else if (patternItem.key.type === Syntax.Literal) {
+      return tmpName + '[' + JSON.stringify(patternItem.key.value) + ']';
+    } else if (patternItem.key.type === Syntax.Identifier) {
       return tmpName + '.' + patternItem.key.name;
     }
-  } else {
+  } else if (node.type === Syntax.ArrayPattern) {
     return tmpName + '[' + idx + ']';
   }
 }
@@ -149,14 +151,6 @@ function getPatternItemValue(node, patternItem) {
   return node.type === Syntax.ObjectPattern
     ? patternItem.value
     : patternItem;
-}
-
-function getInitialValue(index, value) {
-  return getTmpVar(index) + '=' + value;
-}
-
-function getTmpVar(index) {
-  return '$__' + index;
 }
 
 // -------------------------------------------------------
@@ -168,14 +162,14 @@ function getTmpVar(index) {
 
 function visitStructuredAssignment(traverse, node, path, state) {
   var exprNode = node.expression;
-  utils.append('var ' + getTmpVar(state.localScope.tempVarIndex) + '=', state);
+  utils.append('var ' + utils.getTempVar(state.localScope.tempVarIndex) + '=', state);
 
   utils.catchupWhiteSpace(exprNode.right.range[0], state);
   traverse(exprNode.right, path, state);
   utils.catchup(exprNode.right.range[1], state);
 
   utils.append(
-    ',' + getDestructuredComponents(exprNode.left, state) + ';',
+    ';' + getDestructuredComponents(exprNode.left, state) + ';',
     state
   );
 
@@ -200,7 +194,7 @@ visitStructuredAssignment.test = function(node, path, state) {
 // -------------------------------------------------------
 
 function visitStructuredParameter(traverse, node, path, state) {
-  utils.append(getTmpVar(getParamIndex(node, path)), state);
+  utils.append(utils.getTempVar(getParamIndex(node, path)), state);
   utils.catchupWhiteSpace(node.range[1], state);
   return true;
 }
@@ -245,7 +239,7 @@ function visitFunctionBodyForStructuredParameter(traverse, node, path, state) {
 
   if (funcNode.rest) {
     utils.append(
-      restParamVisitors.renderRestParamSetup(funcNode),
+      restParamVisitors.renderRestParamSetup(funcNode, state),
       state
     );
   }

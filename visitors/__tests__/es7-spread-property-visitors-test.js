@@ -5,13 +5,11 @@
 /*jshint evil:true*/
 
 require('mock-modules').autoMockOff();
+require('../../polyfill/Object.es6');
 
 describe('es7-spread-property-visitors', function() {
   var transformFn;
-
-  var shortObjectsVisitors;
-  var spreadPropertyVisitors;
-
+  var originalAssign = Object.assign;
   var visitors;
 
   // These are placeholder variables in scope that we can use to assert that a
@@ -24,12 +22,7 @@ describe('es7-spread-property-visitors', function() {
     require('mock-modules').dumpCache();
     transformFn = require('../../src/jstransform').transform;
 
-    shortObjectsVisitors = require('../es6-object-short-notation-visitors').visitorList;
-    spreadPropertyVisitors = require('../es7-spread-property-visitors').visitorList;
-
-    visitors = spreadPropertyVisitors.concat(
-      shortObjectsVisitors
-    );
+    visitors = require('../es7-spread-property-visitors').visitorList;
   });
 
   function transform(code) {
@@ -47,6 +40,17 @@ describe('es7-spread-property-visitors', function() {
     return expect(objectAssignMock);
   }
 
+  afterEach(function() {
+    Object.assign = originalAssign;
+  });
+
+  // Polyfill sanity checks
+
+  it('has access to a working Object.assign implementation', function() {
+    expect(typeof Object.assign).toBe('function');
+    expect(Object.assign({ b: 2 }, null, { a: 1 })).toEqual({ a: 1, b: 2 });
+  });
+
   // Semantic tests.
 
   it('uses Object.assign with an empty new target object', function() {
@@ -57,7 +61,7 @@ describe('es7-spread-property-visitors', function() {
 
   it('coalesces consecutive properties into a single object', function() {
     expectObjectAssign(
-      'var xyz = { ...x, y: 2, z }'
+      'var xyz = { ...x, y: 2, z: z }'
     ).toBeCalledWith({}, x, { y: 2, z: z });
 
   });
@@ -102,6 +106,20 @@ describe('es7-spread-property-visitors', function() {
     );
   });
 
+  it('should remove trailing commas after properties', function() {
+    expectTransform(
+      'let xyz = { ...x, y: 1, }',
+      'let xyz = Object.assign({}, x, {y: 1 })'
+    );
+  });
+
+  it('should remove trailing commas after spread', function() {
+    expectTransform(
+      'let xyz = { x: 1, ...y, }',
+      'let xyz = Object.assign({ x: 1}, y )'
+    );
+  });
+
   // Don't transform
 
   it('should not transform destructuring assignment', function() {
@@ -128,4 +146,10 @@ describe('es7-spread-property-visitors', function() {
     );
   });
 
+  it('should silently ignore falsy values', function() {
+    var x = null;
+    var y = { y: 'y' };
+    var obj = { ...x, ...y, ...{ ...false, z: 'z', ...y } };
+    expect(obj).toEqual({ y: 'y', z: 'z' });
+  });
 });

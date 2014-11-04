@@ -39,7 +39,7 @@ var RESERVED_WORDS = [].concat(
   LITERALS
 );
 
-var reservedWordsMap = {};
+var reservedWordsMap = Object.create(null);
 RESERVED_WORDS.forEach(function(k) {
     reservedWordsMap[k] = true;
 });

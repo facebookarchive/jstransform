@@ -120,7 +120,7 @@ function renderExpressionBody(traverse, node, path, state) {
   // Special handling of rest param.
   if (node.rest) {
     utils.append(
-      restParamVisitors.renderRestParamSetup(node),
+      restParamVisitors.renderRestParamSetup(node, state),
       state
     );
   }

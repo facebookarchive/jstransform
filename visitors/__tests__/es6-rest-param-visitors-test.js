@@ -260,21 +260,26 @@ describe('es6-rest-param-visitors', () => {
     it('1-line function decl with 2 args', () => {
       expectTransform(
         'function foo(x, y, ...args) { return x + y + args[0]; }',
-        'function foo(x, y ) {var args=Array.prototype.slice.call(arguments,2); return x + y + args[0]; }'
+        'function foo(x, y ) {for (var args=[],$__0=2,$__1=arguments.length;' +
+          '$__0<$__1;$__0++) args.push(arguments[$__0]); return x + y + ' +
+          'args[0]; }'
       );
     })
 
     it('1-line function expression with 1 arg', () => {
       expectTransform(
         '(function(x, ...args) { return args;});',
-        '(function(x ) {var args=Array.prototype.slice.call(arguments,1); return args;});'
+        '(function(x ) {for (var args=[],$__0=1,$__1=arguments.length;' +
+          '$__0<$__1;$__0++) args.push(arguments[$__0]); return args;});'
       );
     });
 
     it('1-line function expression with no args', () => {
       expectTransform(
         'map(function(...args) { return args.map(log); });',
-        'map(function() {var args=Array.prototype.slice.call(arguments,0); return args.map(log); });'
+        'map(function() {for (var args=[],$__0=0,$__1=arguments.length;' +
+          '$__0<$__1;$__0++) args.push(arguments[$__0]); ' +
+          'return args.map(log); });'
       );
     });
 
@@ -300,7 +305,8 @@ describe('es6-rest-param-visitors', () => {
         '',
         ')',
         '',
-        '        {var args=Array.prototype.slice.call(arguments,1);',
+        '        {for (var args=[],$__0=1,$__1=arguments.length;$__0<$__1;' +
+          '$__0++) args.push(arguments[$__0]);',
         ' return         args;',
         '}'
       ].join('\n'));
@@ -310,7 +316,8 @@ describe('es6-rest-param-visitors', () => {
       expectTransform(
         'function foo(/*string*/foo, /*bool*/bar, ...args) { return args; }',
         'function foo(/*string*/foo, /*bool*/bar ) {' +
-          'var args=Array.prototype.slice.call(arguments,2); ' +
+          'for (var args=[],$__0=2,$__1=arguments.length;$__0<$__1;$__0++) ' +
+            'args.push(arguments[$__0]); ' +
           'return args; ' +
         '}'
       );

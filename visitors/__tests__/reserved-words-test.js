@@ -40,6 +40,9 @@ describe('reserved-words', function() {
       var code = 'foo.delete;';
 
       expect(transform(code)).toEqual('foo["delete"];');
+
+      code = '(foo++).delete;';
+      expect(transform(code)).toEqual('(foo++)["delete"];');
     });
 
     it('should handle call expressions', function() {
