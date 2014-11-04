@@ -37,7 +37,8 @@
     "jest-cli": "^0.1.5"
   },
   "jest": {
-    "scriptPreprocessor": "<rootDir>/jestPreprocessor.js"
+    "scriptPreprocessor": "<rootDir>/jestPreprocessor.js",
+    "setupEnvScriptFile": "<rootDir>/jestEnvironment.js"
   },
   "scripts": {
     "prepublish": "jest",
