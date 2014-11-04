@@ -58,6 +58,15 @@ describe('es6-destructuring-visitors', function() {
     expect(eval(code)).toEqual(30);
   });
 
+  it('should handle literal property names', function() {
+    var code = transform([
+      'var {x, "y y": yy, 0: z} = {x: 10, "y y": 20, 0: 30};',
+      '([x, yy, z]);'
+    ].join('\n'));
+
+    expect(eval(code)).toEqual([10, 20, 30]);
+  });
+
   it('should handle array pattern assignment expression', function() {
     var code = transform([
       'var x = 10, y = 20;',
