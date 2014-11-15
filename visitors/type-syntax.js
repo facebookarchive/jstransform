@@ -82,9 +82,9 @@ function visitTypeAnnotatedObjectOrArrayPattern(traverse, node, path, state) {
   return false;
 }
 visitTypeAnnotatedObjectOrArrayPattern.test = function(node, path, state) {
-  var right_type = node.type === Syntax.ObjectPattern
+  var rightType = node.type === Syntax.ObjectPattern
                 || node.type === Syntax.ArrayPattern;
-  return right_type && node.typeAnnotation;
+  return rightType && node.typeAnnotation;
 };
 
 /**

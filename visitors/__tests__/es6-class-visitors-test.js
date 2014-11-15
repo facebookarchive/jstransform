@@ -375,7 +375,8 @@ describe('es6-classes', function() {
         expect(childInst.protoProp).toBe('protoProp');
       });
 
-      it('handles extension from an expression', function() {
+      // ES6 draft section 14.5
+      it('handles extension from a left hand expression', function() {
         var code = transform([
           'function Parent1() {}',
           'Parent1.prototype.protoProp = "protoProp";',
@@ -383,7 +384,7 @@ describe('es6-classes', function() {
 
           'function Parent2() {}',
 
-          'class Child extends true ? Parent1 : Parent2 {}'
+          'class Child extends (true ? Parent1 : Parent2) {}'
         ].join('\n'));
 
         var exports = new Function(
