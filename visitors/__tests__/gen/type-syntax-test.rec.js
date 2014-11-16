@@ -122,8 +122,8 @@ module.exports = {
         },
         'a={set fooProp(value:number){}}': {
             raworiginal: 'a={set fooProp(value:number){}}',
-            transformed: 'a={set fooProp(value:number){}}',
-            eval: 'Unexpected token :',
+            transformed: 'a={set fooProp(value       ){}}',
+            eval: 'No error',
 
         },
         'class Foo {set fooProp(value:number){}}': {

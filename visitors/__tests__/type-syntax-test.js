@@ -21,7 +21,15 @@ if (!!module.parent) {
       'function foo<T,S>() {}',
       'a=function<T,S>() {}',
       'a={set fooProp(value:number){}}',
+      /* TODO: add these back once esprima can parse them
+      'a={set fooProp(value:number): void{}}',
+      'a={get fooProp(): number {}}',
+      */
       'class Foo {set fooProp(value:number){}}',
+      /* TODO: add these back once esprima can parse them
+      'class Foo {set fooProp(value:number): void{}}',
+      'class Foo {get fooProp(): number{}}',
+      */
       'var numVal:number;',
       'var numVal:number = otherNumVal;',
       'var a: {numVal: number};',

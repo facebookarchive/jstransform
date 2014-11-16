@@ -115,7 +115,7 @@ function visitMethod(traverse, node, path, state) {
 }
 
 visitMethod.test = function(node, path, state) {
-  return (node.type === "Property" && node.method)
+  return (node.type === "Property" && (node.method || node.kind === "set" || node.kind === "get"))
       || (node.type === "MethodDefinition");
 };
 
