@@ -28,7 +28,7 @@ describe('static type class syntax', function() {
     require('mock-modules').dumpCache();
 
     classSyntaxVisitors =
-      require('jstransform/visitors/es6-class-visitors').visitorList;
+      require('../es6-class-visitors').visitorList;
     flowSyntaxVisitors = require('../type-syntax.js').visitorList;
     jstransform = require('jstransform');
 
@@ -132,7 +132,7 @@ describe('static type class syntax', function() {
 
     it('strips annotated params before a rest parameter', () => {
       var restParamVisitors =
-        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
+        require('../es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'class Foo {',

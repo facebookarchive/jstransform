@@ -1,5 +1,5 @@
 var esprima = require('esprima-fb');
-var utils = require('jstransform/src/utils');
+var utils = require('../src/utils');
 
 var Syntax = esprima.Syntax;
 
