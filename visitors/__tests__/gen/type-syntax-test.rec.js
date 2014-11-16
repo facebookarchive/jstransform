@@ -8,97 +8,97 @@ module.exports = {
     'TypeAnnotations': {
         'function foo(numVal: any){}': {
             raworiginal: 'function foo(numVal: any){}',
-            transformed: 'function foo(numVal){}',
+            transformed: 'function foo(numVal     ){}',
             eval: 'No error',
 
         },
         'function foo(numVal: number){}': {
             raworiginal: 'function foo(numVal: number){}',
-            transformed: 'function foo(numVal){}',
+            transformed: 'function foo(numVal        ){}',
             eval: 'No error',
 
         },
         'function foo(numVal: number, strVal: string){}': {
             raworiginal: 'function foo(numVal: number, strVal: string){}',
-            transformed: 'function foo(numVal, strVal){}',
+            transformed: 'function foo(numVal        , strVal        ){}',
             eval: 'No error',
 
         },
         'function foo(numVal: number, untypedVal){}': {
             raworiginal: 'function foo(numVal: number, untypedVal){}',
-            transformed: 'function foo(numVal, untypedVal){}',
+            transformed: 'function foo(numVal        , untypedVal){}',
             eval: 'No error',
 
         },
         'function foo(untypedVal, numVal: number){}': {
             raworiginal: 'function foo(untypedVal, numVal: number){}',
-            transformed: 'function foo(untypedVal, numVal){}',
+            transformed: 'function foo(untypedVal, numVal        ){}',
             eval: 'No error',
 
         },
         'function foo(nullableNum: ?number){}': {
             raworiginal: 'function foo(nullableNum: ?number){}',
-            transformed: 'function foo(nullableNum){}',
+            transformed: 'function foo(nullableNum         ){}',
             eval: 'No error',
 
         },
         'function foo(callback: () => void){}': {
             raworiginal: 'function foo(callback: () => void){}',
-            transformed: 'function foo(callback){}',
+            transformed: 'function foo(callback            ){}',
             eval: 'No error',
 
         },
         'function foo(callback: () => number){}': {
             raworiginal: 'function foo(callback: () => number){}',
-            transformed: 'function foo(callback){}',
+            transformed: 'function foo(callback              ){}',
             eval: 'No error',
 
         },
         'function foo(callback: (_:bool) => number){}': {
             raworiginal: 'function foo(callback: (_:bool) => number){}',
-            transformed: 'function foo(callback){}',
+            transformed: 'function foo(callback                    ){}',
             eval: 'No error',
 
         },
         'function foo(callback: (_1:bool, _2:string) => number){}': {
             raworiginal: 'function foo(callback: (_1:bool, _2:string) => number){}',
-            transformed: 'function foo(callback){}',
+            transformed: 'function foo(callback                                ){}',
             eval: 'No error',
 
         },
         'function foo(callback: (_1:bool, ...foo:Array<number>) => number){}': {
             raworiginal: 'function foo(callback: (_1:bool, ...foo:Array<number>) => number){}',
-            transformed: 'function foo(callback){}',
+            transformed: 'function foo(callback                                           ){}',
             eval: 'No error',
 
         },
         'function foo():number{}': {
             raworiginal: 'function foo():number{}',
-            transformed: 'function foo()}',
+            transformed: 'function foo()        }',
             eval: 'Unexpected token }',
 
         },
         'function foo():() => void{}': {
             raworiginal: 'function foo():() => void{}',
-            transformed: 'function foo()}',
+            transformed: 'function foo()            }',
             eval: 'Unexpected token }',
 
         },
         'function foo():(_:bool) => number{}': {
             raworiginal: 'function foo():(_:bool) => number{}',
-            transformed: 'function foo()}',
+            transformed: 'function foo()                    }',
             eval: 'Unexpected token }',
 
         },
         'function foo():(_?:bool) => number{}': {
             raworiginal: 'function foo():(_?:bool) => number{}',
-            transformed: 'function foo()}',
+            transformed: 'function foo()                     }',
             eval: 'Unexpected token }',
 
         },
         'function foo(): {} {}': {
             raworiginal: 'function foo(): {} {}',
-            transformed: 'function foo(){}',
+            transformed: 'function foo()     {}',
             eval: 'No error',
 
         },
@@ -122,97 +122,97 @@ module.exports = {
         },
         'a={set fooProp(value:number){}}': {
             raworiginal: 'a={set fooProp(value:number){}}',
-            transformed: 'a={set fooProp(value:number)){}}',
+            transformed: 'a={set fooProp(value:number){}}',
             eval: 'Unexpected token :',
 
         },
         'class Foo {set fooProp(value:number){}}': {
             raworiginal: 'class Foo {set fooProp(value:number){}}',
-            transformed: 'class Foo {set fooProp(value){}}',
+            transformed: 'class Foo {set fooProp(value       ){}}',
             eval: 'Unexpected reserved word',
 
         },
         'var numVal:number;': {
             raworiginal: 'var numVal:number;',
-            transformed: 'var numVal;',
+            transformed: 'var numVal       ;',
             eval: 'No error',
 
         },
         'var numVal:number = otherNumVal;': {
             raworiginal: 'var numVal:number = otherNumVal;',
-            transformed: 'var numVal = otherNumVal;',
+            transformed: 'var numVal        = otherNumVal;',
             eval: 'otherNumVal is not defined',
 
         },
         'var a: {numVal: number};': {
             raworiginal: 'var a: {numVal: number};',
-            transformed: 'var a;',
+            transformed: 'var a                  ;',
             eval: 'No error',
 
         },
         'var a: {numVal: number;};': {
             raworiginal: 'var a: {numVal: number;};',
-            transformed: 'var a;',
+            transformed: 'var a                   ;',
             eval: 'No error',
 
         },
         'var a: {numVal: number; [indexer: string]: number};': {
             raworiginal: 'var a: {numVal: number; [indexer: string]: number};',
-            transformed: 'var a;',
+            transformed: 'var a                                             ;',
             eval: 'No error',
 
         },
         'var a: ?{numVal: number};': {
             raworiginal: 'var a: ?{numVal: number};',
-            transformed: 'var a;',
+            transformed: 'var a                   ;',
             eval: 'No error',
 
         },
         'var a: {numVal: number; strVal: string}': {
             raworiginal: 'var a: {numVal: number; strVal: string}',
-            transformed: 'var a',
+            transformed: 'var a                                  ',
             eval: 'No error',
 
         },
         'var a: {subObj: {strVal: string}}': {
             raworiginal: 'var a: {subObj: {strVal: string}}',
-            transformed: 'var a',
+            transformed: 'var a                            ',
             eval: 'No error',
 
         },
         'var a: {subObj: ?{strVal: string}}': {
             raworiginal: 'var a: {subObj: ?{strVal: string}}',
-            transformed: 'var a',
+            transformed: 'var a                             ',
             eval: 'No error',
 
         },
         'var a: {param1: number; param2: string}': {
             raworiginal: 'var a: {param1: number; param2: string}',
-            transformed: 'var a',
+            transformed: 'var a                                  ',
             eval: 'No error',
 
         },
         'var a: {param1: number; param2?: string}': {
             raworiginal: 'var a: {param1: number; param2?: string}',
-            transformed: 'var a',
+            transformed: 'var a                                   ',
             eval: 'No error',
 
         },
         'var a: {add(x:number, ...y:Array<string>): void}': {
             raworiginal: 'var a: {add(x:number, ...y:Array<string>): void}',
-            transformed: 'var a',
+            transformed: 'var a                                           ',
             eval: 'No error',
 
         },
         'var a: { id<T>(x: T): T; }': {
             raworiginal: 'var a: { id<T>(x: T): T; }',
-            transformed: 'var a',
+            transformed: 'var a                     ',
             eval: 'No error',
 
         },
         'var a:Array<number> = [1, 2, 3]': {
             raworiginal: 'var a:Array<number> = [1, 2, 3]',
-            transformed: 'var a = [1, 2, 3]',
+            transformed: 'var a               = [1, 2, 3]',
             eval: 'No error',
 
         },
@@ -248,7 +248,7 @@ module.exports = {
         },
         'class Foo<T> { bar<U>():number { return 42; }}': {
             raworiginal: 'class Foo<T> { bar<U>():number { return 42; }}',
-            transformed: 'class Foo<T> { bar<U>(){ return 42; }}',
+            transformed: 'class Foo<T> { bar<U>()        { return 42; }}',
             eval: 'Unexpected reserved word',
 
         },
@@ -260,7 +260,7 @@ module.exports = {
         },
         'function foo(requiredParam, optParam?) {}': {
             raworiginal: 'function foo(requiredParam, optParam?) {}',
-            transformed: 'function foo(requiredParam, optParam) {}',
+            transformed: 'function foo(requiredParam, optParam ) {}',
             eval: 'No error',
 
         },
@@ -272,31 +272,31 @@ module.exports = {
         },
         'var x : number | string = 4;': {
             raworiginal: 'var x : number | string = 4;',
-            transformed: 'var x  = 4;',
+            transformed: 'var x                   = 4;',
             eval: 'No error',
 
         },
         'class Array { concat(items:number | string) {}; }': {
             raworiginal: 'class Array { concat(items:number | string) {}; }',
-            transformed: 'class Array { concat(items) {}; }',
+            transformed: 'class Array { concat(items                ) {}; }',
             eval: 'Unexpected reserved word',
 
         },
         'var x : () => number | () => string = fn;': {
             raworiginal: 'var x : () => number | () => string = fn;',
-            transformed: 'var x  = fn;',
+            transformed: 'var x                               = fn;',
             eval: 'fn is not defined',
 
         },
         'var x: typeof Y = Y;': {
             raworiginal: 'var x: typeof Y = Y;',
-            transformed: 'var x = Y;',
+            transformed: 'var x           = Y;',
             eval: 'Y is not defined',
 
         },
         'var x: typeof Y | number = Y;': {
             raworiginal: 'var x: typeof Y | number = Y;',
-            transformed: 'var x = Y;',
+            transformed: 'var x                    = Y;',
             eval: 'Y is not defined',
 
         },
@@ -332,55 +332,55 @@ module.exports = {
         },
         'function foo(...rest: Array<number>) {}': {
             raworiginal: 'function foo(...rest: Array<number>) {}',
-            transformed: 'function foo(...rest) {}',
+            transformed: 'function foo(...rest               ) {}',
             eval: 'Unexpected token .',
 
         },
         '(function (...rest: Array<number>) {})': {
             raworiginal: '(function (...rest: Array<number>) {})',
-            transformed: '(function (...rest) {})',
+            transformed: '(function (...rest               ) {})',
             eval: 'Unexpected token .',
 
         },
         '((...rest: Array<number>) => rest)': {
             raworiginal: '((...rest: Array<number>) => rest)',
-            transformed: '((...rest) => rest)',
+            transformed: '((...rest               ) => rest)',
             eval: 'Unexpected token .',
 
         },
         'var a: Map<string, Array<string> >': {
             raworiginal: 'var a: Map<string, Array<string> >',
-            transformed: 'var a',
+            transformed: 'var a                             ',
             eval: 'No error',
 
         },
         'var a: Map<string, Array<string>>': {
             raworiginal: 'var a: Map<string, Array<string>>',
-            transformed: 'var a',
+            transformed: 'var a                            ',
             eval: 'No error',
 
         },
         'var a: number[]': {
             raworiginal: 'var a: number[]',
-            transformed: 'var a',
+            transformed: 'var a          ',
             eval: 'No error',
 
         },
         'var a: ?string[]': {
             raworiginal: 'var a: ?string[]',
-            transformed: 'var a',
+            transformed: 'var a           ',
             eval: 'No error',
 
         },
         'var a: Promise<bool>[]': {
             raworiginal: 'var a: Promise<bool>[]',
-            transformed: 'var a',
+            transformed: 'var a                 ',
             eval: 'No error',
 
         },
         'var a:(...rest:Array<number>) => number': {
             raworiginal: 'var a:(...rest:Array<number>) => number',
-            transformed: 'var a',
+            transformed: 'var a                                  ',
             eval: 'No error',
 
         },
