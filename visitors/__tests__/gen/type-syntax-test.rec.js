@@ -74,26 +74,26 @@ module.exports = {
         },
         'function foo():number{}': {
             raworiginal: 'function foo():number{}',
-            transformed: 'function foo()        }',
-            eval: 'Unexpected token }',
+            transformed: 'function foo()       {}',
+            eval: 'No error',
 
         },
         'function foo():() => void{}': {
             raworiginal: 'function foo():() => void{}',
-            transformed: 'function foo()            }',
-            eval: 'Unexpected token }',
+            transformed: 'function foo()           {}',
+            eval: 'No error',
 
         },
         'function foo():(_:bool) => number{}': {
             raworiginal: 'function foo():(_:bool) => number{}',
-            transformed: 'function foo()                    }',
-            eval: 'Unexpected token }',
+            transformed: 'function foo()                   {}',
+            eval: 'No error',
 
         },
         'function foo():(_?:bool) => number{}': {
             raworiginal: 'function foo():(_?:bool) => number{}',
-            transformed: 'function foo()                     }',
-            eval: 'Unexpected token }',
+            transformed: 'function foo()                    {}',
+            eval: 'No error',
 
         },
         'function foo(): {} {}': {

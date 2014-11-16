@@ -48,7 +48,7 @@ visitFunctionParametricAnnotation.test = function(node, path, state) {
 
 function visitFunctionReturnAnnotation(traverse, node, path, state) {
   utils.catchup(node.range[0], state);
-  utils.catchupWhiteOut(node.range[1] + 1, state);
+  utils.catchupWhiteOut(node.range[1], state);
   return false;
 }
 visitFunctionReturnAnnotation.test = function(node, path, state) {
