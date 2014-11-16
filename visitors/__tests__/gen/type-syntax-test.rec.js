@@ -385,4 +385,222 @@ module.exports = {
 
         },
     },
+    'Type Alias': {
+        'type FBID = number;': {
+            raworiginal: 'type FBID = number;',
+            transformed: '                   ',
+            eval: 'No error',
+
+        },
+        'type Foo<T> = Bar<T>': {
+            raworiginal: 'type Foo<T> = Bar<T>',
+            transformed: '                    ',
+            eval: 'No error',
+
+        },
+    },
+    'Interfaces': {
+        'interface A {}': {
+            raworiginal: 'interface A {}',
+            transformed: '              ',
+            eval: 'No error',
+
+        },
+        'interface A extends B {}': {
+            raworiginal: 'interface A extends B {}',
+            transformed: '                        ',
+            eval: 'No error',
+
+        },
+        'interface A<T> extends B<T>, C<T> {}': {
+            raworiginal: 'interface A<T> extends B<T>, C<T> {}',
+            transformed: '                                    ',
+            eval: 'No error',
+
+        },
+        'interface A { foo: () => number; }': {
+            raworiginal: 'interface A { foo: () => number; }',
+            transformed: '                                  ',
+            eval: 'No error',
+
+        },
+        'interface Dictionary { [index: string]: string; length: number; }': {
+            raworiginal: 'interface Dictionary { [index: string]: string; length: number; }',
+            transformed: '                                                                 ',
+            eval: 'No error',
+
+        },
+        'class Foo implements Bar {}': {
+            raworiginal: 'class Foo implements Bar {}',
+            transformed: 'class Foo implements Bar {}',
+            eval: 'Unexpected reserved word',
+
+        },
+        'class Foo extends Bar implements Bat, Man<number> {}': {
+            raworiginal: 'class Foo extends Bar implements Bat, Man<number> {}',
+            transformed: 'class Foo extends Bar implements Bat, Man<number> {}',
+            eval: 'Unexpected reserved word',
+
+        },
+        'class Foo extends class Bar implements Bat {} {}': {
+            raworiginal: 'class Foo extends class Bar implements Bat {} {}',
+            transformed: 'class Foo extends class Bar implements Bat {} {}',
+            eval: 'Unexpected reserved word',
+
+        },
+        'class Foo extends class Bar implements Bat {} implements Man {}': {
+            raworiginal: 'class Foo extends class Bar implements Bat {} implements Man {}',
+            transformed: 'class Foo extends class Bar implements Bat {} implements Man {}',
+            eval: 'Unexpected reserved word',
+
+        },
+    },
+    'Type Grouping': {
+        'var a: (number)': {
+            raworiginal: 'var a: (number)',
+            transformed: 'var a          ',
+            eval: 'No error',
+
+        },
+        'var a: (() => number) | () => string': {
+            raworiginal: 'var a: (() => number) | () => string',
+            transformed: 'var a                               ',
+            eval: 'No error',
+
+        },
+        'var a: number & (string | bool)': {
+            raworiginal: 'var a: number & (string | bool)',
+            transformed: 'var a                          ',
+            eval: 'No error',
+
+        },
+        'var a: (typeof A)': {
+            raworiginal: 'var a: (typeof A)',
+            transformed: 'var a            ',
+            eval: 'No error',
+
+        },
+    },
+    'XJS': {
+        '<a />': {
+            raworiginal: '<a />',
+            transformed: '<a />',
+            eval: 'Unexpected token <',
+
+        },
+        '<n:a n:v />': {
+            raworiginal: '<n:a n:v />',
+            transformed: '<n:a n:v />',
+            eval: 'Unexpected token <',
+
+        },
+        '<a n:foo="bar"> {value} <b><c /></b></a>': {
+            raworiginal: '<a n:foo="bar"> {value} <b><c /></b></a>',
+            transformed: '<a n:foo="bar"> {value} <b><c /></b></a>',
+            eval: 'Unexpected token <',
+
+        },
+        '<a b={" "} c=" " d="&amp;" e="id=1&group=2" f="&#123456789" g="&#123*;" h="&#x;" />': {
+            raworiginal: '<a b={" "} c=" " d="&amp;" e="id=1&group=2" f="&#123456789" g="&#123*;" h="&#x;" />',
+            transformed: '<a b={" "} c=" " d="&amp;" e="id=1&group=2" f="&#123456789" g="&#123*;" h="&#x;" />',
+            eval: 'Unexpected token <',
+
+        },
+        '<a\n/>': {
+            raworiginal: '<a\n/>',
+            transformed: '<a\n/>',
+            eval: 'Unexpected token <',
+
+        },
+        '<日本語></日本語>': {
+            raworiginal: '<日本語></日本語>',
+            transformed: '<日本語></日本語>',
+            eval: 'Unexpected token <',
+
+        },
+        '<AbC-def\n  test="&#x0026;&#38;">\nbar\nbaz\r\n</AbC-def>': {
+            raworiginal: '<AbC-def\n  test="&#x0026;&#38;">\nbar\nbaz\r\n</AbC-def>',
+            transformed: '<AbC-def\n  test="&#x0026;&#38;">\nbar\nbaz\r\n</AbC-def>',
+            eval: 'Unexpected token <',
+
+        },
+        '<a b={x ? <c /> : <d />} />': {
+            raworiginal: '<a b={x ? <c /> : <d />} />',
+            transformed: '<a b={x ? <c /> : <d />} />',
+            eval: 'Unexpected token <',
+
+        },
+        '<a>{}</a>': {
+            raworiginal: '<a>{}</a>',
+            transformed: '<a>{}</a>',
+            eval: 'Unexpected token <',
+
+        },
+        '<a>{/* this is a comment */}</a>': {
+            raworiginal: '<a>{/* this is a comment */}</a>',
+            transformed: '<a>{/* this is a comment */}</a>',
+            eval: 'Unexpected token <',
+
+        },
+        '<div>@test content</div>': {
+            raworiginal: '<div>@test content</div>',
+            transformed: '<div>@test content</div>',
+            eval: 'Unexpected token <',
+
+        },
+        '<div><br />7x invalid-js-identifier</div>': {
+            raworiginal: '<div><br />7x invalid-js-identifier</div>',
+            transformed: '<div><br />7x invalid-js-identifier</div>',
+            eval: 'Unexpected token <',
+
+        },
+        '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />': {
+            raworiginal: '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />',
+            transformed: '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />',
+            eval: 'Unexpected token <',
+
+        },
+        '<a.b></a.b>': {
+            raworiginal: '<a.b></a.b>',
+            transformed: '<a.b></a.b>',
+            eval: 'Unexpected token <',
+
+        },
+        '<a.b.c></a.b.c>': {
+            raworiginal: '<a.b.c></a.b.c>',
+            transformed: '<a.b.c></a.b.c>',
+            eval: 'Unexpected token <',
+
+        },
+        '(<div />) < x;': {
+            raworiginal: '(<div />) < x;',
+            transformed: '(<div />) < x;',
+            eval: 'Unexpected token <',
+
+        },
+        '<div {...props} />': {
+            raworiginal: '<div {...props} />',
+            transformed: '<div {...props} />',
+            eval: 'Unexpected token <',
+
+        },
+        '<div {...props} post="attribute" />': {
+            raworiginal: '<div {...props} post="attribute" />',
+            transformed: '<div {...props} post="attribute" />',
+            eval: 'Unexpected token <',
+
+        },
+        '<div pre="leading" pre2="attribute" {...props}></div>': {
+            raworiginal: '<div pre="leading" pre2="attribute" {...props}></div>',
+            transformed: '<div pre="leading" pre2="attribute" {...props}></div>',
+            eval: 'Unexpected token <',
+
+        },
+        '<a>    </a>': {
+            raworiginal: '<a>    </a>',
+            transformed: '<a>    </a>',
+            eval: 'Unexpected token <',
+
+        },
+    },
 };

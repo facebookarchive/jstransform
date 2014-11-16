@@ -64,7 +64,50 @@ if (!!module.parent) {
       'var a: ?string[]',
       'var a: Promise<bool>[]',
       'var a:(...rest:Array<number>) => number'
-    ]
+    ],
+    'Type Alias': [
+        'type FBID = number;',
+        'type Foo<T> = Bar<T>',
+    ],
+    'Interfaces': [
+        'interface A {}',
+        'interface A extends B {}',
+        'interface A<T> extends B<T>, C<T> {}',
+        'interface A { foo: () => number; }',
+        'interface Dictionary { [index: string]: string; length: number; }',
+        'class Foo implements Bar {}',
+        'class Foo extends Bar implements Bat, Man<number> {}',
+        'class Foo extends class Bar implements Bat {} {}',
+        'class Foo extends class Bar implements Bat {} implements Man {}',
+    ],
+    'Type Grouping': [
+        'var a: (number)',
+        'var a: (() => number) | () => string',
+        'var a: number & (string | bool)',
+        'var a: (typeof A)',
+    ],
+    'XJS': [
+        '<a />',
+        '<n:a n:v />',
+        '<a n:foo="bar"> {value} <b><c /></b></a>',
+        '<a b={" "} c=" " d="&amp;" e="id=1&group=2" f="&#123456789" g="&#123*;" h="&#x;" />',
+        '<a\n/>',
+        '<日本語></日本語>',
+        '<AbC-def\n  test="&#x0026;&#38;">\nbar\nbaz\r\n</AbC-def>',
+        '<a b={x ? <c /> : <d />} />',
+        '<a>{}</a>',
+        '<a>{/* this is a comment */}</a>',
+        '<div>@test content</div>',
+        '<div><br />7x invalid-js-identifier</div>',
+        '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />',
+        '<a.b></a.b>',
+        '<a.b.c></a.b.c>',
+        '(<div />) < x;',
+        '<div {...props} />',
+        '<div {...props} post="attribute" />',
+        '<div pre="leading" pre2="attribute" {...props}></div>',
+        '<a>    </a>',
+    ],
   };
 } else {
   require('mock-modules').autoMockOff();
