@@ -21,15 +21,11 @@ if (!!module.parent) {
       'function foo<T,S>() {}',
       'a=function<T,S>() {}',
       'a={set fooProp(value:number){}}',
-      /* TODO: add these back once esprima can parse them
       'a={set fooProp(value:number): void{}}',
       'a={get fooProp(): number {}}',
-      */
       'class Foo {set fooProp(value:number){}}',
-      /* TODO: add these back once esprima can parse them
       'class Foo {set fooProp(value:number): void{}}',
       'class Foo {get fooProp(): number{}}',
-      */
       'var numVal:number;',
       'var numVal:number = otherNumVal;',
       'var a: {numVal: number};',
@@ -115,6 +111,43 @@ if (!!module.parent) {
         '<div {...props} post="attribute" />',
         '<div pre="leading" pre2="attribute" {...props}></div>',
         '<a>    </a>',
+    ],
+    'Call Properties': [
+        'var a : { (): number }',
+        'var a : { (): number; }',
+        'var a : { (): number; y: string; (x: string): string }',
+        'var a : { <T>(x: T): number; }',
+        'interface A { (): number; }',
+    ],
+    'String Literal Types': [
+        'function createElement(tagName: "div"): HTMLDivElement {}',
+        'function createElement(tagName: \'div\'): HTMLDivElement {}',
+    ],
+    'Qualified Generic Type': [
+        'var a : A.B',
+        'var a : A.B.C',
+        'var a : A.B<T>',
+        'var a : typeof A.B<T>',
+    ],
+    'Declare Statements': [
+        'declare var foo',
+        'declare var foo;',
+        'declare function foo(): void',
+        'declare function foo(): void;',
+        'declare function foo<T>(): void;',
+        'declare function foo(x: number, y: string): void;',
+        'declare class A {}',
+        'declare class A<T> extends B<T> { x: number }',
+        'declare class A { static foo(): number; static x : string }',
+        'declare class A { static [ indexer: number]: string }',
+        'declare class A { static () : number }',
+    ],
+    'Declare Module': [
+        'declare module A {}',
+        'declare module "./a/b.js" {}',
+        'declare module A { declare var x: number; }',
+        'declare module A { declare function foo(): number; }',
+        'declare module A { declare class B { foo(): number; } }',
     ],
   };
 } else {

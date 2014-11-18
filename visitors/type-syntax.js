@@ -34,6 +34,20 @@ visitInterfaceDeclaration.test = function(node, path, state) {
   return node.type === Syntax.InterfaceDeclaration;
 };
 
+function visitDeclare(traverse, node, path, state) {
+  utils.catchupWhiteOut(node.range[1], state);
+  return false;
+}
+visitDeclare.test = function(node, path, state) {
+  switch (node.type) {
+  case Syntax.DeclareVariable:
+  case Syntax.DeclareFunction:
+  case Syntax.DeclareClass:
+  case Syntax.DeclareModule: return true
+  }
+  return false;
+}
+
 function visitFunctionParametricAnnotation(traverse, node, path, state) {
   utils.catchup(node.range[0], state);
   utils.catchupWhiteOut(node.range[1], state);
@@ -121,6 +135,7 @@ visitMethod.test = function(node, path, state) {
 
 exports.visitorList = [
   visitClassProperty,
+  visitDeclare,
   visitInterfaceDeclaration,
   visitFunctionParametricAnnotation,
   visitFunctionReturnAnnotation,
