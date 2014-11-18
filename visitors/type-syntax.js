@@ -1,5 +1,5 @@
 var esprima = require('esprima-fb');
-var utils = require('jstransform/src/utils');
+var utils = require('../src/utils');
 
 var Syntax = esprima.Syntax;
 
@@ -48,7 +48,7 @@ visitFunctionParametricAnnotation.test = function(node, path, state) {
 
 function visitFunctionReturnAnnotation(traverse, node, path, state) {
   utils.catchup(node.range[0], state);
-  utils.move(node.range[1] + 1, state);
+  utils.catchupWhiteOut(node.range[1], state);
   return false;
 }
 visitFunctionReturnAnnotation.test = function(node, path, state) {
@@ -57,7 +57,7 @@ visitFunctionReturnAnnotation.test = function(node, path, state) {
 
 function visitOptionalFunctionParameterAnnotation(traverse, node, path, state) {
   utils.catchup(node.range[0] + node.name.length, state);
-  utils.move(node.range[1], state);
+  utils.catchupWhiteOut(node.range[1], state);
   return false;
 }
 visitOptionalFunctionParameterAnnotation.test = function(node, path, state) {
@@ -69,7 +69,7 @@ visitOptionalFunctionParameterAnnotation.test = function(node, path, state) {
 
 function visitTypeAnnotatedIdentifier(traverse, node, path, state) {
   utils.catchup(node.typeAnnotation.range[0], state);
-  utils.move(node.typeAnnotation.range[1], state);
+  utils.catchupWhiteOut(node.typeAnnotation.range[1], state);
   return false;
 }
 visitTypeAnnotatedIdentifier.test = function(node, path, state) {
@@ -115,7 +115,7 @@ function visitMethod(traverse, node, path, state) {
 }
 
 visitMethod.test = function(node, path, state) {
-  return (node.type === "Property" && node.method)
+  return (node.type === "Property" && (node.method || node.kind === "set" || node.kind === "get"))
       || (node.type === "MethodDefinition");
 };
 

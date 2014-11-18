@@ -38,7 +38,11 @@
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/jestPreprocessor.js",
-    "setupEnvScriptFile": "<rootDir>/jestEnvironment.js"
+    "setupEnvScriptFile": "<rootDir>/jestEnvironment.js",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/__tests__/[^/]*/.+"
+    ]
   },
   "scripts": {
     "prepublish": "jest",

@@ -114,7 +114,7 @@ describe('static type function syntax', function() {
 
     it('strips annotated params before a rest parameter', () => {
       var restParamVisitors =
-        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
+        require('../es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'function foo(param1: number, ...args) {',
@@ -132,7 +132,7 @@ describe('static type function syntax', function() {
 
     it('strips annotated rest parameter', () => {
       var restParamVisitors =
-        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
+        require('../es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'function foo(param1: number, ...args: Array<number>) {',
@@ -220,7 +220,7 @@ describe('static type function syntax', function() {
           '  param1();',
           '}'
         ],
-        require('jstransform/visitors/es6-rest-param-visitors').visitorList
+        require('../es6-rest-param-visitors').visitorList
       );
       eval(code);
 
@@ -271,7 +271,7 @@ describe('static type function syntax', function() {
 
     it('strips multi-parameter type annotations', () => {
       var restParamVisitors =
-        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
+        require('../es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'function foo<T, S>(param1) {',
