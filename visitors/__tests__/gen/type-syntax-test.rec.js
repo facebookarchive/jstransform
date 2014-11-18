@@ -126,9 +126,33 @@ module.exports = {
             eval: 'No error',
 
         },
+        'a={set fooProp(value:number): void{}}': {
+            raworiginal: 'a={set fooProp(value:number): void{}}',
+            transformed: 'a={set fooProp(value       )      {}}',
+            eval: 'No error',
+
+        },
+        'a={get fooProp(): number {}}': {
+            raworiginal: 'a={get fooProp(): number {}}',
+            transformed: 'a={get fooProp()         {}}',
+            eval: 'No error',
+
+        },
         'class Foo {set fooProp(value:number){}}': {
             raworiginal: 'class Foo {set fooProp(value:number){}}',
             transformed: 'class Foo {set fooProp(value       ){}}',
+            eval: 'Unexpected reserved word',
+
+        },
+        'class Foo {set fooProp(value:number): void{}}': {
+            raworiginal: 'class Foo {set fooProp(value:number): void{}}',
+            transformed: 'class Foo {set fooProp(value       )      {}}',
+            eval: 'Unexpected reserved word',
+
+        },
+        'class Foo {get fooProp(): number{}}': {
+            raworiginal: 'class Foo {get fooProp(): number{}}',
+            transformed: 'class Foo {get fooProp()        {}}',
             eval: 'Unexpected reserved word',
 
         },
@@ -600,6 +624,178 @@ module.exports = {
             raworiginal: '<a>    </a>',
             transformed: '<a>    </a>',
             eval: 'Unexpected token <',
+
+        },
+    },
+    'Call Properties': {
+        'var a : { (): number }': {
+            raworiginal: 'var a : { (): number }',
+            transformed: 'var a                 ',
+            eval: 'No error',
+
+        },
+        'var a : { (): number; }': {
+            raworiginal: 'var a : { (): number; }',
+            transformed: 'var a                  ',
+            eval: 'No error',
+
+        },
+        'var a : { (): number; y: string; (x: string): string }': {
+            raworiginal: 'var a : { (): number; y: string; (x: string): string }',
+            transformed: 'var a                                                 ',
+            eval: 'No error',
+
+        },
+        'var a : { <T>(x: T): number; }': {
+            raworiginal: 'var a : { <T>(x: T): number; }',
+            transformed: 'var a                         ',
+            eval: 'No error',
+
+        },
+        'interface A { (): number; }': {
+            raworiginal: 'interface A { (): number; }',
+            transformed: '                           ',
+            eval: 'No error',
+
+        },
+    },
+    'String Literal Types': {
+        'function createElement(tagName: "div"): HTMLDivElement {}': {
+            raworiginal: 'function createElement(tagName: "div"): HTMLDivElement {}',
+            transformed: 'function createElement(tagName       )                 {}',
+            eval: 'No error',
+
+        },
+        'function createElement(tagName: \'div\'): HTMLDivElement {}': {
+            raworiginal: 'function createElement(tagName: \'div\'): HTMLDivElement {}',
+            transformed: 'function createElement(tagName       )                 {}',
+            eval: 'No error',
+
+        },
+    },
+    'Qualified Generic Type': {
+        'var a : A.B': {
+            raworiginal: 'var a : A.B',
+            transformed: 'var a      ',
+            eval: 'No error',
+
+        },
+        'var a : A.B.C': {
+            raworiginal: 'var a : A.B.C',
+            transformed: 'var a        ',
+            eval: 'No error',
+
+        },
+        'var a : A.B<T>': {
+            raworiginal: 'var a : A.B<T>',
+            transformed: 'var a         ',
+            eval: 'No error',
+
+        },
+        'var a : typeof A.B<T>': {
+            raworiginal: 'var a : typeof A.B<T>',
+            transformed: 'var a                ',
+            eval: 'No error',
+
+        },
+    },
+    'Declare Statements': {
+        'declare var foo': {
+            raworiginal: 'declare var foo',
+            transformed: '               ',
+            eval: 'No error',
+
+        },
+        'declare var foo;': {
+            raworiginal: 'declare var foo;',
+            transformed: '                ',
+            eval: 'No error',
+
+        },
+        'declare function foo(): void': {
+            raworiginal: 'declare function foo(): void',
+            transformed: '                            ',
+            eval: 'No error',
+
+        },
+        'declare function foo(): void;': {
+            raworiginal: 'declare function foo(): void;',
+            transformed: '                             ',
+            eval: 'No error',
+
+        },
+        'declare function foo<T>(): void;': {
+            raworiginal: 'declare function foo<T>(): void;',
+            transformed: '                                ',
+            eval: 'No error',
+
+        },
+        'declare function foo(x: number, y: string): void;': {
+            raworiginal: 'declare function foo(x: number, y: string): void;',
+            transformed: '                                                 ',
+            eval: 'No error',
+
+        },
+        'declare class A {}': {
+            raworiginal: 'declare class A {}',
+            transformed: '                  ',
+            eval: 'No error',
+
+        },
+        'declare class A<T> extends B<T> { x: number }': {
+            raworiginal: 'declare class A<T> extends B<T> { x: number }',
+            transformed: '                                             ',
+            eval: 'No error',
+
+        },
+        'declare class A { static foo(): number; static x : string }': {
+            raworiginal: 'declare class A { static foo(): number; static x : string }',
+            transformed: '                                                           ',
+            eval: 'No error',
+
+        },
+        'declare class A { static [ indexer: number]: string }': {
+            raworiginal: 'declare class A { static [ indexer: number]: string }',
+            transformed: '                                                     ',
+            eval: 'No error',
+
+        },
+        'declare class A { static () : number }': {
+            raworiginal: 'declare class A { static () : number }',
+            transformed: '                                      ',
+            eval: 'No error',
+
+        },
+    },
+    'Declare Module': {
+        'declare module A {}': {
+            raworiginal: 'declare module A {}',
+            transformed: '                   ',
+            eval: 'No error',
+
+        },
+        'declare module "./a/b.js" {}': {
+            raworiginal: 'declare module "./a/b.js" {}',
+            transformed: '                            ',
+            eval: 'No error',
+
+        },
+        'declare module A { declare var x: number; }': {
+            raworiginal: 'declare module A { declare var x: number; }',
+            transformed: '                                           ',
+            eval: 'No error',
+
+        },
+        'declare module A { declare function foo(): number; }': {
+            raworiginal: 'declare module A { declare function foo(): number; }',
+            transformed: '                                                    ',
+            eval: 'No error',
+
+        },
+        'declare module A { declare class B { foo(): number; } }': {
+            raworiginal: 'declare module A { declare class B { foo(): number; } }',
+            transformed: '                                                       ',
+            eval: 'No error',
 
         },
     },
