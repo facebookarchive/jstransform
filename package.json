@@ -1,6 +1,6 @@
 {
   "name": "jstransform",
-  "version": "8.0.0",
+  "version": "8.1.0",
   "description": "A simple AST visitor-based JS transformer",
   "contributors": [
     {
