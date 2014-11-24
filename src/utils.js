@@ -621,6 +621,7 @@ exports.declareIdentInLocalScope = declareIdentInLocalScope;
 exports.getBoundaryNode = getBoundaryNode;
 exports.getDocblock = getDocblock;
 exports.getLexicalBindingMetadata = getLexicalBindingMetadata;
+exports.getLocalBindingMetadata = getLocalBindingMetadata;
 exports.initScopeMetadata = initScopeMetadata;
 exports.identWithinLexicalScope = identWithinLexicalScope;
 exports.identInLocalScope = identInLocalScope;
