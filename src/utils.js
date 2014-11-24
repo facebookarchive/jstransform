@@ -461,10 +461,6 @@ function getLexicalBindingMetadata(identName, state) {
       return currScope.identifiers[identName];
     }
 
-    if (stopBeforeNode && currScope.parentNode === stopBeforeNode) {
-      break;
-    }
-
     currScope = currScope.parentScope;
   }
 }
