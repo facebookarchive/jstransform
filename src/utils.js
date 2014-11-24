@@ -455,6 +455,21 @@ function declareIdentInLocalScope(identName, metaData, state) {
 }
 
 function getLexicalBindingMetadata(identName, state) {
+  var currScope = state.localScope;
+  while (currScope) {
+    if (currScope.identifiers[identName] !== undefined) {
+      return currScope.identifiers[identName];
+    }
+
+    if (stopBeforeNode && currScope.parentNode === stopBeforeNode) {
+      break;
+    }
+
+    currScope = currScope.parentScope;
+  }
+}
+
+function getLocalBindingMetadata(identName, state) {
   return state.localScope.identifiers[identName];
 }
 
