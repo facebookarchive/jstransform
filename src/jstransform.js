@@ -96,9 +96,12 @@ function traverse(node, path, state) {
           for (var i = 0; i < parentNode.params.length; i++) {
             param = parentNode.params[i];
             if (param.type === Syntax.Identifier) {
-              declareIdentInScope(
-                param.name, initScopeMetadata(parentNode), state
+              var metadata = initScopeMetadata(
+                parentNode,
+                path.slice(1),
+                path[0]
               );
+              declareIdentInScope(param.name, metadata, state);
             }
           }
         }
