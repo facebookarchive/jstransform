@@ -146,9 +146,12 @@ function traverse(node, path, state) {
       });
 
       if (parentNode.type === Syntax.CatchClause) {
-        declareIdentInScope(
-          parentNode.param.name, initScopeMetadata(parentNode), state
+        var metadata = initScopeMetadata(
+          parentNode,
+          path.slice(1),
+          parentNode
         );
+        declareIdentInScope(parentNode.param.name, metadata, state);
       }
       collectBlockIdentsAndTraverse(node, path, state);
     }
