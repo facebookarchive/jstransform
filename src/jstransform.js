@@ -41,7 +41,12 @@ function _nodeIsClosureScopeBoundary(node, parentNode) {
     || parentNode.type === Syntax.FunctionExpression
     || parentNode.type === Syntax.ArrowFunctionExpression;
 
-  return node.type === Syntax.BlockStatement && parentIsFunction;
+  var parentIsCurlylessArrowFunc =
+    parentNode.type === Syntax.ArrowFunctionExpression
+    && node === parentNode.body;
+
+  return parentIsFunction
+         && (node.type === Syntax.BlockStatement || parentIsCurlylessArrowFunc);
 }
 
 function _nodeIsBlockScopeBoundary(node, parentNode) {
@@ -64,12 +69,16 @@ function traverse(node, path, state) {
   var parentNode = path[0];
   if (!Array.isArray(node) && state.localScope.parentNode !== parentNode) {
     if (_nodeIsClosureScopeBoundary(node, parentNode)) {
-      var scopeIsStrict =
-        state.scopeIsStrict
-        || node.body.length > 0
-           && node.body[0].type === Syntax.ExpressionStatement
-           && node.body[0].expression.type === Syntax.Literal
-           && node.body[0].expression.value === 'use strict';
+      var scopeIsStrict = state.scopeIsStrict;
+      if (!scopeIsStrict
+          && (node.type === Syntax.BlockStatement
+              || node.type === Syntax.Program)) {
+          scopeIsStrict =
+            node.body.length > 0
+            && node.body[0].type === Syntax.ExpressionStatement
+            && node.body[0].expression.type === Syntax.Literal
+            && node.body[0].expression.value === 'use strict';
+      }
 
       if (node.type === Syntax.Program) {
         state = utils.updateState(state, {

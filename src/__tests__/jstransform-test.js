@@ -67,7 +67,7 @@ describe('jstransform', function() {
         'function blah() {}';
       var idents = ['foo', 'bar', 'baz', 'blah'];
 
-      testScopeBoundary(source, idents, 3, function(node, path, state) {
+      testScopeBoundary(source, idents, 3, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
     });
@@ -85,18 +85,18 @@ describe('jstransform', function() {
       var blahIdents = ['arguments', 'bar', 'nested'];
       var nestedIdents = ['arguments', 'baz'];
 
-      testScopeBoundary(source, programIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, blahIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, blahIdents, 2, function(node, path) {
         // All direct children of blah()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
                path[1].id.name === 'blah';
       });
 
-      testScopeBoundary(source, nestedIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, nestedIdents, 1, function(node, path) {
         // All direct children of nested()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
@@ -119,11 +119,11 @@ describe('jstransform', function() {
       var blahIdents = ['arguments', 'bar'];
       var anotherIdents = ['arguments', 'baz'];
 
-      testScopeBoundary(source, programIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, blahIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, blahIdents, 1, function(node, path) {
         // All direct children of blah()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionExpression &&
@@ -131,12 +131,30 @@ describe('jstransform', function() {
                path[2].key.name === 'blah';
       });
 
-      testScopeBoundary(source, anotherIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, anotherIdents, 1, function(node, path) {
         // All direct children of another()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionExpression &&
                path[2] && path[2].type === Syntax.MethodDefinition &&
                path[2].key.name === 'another';
+      });
+    });
+
+    it('creates a scope boundary around concise ArrowFunc exprs', function() {
+      var source =
+        'var foo;' +
+        'var bar = baz => baz;';
+
+      var programIdents = ['foo', 'bar'];
+      var barIdents = ['arguments', 'baz'];
+
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
+        return path[0] && path[0].type === Syntax.Program;
+      });
+
+      testScopeBoundary(source, barIdents, 1, function(node, path) {
+        return path[0] && path[0].type === Syntax.ArrowFunctionExpression
+               && path[0].body === node;
       });
     });
 
@@ -153,18 +171,18 @@ describe('jstransform', function() {
       var barIdents = ['arguments', 'baz'];
       var bazIdents = ['arguments', 'foo'];
 
-      testScopeBoundary(source, programIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, barIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, barIdents, 2, function(node, path) {
         // All direct children of blah()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
                path[1].id.name === 'bar';
       });
 
-      testScopeBoundary(source, bazIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, bazIdents, 1, function(node, path) {
         // All direct children of baz()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
@@ -181,11 +199,11 @@ describe('jstransform', function() {
       var programIdents = ['foo', 'blah'];
       var blahIdents = ['arguments', 'bar', 'baz'];
 
-      testScopeBoundary(source, programIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, blahIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, blahIdents, 1, function(node, path) {
         // All direct children of blah()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
@@ -202,11 +220,11 @@ describe('jstransform', function() {
       var programIdents = ['foo', 'bar'];
       var bazIdents = ['arguments', 'baz', 'blah'];
 
-      testScopeBoundary(source, programIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, bazIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, bazIdents, 1, function(node, path) {
         // All direct children of baz()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionExpression &&
@@ -226,11 +244,11 @@ describe('jstransform', function() {
       var programIdents = ['blah'];
       var catchIdents = ['e'];
 
-      testScopeBoundary(source, programIdents, 2, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 2, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, catchIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, catchIdents, 1, function(node, path) {
         // All direct children of catch(e) block
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.CatchClause;
@@ -246,11 +264,11 @@ describe('jstransform', function() {
       var programIdents = ['blah'];
       var catchIdents = ['e'];
 
-      testScopeBoundary(source, programIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, programIdents, 1, function(node, path) {
         return path[0] && path[0].type === Syntax.Program;
       });
 
-      testScopeBoundary(source, catchIdents, 1, function(node, path, state) {
+      testScopeBoundary(source, catchIdents, 1, function(node, path) {
         // All direct children of catch(e) block
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.CatchClause;
@@ -271,14 +289,14 @@ describe('jstransform', function() {
       var programIdents = ['foo', 'blah'];
       var blahIdents = ['arguments', 'bar', 'nested'];
 
-      testParentScope(source, programIdents, 2, function(node, path, state) {
+      testParentScope(source, programIdents, 2, function(node, path) {
         // All direct children of blah()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
                path[1].id.name === 'blah';
       });
 
-      testParentScope(source, blahIdents, 1, function(node, path, state) {
+      testParentScope(source, blahIdents, 1, function(node, path) {
         // All direct children of nested()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionDeclaration &&
@@ -296,7 +314,7 @@ describe('jstransform', function() {
         '}';
       var programIdents = ['foo', 'ClassA'];
 
-      testParentScope(source, programIdents, 1, function(node, path, state) {
+      testParentScope(source, programIdents, 1, function(node, path) {
         // All direct children of blah()
         return path[0] && path[0].type === Syntax.BlockStatement &&
                path[1] && path[1].type === Syntax.FunctionExpression &&

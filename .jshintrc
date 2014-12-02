@@ -6,6 +6,7 @@
   "expr": true,
   "funcscope": true,
   "globalstrict": false,
+  "laxbreak": true,
   "loopfunc": false,
   "newcap": true,
   "node": true,
