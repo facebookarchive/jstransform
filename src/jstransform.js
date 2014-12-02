@@ -180,6 +180,7 @@ function collectBlockIdentsAndTraverse(node, path, state) {
 function visitLocalClosureIdentifiers(node, path, state) {
   var metaData;
   switch (node.type) {
+    case Syntax.ArrowFunctionExpression:
     case Syntax.FunctionExpression:
       // Function expressions don't get their names (if there is one) added to
       // the closure scope they're defined in

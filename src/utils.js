@@ -581,6 +581,7 @@ function containsChildMatching(node, matcher) {
 }
 
 var scopeTypes = {};
+scopeTypes[Syntax.ArrowFunctionExpression] = true;
 scopeTypes[Syntax.FunctionExpression] = true;
 scopeTypes[Syntax.FunctionDeclaration] = true;
 scopeTypes[Syntax.Program] = true;
