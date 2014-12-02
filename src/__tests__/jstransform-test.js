@@ -229,6 +229,45 @@ describe('jstransform', function() {
       });
     });
 
+    it('includes rest param args in function scope boundaries', function() {
+      var source =
+        'var foo;' +
+        'function blah(...bar) {' +
+        '  var baz;' +
+        '}' +
+        'var blah2 = (...bar2) => {var baz;};' +
+        'var blah3 = (...bar3) => bar3;';
+      var programIdents = ['foo', 'blah', 'blah2', 'blah3'];
+      var blahIdents = ['arguments', 'bar', 'baz'];
+      var blah2Idents = ['arguments', 'bar2', 'baz'];
+      var blah3Idents = ['arguments', 'bar3'];
+
+      testScopeBoundary(source, programIdents, 4, function(node, path) {
+        return path[0] && path[0].type === Syntax.Program;
+      });
+
+      testScopeBoundary(source, blahIdents, 1, function(node, path) {
+        // All direct children of blah()
+        return path[0] && path[0].type === Syntax.BlockStatement &&
+               path[1] && path[1].type === Syntax.FunctionDeclaration &&
+               path[1].id.name === 'blah';
+      });
+
+      testScopeBoundary(source, blah2Idents, 1, function(node, path) {
+        // All direct children of blah2()
+        return path[0] && path[0].type === Syntax.BlockStatement &&
+               path[1] && path[1].type === Syntax.ArrowFunctionExpression &&
+               path[2].id.name === 'blah2';
+      });
+
+      testScopeBoundary(source, blah3Idents, 1, function(node, path) {
+        // All direct children of blah3()
+        return path[0] && path[0].type === Syntax.ArrowFunctionExpression &&
+               path[0].body === node &&
+               path[1].id.name === 'blah3';
+      });
+    });
+
     it('puts FunctionExpression names within function scope', function() {
       var source =
         'var foo;' +

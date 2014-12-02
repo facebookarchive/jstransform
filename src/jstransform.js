@@ -102,17 +102,24 @@ function traverse(node, path, state) {
         // function
         if (parentNode.params.length > 0) {
           var param;
+          var metadata = initScopeMetadata(parentNode, path.slice(1), path[0]);
           for (var i = 0; i < parentNode.params.length; i++) {
             param = parentNode.params[i];
             if (param.type === Syntax.Identifier) {
-              var metadata = initScopeMetadata(
-                parentNode,
-                path.slice(1),
-                path[0]
-              );
               declareIdentInScope(param.name, metadata, state);
             }
           }
+        }
+
+        // Include rest arg identifiers in the scope boundaries of their
+        // functions
+        if (parentNode.rest) {
+          var metadata = initScopeMetadata(
+            parentNode,
+            path.slice(1),
+            path[0]
+          );
+          declareIdentInScope(parentNode.rest.name, metadata, state);
         }
 
         // Named FunctionExpressions scope their name within the body block of
