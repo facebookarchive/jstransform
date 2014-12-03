@@ -1461,4 +1461,23 @@ describe('es6-classes', function() {
       ].join('\n'))
     });
   });
+
+  describe('returns from implicit super call', function() {
+    it('returns super call', function() {
+      var code = transform([
+        'class X {',
+        '  constructor() {',
+        '    return {obj: 2};',
+        '  }',
+        '}',
+        'class Y extends X {',
+        '}'
+      ].join('\n'));
+
+      var Y = new Function(code + ' return Y;')();
+      var val = new Y();
+      expect(val.obj).toBe(2);
+    });
+  });
+
 });
