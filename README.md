@@ -8,7 +8,7 @@ A simple utility for pluggable JS syntax transforms using the esprima parser.
 * Supports source map generation
 * Comes pre-bundled with a small set of (optional) ES6 -> ES5 transforms
 
-NOTE: If you're looking for a library for writing new greenfield JS transformations, consider looking at the  [Recast](https://github.com/benjamn/recast) library instead of jstransform. We are still actively supporting jstransform (and intend to for the foreseeable future), but longer term we would like to direct efforts toward Recast. Recast does a far better job of performantly scaling to support a multi-pass JS transformation pipeline, and this is important when attempting to apply many transformations to a source file.
+NOTE: If you're looking for a library for writing new greenfield JS transformations, consider looking at the  [Recast](https://github.com/benjamn/recast) library instead of jstransform. We are still actively supporting jstransform (and intend to for the foreseeable future), but longer term we would like to direct efforts toward Recast. Recast does a far better job of supporting a multi-pass JS transformation pipeline, and this is important when attempting to apply many transformations to a source file.
 
 ## Examples
 Using a pre-bundled or existing transform:
