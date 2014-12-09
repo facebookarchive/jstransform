@@ -232,6 +232,21 @@ function walker(node, path, state) {
 
 var _astCache = {};
 
+function getAstForSource(source, options) {
+  if (_astCache[source] && !options.disableAstCache) {
+    return _astCache[source];
+  }
+  var ast = esprima.parse(source, {
+    comment: true,
+    loc: true,
+    range: true
+  });
+  if (!options.disableAstCache) {
+    _astCache[source] = ast;
+  }
+  return ast;
+}
+
 /**
  * Applies all available transformations to the source
  * @param {array} visitors
@@ -243,13 +258,7 @@ function transform(visitors, source, options) {
   options = options || {};
   var ast;
   try {
-    var cachedAst = _astCache[source];
-    ast = cachedAst ||
-      (_astCache[source] = esprima.parse(source, {
-        comment: true,
-        loc: true,
-        range: true
-      }));
+    ast = getAstForSource(source, options);
     } catch (e) {
     e.message = 'Parse Error: ' + e.message;
     throw e;
