@@ -47,6 +47,7 @@ describe('static type syntax syntax', function() {
 
   describe('type alias', () => {
     it('strips type aliases', () => {
+      /*global type*/
       var code = transform([
         'var type = 42;',
         'type FBID = number;',

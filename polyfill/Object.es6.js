@@ -21,7 +21,7 @@
 
 if (!Object.assign) {
   Object.assign = function(target, sources) {
-    if (target == null) {
+    if (target === null || target === undefined) {
       throw new TypeError('Object.assign target cannot be null or undefined');
     }
 
@@ -30,7 +30,7 @@ if (!Object.assign) {
 
     for (var nextIndex = 1; nextIndex < arguments.length; nextIndex++) {
       var nextSource = arguments[nextIndex];
-      if (nextSource == null) {
+      if (nextSource === null || nextSource === undefined) {
         continue;
       }
 

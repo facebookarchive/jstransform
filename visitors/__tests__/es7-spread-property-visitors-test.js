@@ -146,9 +146,15 @@ describe('es7-spread-property-visitors', function() {
   });
 
   it('should silently ignore falsy values', function() {
-    var x = null;
-    var y = { y: 'y' };
-    var obj = { ...x, ...y, ...{ ...false, z: 'z', ...y } };
+    /*globals obj*/
+    var code = transform([
+      'var x = null;',
+      'var y = { y: "y" };',
+      'var obj = { ...x, ...y, ...{ ...false, z: "z", ...y } };'
+    ].join('\n'));
+
+    eval(code);
+
     expect(obj).toEqual({ y: 'y', z: 'z' });
   });
 });

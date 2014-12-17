@@ -64,6 +64,7 @@ function _nodeIsBlockScopeBoundary(node, parentNode) {
  * @param {object} state
  */
 function traverse(node, path, state) {
+  /*jshint -W004*/
   // Create a scope stack entry if this is the first node we've encountered in
   // its local scope
   var parentNode = path[0];

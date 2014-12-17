@@ -46,6 +46,7 @@ describe('static type interface syntax', function() {
 
   describe('Interface Declaration', () => {
     it('strips interface declarations', () => {
+      /*global interface*/
       var code = transform([
         'var interface = 42;',
         'interface A { foo: () => number; }',

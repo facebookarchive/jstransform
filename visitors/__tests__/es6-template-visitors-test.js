@@ -34,6 +34,7 @@ describe('ES6 Template Visitor', function() {
   }
 
   function expectEvalTag(code, tagFn, scope) {
+    /*jshint unused:false*/
     if (scope) {
       Object.keys(scope).forEach((key) => this[key] = scope[key]);
     }
@@ -101,6 +102,7 @@ describe('ES6 Template Visitor', function() {
   });
 
   it('should transform tags with simple templates', function() {
+    /*jshint unused:false*/
     var tag = function(elements) {
       expectSiteObj(elements, ['foo bar'], ['foo bar']);
     };
@@ -152,6 +154,7 @@ describe('ES6 Template Visitor', function() {
       }
     );
 
+    /*global args*/
     expectEvalTag(
       "tag`a\nb\n${c}\nd`",
       (elements, ...args) => {

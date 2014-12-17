@@ -23,10 +23,6 @@ describe('es7-rest-property-visitors', function() {
     return transformFn(visitors, lines).code;
   }
 
-  function expectTransform(code, result) {
-    expect(transform(code)).toEqual(result);
-  }
-
   // Semantic tests.
 
   it('picks off remaining properties from an object', function() {

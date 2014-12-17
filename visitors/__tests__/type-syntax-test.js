@@ -1,3 +1,6 @@
+/*jshint evil: true*/
+/*jshint loopfunc: true*/
+
 if (!!module.parent) {
   module.exports = {
     'TypeAnnotations': [

@@ -17,6 +17,7 @@
  */
 
 /*jshint evil:true*/
+/*jshint -W117*/
 
 jest.autoMockOff();
 
@@ -994,7 +995,6 @@ describe('es6-classes', function() {
         var exports = new Function(
           code1 + code2 + 'return {Parent: Parent, Child: Child};'
         )();
-        var Parent = exports.Parent;
         var Child = exports.Child;
 
         var childInst = new Child();
@@ -1436,7 +1436,7 @@ describe('es6-classes', function() {
         '    bar();',
         '  };',
         ''
-      ].join('\n'))
+      ].join('\n'));
     });
   });
 

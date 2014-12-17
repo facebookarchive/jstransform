@@ -34,10 +34,6 @@ describe('es6-es7-object-integration-test', function() {
     return transformFn(visitors, code).code;
   }
 
-  function expectTransform(code, result) {
-    expect(transform(code)).toEqual(result);
-  }
-
   it('handles spread with concise methods and short notation', function() {
     var code = 'var xyz = { ...x, y() { return 42; }, z }';
     var objectAssignMock = jest.genMockFunction();

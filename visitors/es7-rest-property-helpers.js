@@ -21,7 +21,6 @@
  */
 
 var Syntax = require('esprima-fb').Syntax;
-var utils = require('../src/utils');
 
 // TODO: This is a pretty massive helper, it should only be defined once, in the
 // transform's runtime environment. We don't currently have a runtime though.

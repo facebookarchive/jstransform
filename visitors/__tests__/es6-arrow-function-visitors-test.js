@@ -19,6 +19,7 @@
  */
 
 /*jshint evil:true*/
+/*jshint -W117*/
 
 require('mock-modules').autoMockOff();
 

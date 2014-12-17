@@ -19,6 +19,7 @@
  */
 
 /*jshint evil:true*/
+/*jshint -W117*/
 
 require('mock-modules').autoMockOff();
 
@@ -133,7 +134,7 @@ describe('es6-rest-param-visitors', () => {
 
       eval(code);
 
-      expect(test('foo', 'bar')).toEqual(['foo', 'bar'])
+      expect(test('foo', 'bar')).toEqual(['foo', 'bar']);
     });
 
     it('should capture 2 rest params, having 2 args', () => {
@@ -264,7 +265,7 @@ describe('es6-rest-param-visitors', () => {
           '$__0<$__1;$__0++) args.push(arguments[$__0]); return x + y + ' +
           'args[0]; }'
       );
-    })
+    });
 
     it('1-line function expression with 1 arg', () => {
       expectTransform(

@@ -47,6 +47,7 @@ describe('es6-object-concise-method-visitors', function() {
   // Functional tests.
 
   it('should transform concise method and return 42', function() {
+    /*global foo*/
     var code = transform([
       'var foo = {',
       '  bar(x) {',

@@ -58,5 +58,5 @@ describe('reserved-words', function() {
 
       expect(transform(code)).toEqual('var x = {"null": 1};');
     });
-  })
+  });
 });

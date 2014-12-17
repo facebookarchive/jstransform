@@ -422,6 +422,7 @@ function append(str, state) {
  * @return {string}
  */
 function updateIndent(str, state) {
+  /*jshint -W004*/
   var indentBy = state.indentBy;
   if (indentBy < 0) {
     for (var i = 0; i < -indentBy; i++) {

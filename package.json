@@ -34,7 +34,8 @@
     "node": ">=0.8.8"
   },
   "devDependencies": {
-    "jest-cli": "^0.2"
+    "jest-cli": "^0.2",
+    "jshint": "^2.5.10"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/jestPreprocessor.js",
@@ -45,7 +46,7 @@
     ]
   },
   "scripts": {
-    "prepublish": "jest",
-    "test": "jest"
+    "prepublish": "jshint --config=.jshintrc --exclude=node_modules . && jest",
+    "test": "jshint --config=.jshintrc --exclude=node_modules . && jest"
   }
 }
