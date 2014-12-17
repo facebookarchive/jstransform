@@ -5,6 +5,12 @@
   "eqnull": false,
   "expr": true,
   "funcscope": true,
+  "globals": {
+    "beforeEach": true,
+    "describe": true,
+    "it": true,
+    "jest": true
+  },
   "globalstrict": false,
   "laxbreak": true,
   "loopfunc": false,

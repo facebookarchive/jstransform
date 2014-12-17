@@ -236,9 +236,13 @@ function visitClassFunctionExpression(traverse, node, path, state) {
       path.shift();
     }
   }
-  utils.append(')', state);
-  utils.catchupWhiteSpace(node.body.range[0], state);
-  utils.append('{', state);
+
+  var closingParenPosition = utils.getNextSyntacticCharOffset(')', state);
+  utils.catchupWhiteSpace(closingParenPosition, state);
+
+  var openingBracketPosition = utils.getNextSyntacticCharOffset('{', state);
+  utils.catchup(openingBracketPosition + 1, state);
+
   if (!state.scopeIsStrict) {
     utils.append('"use strict";', state);
     state = utils.updateState(state, {

@@ -259,29 +259,87 @@ function getNodeSourceText(node, state) {
   return state.g.source.substring(node.range[0], node.range[1]);
 }
 
-function replaceNonWhite(value) {
+function _replaceNonWhite(value) {
   return value.replace(nonWhiteRegexp, ' ');
 }
 
 /**
  * Removes all non-whitespace characters
  */
-function stripNonWhite(value) {
+function _stripNonWhite(value) {
   return value.replace(nonWhiteRegexp, '');
+}
+
+/**
+ * Finds the position of the next instance of the specified syntactic char in
+ * the pending source.
+ *
+ * NOTE: This will skip instances of the specified char if they sit inside a
+ *       comment body.
+ *
+ * NOTE: This function also assumes that the buffer's current position is not
+ *       already within a comment or a string. This is rarely the case since all
+ *       of the buffer-advancement utility methods tend to be used on syntactic
+ *       nodes' range values -- but it's a small gotcha that's worth mentioning.
+ */
+function getNextSyntacticCharOffset(char, state) {
+  var pendingSource = state.g.source.substring(state.g.position);
+  var pendingSourceLines = pendingSource.split('\n');
+
+  var charOffset = 0;
+  var line;
+  var withinBlockComment = false;
+  var withinString = false;
+  lineLoop: while ((line = pendingSourceLines.shift()) !== undefined) {
+    var lineEndPos = charOffset + line.length;
+    charLoop: for (; charOffset < lineEndPos; charOffset++) {
+      var currChar = pendingSource[charOffset];
+      if (currChar === '"' || currChar === '\'') {
+        withinString = !withinString;
+        continue charLoop;
+      } else if (withinString) {
+        continue charLoop;
+      } else if (charOffset + 1 < lineEndPos) {
+        var nextTwoChars = currChar + line[charOffset + 1];
+        if (nextTwoChars === '//') {
+          charOffset = lineEndPos + 1;
+          continue lineLoop;
+        } else if (nextTwoChars === '/*') {
+          withinBlockComment = true;
+          charOffset += 1;
+          continue charLoop;
+        } else if (nextTwoChars === '*/') {
+          withinBlockComment = false;
+          charOffset += 1;
+          continue charLoop;
+        }
+      }
+
+      if (!withinBlockComment && currChar === char) {
+        return charOffset + state.g.position;
+      }
+    }
+
+    // Account for '\n'
+    charOffset++;
+    withinString = false;
+  }
+
+  throw new Error('`' + char + '` not found!');
 }
 
 /**
  * Catches up as `catchup` but replaces non-whitespace chars with spaces.
  */
 function catchupWhiteOut(end, state) {
-  catchup(end, state, replaceNonWhite);
+  catchup(end, state, _replaceNonWhite);
 }
 
 /**
  * Catches up as `catchup` but removes all non-whitespace characters.
  */
 function catchupWhiteSpace(end, state) {
-  catchup(end, state, stripNonWhite);
+  catchup(end, state, _stripNonWhite);
 }
 
 /**
@@ -606,11 +664,12 @@ function getTempVarWithValue(tempVarIndex, tempVarValue) {
   return getTempVar(tempVarIndex) + '=' + tempVarValue;
 }
 
+exports.analyzeAndTraverse = analyzeAndTraverse;
 exports.append = append;
 exports.catchup = catchup;
+exports.catchupNewlines = catchupNewlines;
 exports.catchupWhiteOut = catchupWhiteOut;
 exports.catchupWhiteSpace = catchupWhiteSpace;
-exports.catchupNewlines = catchupNewlines;
 exports.containsChildMatching = containsChildMatching;
 exports.containsChildOfType = containsChildOfType;
 exports.createState = createState;
@@ -619,16 +678,16 @@ exports.getBoundaryNode = getBoundaryNode;
 exports.getDocblock = getDocblock;
 exports.getLexicalBindingMetadata = getLexicalBindingMetadata;
 exports.getLocalBindingMetadata = getLocalBindingMetadata;
-exports.initScopeMetadata = initScopeMetadata;
-exports.identWithinLexicalScope = identWithinLexicalScope;
+exports.getNextSyntacticCharOffset = getNextSyntacticCharOffset;
+exports.getNodeSourceText = getNodeSourceText;
+exports.getOrderedChildren = getOrderedChildren;
+exports.getTempVar = getTempVar;
+exports.getTempVarWithValue = getTempVarWithValue;
 exports.identInLocalScope = identInLocalScope;
+exports.identWithinLexicalScope = identWithinLexicalScope;
 exports.indentBefore = indentBefore;
+exports.initScopeMetadata = initScopeMetadata;
 exports.move = move;
 exports.scopeTypes = scopeTypes;
 exports.updateIndent = updateIndent;
 exports.updateState = updateState;
-exports.analyzeAndTraverse = analyzeAndTraverse;
-exports.getOrderedChildren = getOrderedChildren;
-exports.getNodeSourceText = getNodeSourceText;
-exports.getTempVar = getTempVar;
-exports.getTempVarWithValue = getTempVarWithValue;

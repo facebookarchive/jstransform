@@ -1440,7 +1440,7 @@ describe('es6-classes', function() {
     });
   });
 
-  describe('preserve newlines', function() {
+  describe('preserves non-class syntax/style', function() {
     it('preserve newlines', function() {
       expect(transform([
         'class Foo {',
@@ -1458,7 +1458,19 @@ describe('es6-classes', function() {
         '    bar();',
         '  };',
         ''
-      ].join('\n'))
+      ].join('\n'));
+    });
+
+    it('preserves comments between method params and open-bracket', function() {
+      expect(transform([
+        'class Foo {',
+        '  testMethod() /* comment */ {}',
+        '}',
+      ].join('\n'))).toBe([
+        'function Foo(){"use strict";}',
+        '  Foo.prototype.testMethod=function() /* comment */ {"use strict";};',
+        ''
+      ].join('\n'));
     });
   });
 });
