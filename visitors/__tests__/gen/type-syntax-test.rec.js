@@ -412,13 +412,13 @@ module.exports = {
     'Type Alias': {
         'type FBID = number;': {
             raworiginal: 'type FBID = number;',
-            transformed: '                   ',
+            transformed: 'var FBID;                   ',
             eval: 'No error',
 
         },
         'type Foo<T> = Bar<T>': {
             raworiginal: 'type Foo<T> = Bar<T>',
-            transformed: '                    ',
+            transformed: 'var Foo;                    ',
             eval: 'No error',
 
         },

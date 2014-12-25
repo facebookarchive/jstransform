@@ -46,7 +46,7 @@ describe('static type syntax syntax', function() {
   }
 
   describe('type alias', () => {
-    it('strips type aliases', () => {
+    it('ignores type aliases', () => {
       /*global type*/
       var code = transform([
         'var type = 42;',
@@ -56,6 +56,14 @@ describe('static type syntax syntax', function() {
       ]);
       eval(code);
       expect(type).toBe(84);
+    });
+    it('allows export of type aliases', () => {
+      var code = transform([
+        'type FBID = number;',
+        'exports.FBID = FBID;',
+      ]);
+      eval(code);
+      expect(exports.FBID).toBe(void 0);
     });
   });
 });

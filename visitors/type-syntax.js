@@ -19,6 +19,7 @@ visitClassProperty.test = function(node, path, state) {
 };
 
 function visitTypeAlias(traverse, node, path, state) {
+  utils.append('var ' + node.id.name + ';', state);
   utils.catchupWhiteOut(node.range[1], state);
   return false;
 }
