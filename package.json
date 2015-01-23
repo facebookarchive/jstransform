@@ -46,7 +46,7 @@
     ]
   },
   "scripts": {
-    "prepublish": "jshint --config=.jshintrc --exclude=node_modules . && jest",
-    "test": "jshint --config=.jshintrc --exclude=node_modules . && jest"
+    "prepublish": "jest && jshint --config=.jshintrc --exclude=node_modules .",
+    "test": "jest && jshint --config=.jshintrc --exclude=node_modules ."
   }
 }
