@@ -239,7 +239,8 @@ function getAstForSource(source, options) {
   var ast = esprima.parse(source, {
     comment: true,
     loc: true,
-    range: true
+    range: true,
+    sourceType: options.sourceType
   });
   if (!options.disableAstCache) {
     _astCache[source] = ast;
