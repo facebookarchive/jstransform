@@ -15,6 +15,7 @@
  */
 
 /*jshint evil:true*/
+/*jshint -W117*/
 
 require('mock-modules').autoMockOff();
 
@@ -46,7 +47,6 @@ describe('static type interface syntax', function() {
 
   describe('Interface Declaration', () => {
     it('strips interface declarations', () => {
-      /*global interface*/
       var code = transform([
         'var interface = 42;',
         'interface A { foo: () => number; }',
@@ -56,6 +56,17 @@ describe('static type interface syntax', function() {
       ]);
       eval(code);
       expect(interface).toBe(126);
+    });
+
+    it('catches up correctly', () => {
+      var code = transform([
+        "var X = require('X');",
+        'interface A { foo: () => number; }',
+      ]);
+      expect(code).toBe([
+        "var X = require('X');",
+        '                                  '
+      ].join('\n'));
     });
   });
 });

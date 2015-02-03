@@ -30,7 +30,7 @@ describe('static type object-method syntax', function() {
     flowSyntaxVisitors = require('../type-syntax.js').visitorList;
     jstransform = require('jstransform');
     objMethodVisitors =
-      require('../es6-object-concise-method-visitors');
+      require('jstransform/visitors/es6-object-concise-method-visitors');
 
     visitorList = objMethodVisitors.visitorList;
   });
@@ -107,7 +107,7 @@ describe('static type object-method syntax', function() {
 
     it('strips annotated params before a rest parameter', () => {
       var restParamVisitors =
-        require('../es6-rest-param-visitors').visitorList;
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'var foo = {',
@@ -122,7 +122,7 @@ describe('static type object-method syntax', function() {
 
     it('strips annotated rest parameter', () => {
       var restParamVisitors =
-        require('../es6-rest-param-visitors').visitorList;
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'var foo = {',
@@ -169,7 +169,7 @@ describe('static type object-method syntax', function() {
     it('strips multi-parameter type annotations', () => {
       // TODO: Doesnt parse
       var restParamVisitors =
-        require('../es6-rest-param-visitors').visitorList;
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'var foo = {',

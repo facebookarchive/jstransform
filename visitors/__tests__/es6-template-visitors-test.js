@@ -154,7 +154,6 @@ describe('ES6 Template Visitor', function() {
       }
     );
 
-    /*global args*/
     expectEvalTag(
       "tag`a\nb\n${c}\nd`",
       (elements, ...args) => {

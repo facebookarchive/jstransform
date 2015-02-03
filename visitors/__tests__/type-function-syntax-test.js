@@ -115,7 +115,7 @@ describe('static type function syntax', function() {
 
     it('strips annotated params before a rest parameter', () => {
       var restParamVisitors =
-        require('../es6-rest-param-visitors').visitorList;
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'function foo(param1: number, ...args) {',
@@ -133,7 +133,7 @@ describe('static type function syntax', function() {
 
     it('strips annotated rest parameter', () => {
       var restParamVisitors =
-        require('../es6-rest-param-visitors').visitorList;
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'function foo(param1: number, ...args: Array<number>) {',
@@ -221,7 +221,7 @@ describe('static type function syntax', function() {
           '  param1();',
           '}'
         ],
-        require('../es6-rest-param-visitors').visitorList
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList
       );
       eval(code);
 
@@ -272,7 +272,7 @@ describe('static type function syntax', function() {
 
     it('strips multi-parameter type annotations', () => {
       var restParamVisitors =
-        require('../es6-rest-param-visitors').visitorList;
+        require('jstransform/visitors/es6-rest-param-visitors').visitorList;
 
       var code = transform([
         'function foo<T, S>(param1) {',
@@ -290,9 +290,9 @@ describe('static type function syntax', function() {
   });
 
   describe('arrow functions', () => {
-    // TODO: We don't currently support arrow functions, but we should
-    //       soon! The only reason we don't now is because we don't
-    //       need it at this very moment and I'm in a rush to get the
-    //       basics in.
+    // TODO(#3241230): We don't currently support arrow functions, but we should
+    //                 soon! The only reason we don't now is because we don't
+    //                 need it at this very moment and I'm in a rush to get the
+    //                 basics in.
   });
 });
