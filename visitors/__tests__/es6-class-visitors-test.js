@@ -63,13 +63,13 @@ describe('es6-classes', function() {
           'function strictStuff() {',
           '  "use strict";',
           '  function A(){}',
-          '    A.prototype.foo=function() {};',
+          '    Object.defineProperty(A.prototype,"foo",{writable:true,configurable:true,value:function() {}});',
           '  ',
           '}',
           'function B(){"use strict";}',
-          '  B.prototype.bar=function() {"use strict";',
+          '  Object.defineProperty(B.prototype,"bar",{writable:true,configurable:true,value:function() {"use strict";',
           '    function C(){}',
-          '  };',
+          '  }});',
           ''
         ].join('\n');
 
@@ -101,10 +101,10 @@ describe('es6-classes', function() {
         var expected = [
           '"use strict";',
           '',
-          '  Foo.prototype.foo=function() {',
+          '  Object.defineProperty(Foo.prototype,"foo",{writable:true,configurable:true,value:function() {',
           '    ',
           '    ',
-          '  };',
+          '  }});',
           '',
           '  function Foo(p1,',
           '              p2) {',
@@ -113,9 +113,9 @@ describe('es6-classes', function() {
           '    this.p2 = p2;',
           '  }',
           '',
-          '  Foo.prototype.bar=function(){};',
-          '  Foo.baz=function() {',
-          '};',
+          '  Object.defineProperty(Foo.prototype,"bar",{writable:true,configurable:true,value:function(){}});',
+          '  Object.defineProperty(Foo,"baz",{writable:true,configurable:true,value:function() {',
+          '}});',
           ''
         ].join('\n');
 
@@ -161,12 +161,12 @@ describe('es6-classes', function() {
           'Foo.prototype.constructor=Foo;' +
           'Foo.__superConstructor__=Bar;',
 
-          '  Foo.prototype.foo=function() {"use strict";',
+          '  Object.defineProperty(Foo.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
           '    ',
           '    ',
           '    ____SuperProtoOfBar.foo.call(this,p1,',
           '          p2);',
-          '  };',
+          '  }});',
           '',
           '  function Foo(p1,',
           '              p2) {"use strict";',
@@ -177,9 +177,9 @@ describe('es6-classes', function() {
           '               p2);',
           '  }',
           '',
-          '  Foo.prototype.bar=function(){"use strict";};',
-          '  Foo.baz=function() {"use strict";',
-          '};',
+          '  Object.defineProperty(Foo.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(Foo,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
           ''
         ].join('\n');
 
@@ -222,10 +222,10 @@ describe('es6-classes', function() {
           'Foo.prototype.constructor=Foo;' +
           'Foo.__superConstructor__=____Class0;',
 
-          '  Foo.prototype.foo=function() {"use strict";',
+          '  Object.defineProperty(Foo.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
           '    ',
           '    ',
-          '  };',
+          '  }});',
           '',
           '  function Foo(p1,',
           '              p2) {"use strict";',
@@ -234,9 +234,9 @@ describe('es6-classes', function() {
           '    this.p2 = p2;',
           '  }',
           '',
-          '  Foo.prototype.bar=function(){"use strict";};',
-          '  Foo.baz=function() {"use strict";',
-          '};',
+          '  Object.defineProperty(Foo.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(Foo,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
           ''
         ].join('\n');
 
@@ -1041,8 +1041,47 @@ describe('es6-classes', function() {
           '}'
         ].join('\n'));
 
-        expect(code).toMatch(/Foo.title\s*=\s*function\*\(/);
-        expect(code).toMatch(/Foo.prototype.gen\s*=\s*function\*\(/);
+        expect(code).toMatch(/function\*\(/);
+        expect(code).toMatch(/function\*\(/);
+      });
+
+      it('properly handles methods in ES3 compat mode', function() {
+        var code =  transform([
+          'class Foo {',
+          '  title() {',
+          '    return 42;',
+          '  }',
+          '}'
+        ].join('\n'), {es3: true});
+
+        eval(code);
+
+        var fooInst = new Foo();
+        var descriptor =
+          Object.getOwnPropertyDescriptor(Foo.prototype, 'title');
+
+        expect(fooInst.title()).toBe(42);
+        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.configurable).toBe(true);
+      });
+
+      it('properly handles static methods in ES3 compat mode', function() {
+        var code =  transform([
+          'class Foo {',
+          '  static title() {',
+          '    return 42;',
+          '  }',
+          '}'
+        ].join('\n'), {es3: true});
+
+        eval(code);
+
+        var descriptor =
+          Object.getOwnPropertyDescriptor(Foo, 'title');
+
+        expect(Foo.title()).toBe(42);
+        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.configurable).toBe(true);
       });
 
       it('properly handles getter methods in ES5 compat mode', function() {
@@ -1064,7 +1103,7 @@ describe('es6-classes', function() {
           Object.getOwnPropertyDescriptor(Foo.prototype, 'title');
 
         expect(fooInst.title).toBe(42);
-        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.enumerable).toBe(false);
         expect(descriptor.configurable).toBe(true);
         expect(fooInst['foo bar']).toBe(21);
       });
@@ -1090,7 +1129,7 @@ describe('es6-classes', function() {
           Object.getOwnPropertyDescriptor(Foo.prototype, 'title');
 
         expect(fooInst.__title).toBe(42);
-        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.enumerable).toBe(false);
         expect(descriptor.configurable).toBe(true);
         expect(fooInst.__fooBar).toBe(21);
       });
@@ -1117,7 +1156,7 @@ describe('es6-classes', function() {
 
         expect(fooInst.__title).toBe(42);
         expect(fooInst.title).toBe(42);
-        expect(descriptor.enumerable).toBe(true);
+        expect(descriptor.enumerable).toBe(false);
         expect(descriptor.configurable).toBe(true);
       });
 
@@ -1240,10 +1279,10 @@ describe('es6-classes', function() {
 
         var expected = [
           'var Foo = (function(){',
-          '  ____Class0.prototype.foo=function() {"use strict";',
+          '  Object.defineProperty(____Class0.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
           '    ',
           '    ',
-          '  };',
+          '  }});',
           '',
           '  function ____Class0(p1,',
           '              p2) {"use strict";',
@@ -1252,9 +1291,9 @@ describe('es6-classes', function() {
           '    this.p2 = p2;',
           '  }',
           '',
-          '  ____Class0.prototype.bar=function(){"use strict";};',
-          '  ____Class0.baz=function() {"use strict";',
-          '};',
+          '  Object.defineProperty(____Class0.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(____Class0,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
           'return ____Class0;})()'
         ].join('\n');
 
@@ -1301,12 +1340,12 @@ describe('es6-classes', function() {
           '____Class0.prototype.constructor=____Class0;' +
           '____Class0.__superConstructor__=Bar;',
 
-          '  ____Class0.prototype.foo=function() {"use strict";',
+          '  Object.defineProperty(____Class0.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
           '    ',
           '    ',
           '    ____SuperProtoOfBar.foo.call(this,p1,',
           '          p2);',
-          '  };',
+          '  }});',
           '',
           '  function ____Class0(p1,',
           '              p2) {"use strict";',
@@ -1317,9 +1356,9 @@ describe('es6-classes', function() {
           '               p2);',
           '  }',
           '',
-          '  ____Class0.prototype.bar=function(){"use strict";};',
-          '  ____Class0.baz=function() {"use strict";',
-          '};',
+          '  Object.defineProperty(____Class0.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(____Class0,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
           'return ____Class0;})()'
         ].join('\n');
 
@@ -1363,10 +1402,10 @@ describe('es6-classes', function() {
           '____Class0.prototype.constructor=____Class0;' +
           '____Class0.__superConstructor__=____Class1;',
 
-          '  ____Class0.prototype.foo=function() {"use strict";',
+          '  Object.defineProperty(____Class0.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
           '    ',
           '    ',
-          '  };',
+          '  }});',
           '',
           '  function ____Class0(p1,',
           '              p2) {"use strict";',
@@ -1375,9 +1414,9 @@ describe('es6-classes', function() {
           '    this.p2 = p2;',
           '  }',
           '',
-          '  ____Class0.prototype.bar=function(){"use strict";};',
-          '  ____Class0.baz=function() {"use strict";',
-          '};',
+          '  Object.defineProperty(____Class0.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(____Class0,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
           'return ____Class0;})()'
         ].join('\n');
 
@@ -1432,9 +1471,9 @@ describe('es6-classes', function() {
         '}'
       ].join('\n'))).toBe([
         'function Foo(){"use strict";}',
-        '  Foo.prototype["delete"]=function(x, y) {"use strict";',
+        '  Object.defineProperty(Foo.prototype,"delete",{writable:true,configurable:true,value:function(x, y) {"use strict";',
         '    bar();',
-        '  };',
+        '  }});',
         ''
       ].join('\n'));
     });
@@ -1452,11 +1491,11 @@ describe('es6-classes', function() {
         '}'
       ].join('\n'))).toBe([
         'function Foo(){"use strict";}',
-        '  Foo.prototype.A=function(',
+        '  Object.defineProperty(Foo.prototype,"A",{writable:true,configurable:true,value:function(',
         '',
         'x, y) {"use strict";',
         '    bar();',
-        '  };',
+        '  }});',
         ''
       ].join('\n'));
     });
@@ -1468,7 +1507,7 @@ describe('es6-classes', function() {
         '}',
       ].join('\n'))).toBe([
         'function Foo(){"use strict";}',
-        '  Foo.prototype.testMethod=function() /* comment */ {"use strict";};',
+        '  Object.defineProperty(Foo.prototype,"testMethod",{writable:true,configurable:true,value:function() /* comment */ {"use strict";}});',
         ''
       ].join('\n'));
     });
