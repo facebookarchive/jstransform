@@ -181,7 +181,7 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   if (methodNode.key.name === 'constructor') {
     utils.append('function ' + state.className, state);
   } else {
-    var methodAccessorComputed = false;
+    var methodAccessorComputed = methodNode.computed;
     var methodAccessor;
     var prototypeOrStatic = methodNode.static ? '' : '.prototype';
     var objectAccessor = state.className + prototypeOrStatic;
