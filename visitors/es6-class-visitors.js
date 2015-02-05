@@ -181,6 +181,7 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   if (methodNode.key.name === 'constructor') {
     utils.append('function ' + state.className, state);
   } else {
+    var methodAccessorComputed = false;
     var methodAccessor;
     var prototypeOrStatic = methodNode.static ? '' : '.prototype';
     var objectAccessor = state.className + prototypeOrStatic;
@@ -194,16 +195,13 @@ function visitClassFunctionExpression(traverse, node, path, state) {
       if (isGetter || isSetter) {
         methodAccessor = JSON.stringify(methodAccessor);
       } else if (reservedWordsHelper.isReservedWord(methodAccessor)) {
-        methodAccessor = '[' + JSON.stringify(methodAccessor) + ']';
-      } else {
-        methodAccessor = '.' + methodAccessor;
+        methodAccessorComputed = true;
+        methodAccessor = JSON.stringify(methodAccessor);
       }
     } else if (methodNode.key.type === Syntax.Literal) {
       // 'foo bar'() {}  | get 'foo bar'() {} | set 'foo bar'() {}
       methodAccessor = JSON.stringify(methodNode.key.value);
-      if (!(isGetter || isSetter)) {
-        methodAccessor = '[' + methodAccessor + ']';
-      }
+      methodAccessorComputed = true;
     }
 
     if (isSetter || isGetter) {
@@ -211,16 +209,35 @@ function visitClassFunctionExpression(traverse, node, path, state) {
         'Object.defineProperty(' +
           objectAccessor + ',' +
           methodAccessor + ',' +
-          '{enumerable:true,configurable:true,' +
+          '{configurable:true,' +
           methodNode.kind + ':function',
         state
       );
     } else {
-      utils.append(
-        objectAccessor +
-        methodAccessor + '=function' + (node.generator ? '*' : ''),
-        state
-      );
+      if (state.g.opts.es3) {
+        if (methodAccessorComputed) {
+          methodAccessor = '[' + methodAccessor + ']';
+        } else {
+          methodAccessor = '.' + methodAccessor;
+        }
+        utils.append(
+          objectAccessor +
+          methodAccessor + '=function' + (node.generator ? '*' : ''),
+          state
+        );
+      } else {
+        if (!methodAccessorComputed) {
+          methodAccessor = JSON.stringify(methodAccessor);
+        }
+        utils.append(
+          'Object.defineProperty(' +
+            objectAccessor + ',' +
+            methodAccessor + ',' +
+            '{writable:true,configurable:true,' +
+            'value:function' + (node.generator ? '*' : ''),
+          state
+        );
+      }
     }
   }
   utils.move(methodNode.key.range[1], state);
@@ -257,7 +274,7 @@ function visitClassFunctionExpression(traverse, node, path, state) {
   utils.catchup(node.body.range[1], state);
 
   if (methodNode.key.name !== 'constructor') {
-    if (isGetter || isSetter) {
+    if (isGetter || isSetter || !state.g.opts.es3) {
       utils.append('})', state);
     }
     utils.append(';', state);
