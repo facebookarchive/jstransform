@@ -35,7 +35,8 @@
   },
   "devDependencies": {
     "jest-cli": "^0.2",
-    "jshint": "^2.5.10"
+    "jshint": "^2.5.10",
+    "node-hint": "^0.0.6"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/jestPreprocessor.js",

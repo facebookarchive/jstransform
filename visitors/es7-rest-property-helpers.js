@@ -28,7 +28,7 @@ var restFunction =
   '(function(source, exclusion) {' +
     'var rest = {};' +
     'var hasOwn = Object.prototype.hasOwnProperty;' +
-    'if (source == null) {' +
+    'if (source === null) {' +
       'throw new TypeError();' +
     '}' +
     'for (var key in source) {' +

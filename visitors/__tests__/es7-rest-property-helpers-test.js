@@ -6,6 +6,8 @@
 
 require('mock-modules').autoMockOff();
 
+var jshint = require('node-hint');
+
 describe('es7-rest-property-visitors', function() {
   var transformFn;
 
@@ -30,6 +32,7 @@ describe('es7-rest-property-visitors', function() {
       '({ x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 });',
       '([ x, y, z ]);'
     );
+
     expect(eval(code)).toEqual([1, 2, { a: 3, b: 4 }]);
   });
 
@@ -55,6 +58,14 @@ describe('es7-rest-property-visitors', function() {
       '({ ...y } = obj);',
       '(y);'
     );
+
+    jshint.hint({
+        source: code.split('\n')[2],
+        sourceName: 'only extracts own properties'
+      },
+      getLintHandler(code)
+    );
+     
     expect(eval(code)).toEqual({ y: 2 });
   });
 
@@ -94,4 +105,19 @@ describe('es7-rest-property-visitors', function() {
   //  expect(() => transform('({ x: { ...z }, y: { ...z } } = obj)')).toThrow();
   // });
 
+ function getLintHandler(source) {
+        
+   return lintHandler;
+
+ 
+   function lintHandler(err, result) {
+     if(result && /0\serrors\stotal/.test(result)) {
+
+       return; // If no errors, don't print anything out.
+     }
+     console.log(err || result);
+     console.log('Code that was linted: ' + source);
+   }
+ }
+    
 });
