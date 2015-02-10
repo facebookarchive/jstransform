@@ -106,7 +106,7 @@ if (!!module.parent) {
         '<a>{/* this is a comment */}</a>',
         '<div>@test content</div>',
         '<div><br />7x invalid-js-identifier</div>',
-        '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />',
+        '<LeftRight left=<a /> right=<b>monkeys</b> />',
         '<a.b></a.b>',
         '<a.b.c></a.b.c>',
         '(<div />) < x;',
@@ -151,6 +151,14 @@ if (!!module.parent) {
         'declare module A { declare var x: number; }',
         'declare module A { declare function foo(): number; }',
         'declare module A { declare class B { foo(): number; } }',
+    ],
+    'Typecasts': [
+        '(xxx: number)',
+        '({xxx: 0, yyy: "hey"}: {xxx: number; yyy: string})',
+        // distinguish between function type params and typecasts
+        '((xxx) => xxx + 1: (xxx: number) => number)',
+        // parens disambiguate groups from casts
+        '((xxx: number), (yyy: string))',
     ],
   };
 } else {

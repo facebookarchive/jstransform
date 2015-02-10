@@ -578,9 +578,9 @@ module.exports = {
             eval: 'Unexpected token <',
 
         },
-        '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />': {
-            raworiginal: '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />',
-            transformed: '<LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />',
+        '<LeftRight left=<a /> right=<b>monkeys</b> />': {
+            raworiginal: '<LeftRight left=<a /> right=<b>monkeys</b> />',
+            transformed: '<LeftRight left=<a /> right=<b>monkeys</b> />',
             eval: 'Unexpected token <',
 
         },
@@ -796,6 +796,32 @@ module.exports = {
             raworiginal: 'declare module A { declare class B { foo(): number; } }',
             transformed: '                                                       ',
             eval: 'No error',
+
+        },
+    },
+    'Typecasts': {
+        '(xxx: number)': {
+            raworiginal: '(xxx: number)',
+            transformed: '(xxx        )',
+            eval: 'xxx is not defined',
+
+        },
+        '({xxx: 0, yyy: "hey"}: {xxx: number; yyy: string})': {
+            raworiginal: '({xxx: 0, yyy: "hey"}: {xxx: number; yyy: string})',
+            transformed: '({xxx: 0, yyy: "hey"}                            )',
+            eval: 'No error',
+
+        },
+        '((xxx) => xxx + 1: (xxx: number) => number)': {
+            raworiginal: '((xxx) => xxx + 1: (xxx: number) => number)',
+            transformed: '((xxx) => xxx + 1                         )',
+            eval: 'Unexpected token >',
+
+        },
+        '((xxx: number), (yyy: string))': {
+            raworiginal: '((xxx: number), (yyy: string))',
+            transformed: '((xxx        ), (yyy        ))',
+            eval: 'xxx is not defined',
 
         },
     },
