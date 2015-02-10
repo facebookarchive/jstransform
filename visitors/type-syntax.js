@@ -26,6 +26,15 @@ visitTypeAlias.test = function(node, path, state) {
   return node.type === Syntax.TypeAlias;
 };
 
+function visitTypeCast(traverse, node, path, state) {
+  utils.catchup(node.typeAnnotation.range[0], state);
+  utils.catchupWhiteOut(node.typeAnnotation.range[1], state);
+  return false;
+}
+visitTypeCast.test = function(node, path, state) {
+  return node.type === Syntax.TypeCastExpression;
+};
+
 function visitInterfaceDeclaration(traverse, node, path, state) {
   utils.catchupWhiteOut(node.range[1], state);
   return false;
@@ -143,6 +152,7 @@ exports.visitorList = [
   visitMethod,
   visitOptionalFunctionParameterAnnotation,
   visitTypeAlias,
+  visitTypeCast,
   visitTypeAnnotatedIdentifier,
   visitTypeAnnotatedObjectOrArrayPattern
 ];
