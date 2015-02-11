@@ -16,6 +16,8 @@
  * @emails jeffmo@fb.com
  */
 
+/*jshint evil:true*/
+
 require('mock-modules').autoMockOff();
 
 describe('jstransform-utils', function() {
