@@ -23,12 +23,12 @@ describe('es6-call-spread-visitors', function() {
 
   it('should spread given data with context', function() {
     expect(transform('Math.max(1,\t[2], 3, ...[4, 5, 6])'))
-      .toEqual('Math.max.apply(Math, [1,\t[2], 3].concat([4, 5, 6]))');
+      .toEqual('var $__0;($__0 = Math).max.apply($__0, [1,\t[2], 3].concat([4, 5, 6]))');
   });
 
   it('should avoid unnecessary concat call', function() {
     expect(transform('window.Math.max(...list)'))
-      .toEqual('window.Math.max.apply(window.Math, list)');
+      .toEqual('var $__0;($__0 = window.Math).max.apply($__0, list)');
   });
 
   it('should default to null context', function() {
@@ -38,7 +38,7 @@ describe('es6-call-spread-visitors', function() {
 
   it('should handle computed method names', function() {
     expect(transform('Math["m" + (0 ? "in" : "ax")](1, 2, ...list)'))
-      .toEqual('Math["m" + (0 ? "in" : "ax")].apply(Math, [1, 2].concat(list))');
+      .toEqual('var $__0;($__0 = Math)["m" + (0 ? "in" : "ax")].apply($__0, [1, 2].concat(list))');
   });
 
   it('should handle immediately invoked function expressions', function() {
@@ -63,19 +63,20 @@ describe('es6-call-spread-visitors', function() {
 
   it('should not evaluate context more than once', function() {
     var code = transform([
-      'var x = 3;',
-      'function foo() {',
-      '  x++;',
-      '  return {',
-      '    bar: function(x, y) {',
-      '      return [x, y, this.z];',
-      '    },',
-      '    z: 3,',
-      '  };',
-      '}',
-      'foo().bar(...[1, 2]).concat(x).join(" ");',
+      'var obj = {',
+      '  calls: 0,',
+      '  get context() {',
+      '    this.calls++;',
+      '    return {',
+      '      add: function(a, b) { return a + b; }',
+      '    };',
+      '  }',
+      '};',
+      'var nums = [1, 2];',
+      'obj.context.add(...nums);',
+      'obj.calls === 1; // this will actually be 2',
     ].join('\n'));
-    expect(eval(code)).toEqual("1 2 3 4");
+    expect(eval(code)).toEqual(true);
   });
 
   it('should transform nested spread expressions', function() {

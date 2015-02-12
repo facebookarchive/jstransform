@@ -30,27 +30,12 @@ function visitCallSpread(traverse, node, path, state) {
     utils.append('new (Function.prototype.bind.apply(', state);
     process(traverse, node.callee, path, state);
   } else if (node.callee.type === Syntax.MemberExpression) {
-    var isTemporaryVariableRequired = utils.containsChildMatching(
-      node.callee.object,
-      function(node) {
-        return (
-          node.type === Syntax.NewExpression ||
-          node.type === Syntax.CallExpression
-        );
-      }
-    );
-    if (isTemporaryVariableRequired) {
-      // Input  = get().fn(1, 2, ...more)
-      // Output = (_ = get()).fn.apply(_, [1, 2].apply(more))
-      var tempVar = utils.injectTempVar(state);
-      utils.append('(' + tempVar + ' = ', state);
-      process(traverse, node.callee.object, path, state);
-      utils.append(')', state);
-    } else {
-      // Input  = get.fn(1, 2, ...more)
-      // Output = get.fn.apply(get, [1, 2].concat(more))
-      process(traverse, node.callee.object, path, state);
-    }
+    // Input  = get().fn(1, 2, ...more)
+    // Output = (_ = get()).fn.apply(_, [1, 2].apply(more))
+    var tempVar = utils.injectTempVar(state);
+    utils.append('(' + tempVar + ' = ', state);
+    process(traverse, node.callee.object, path, state);
+    utils.append(')', state);
     if (node.callee.property.type === Syntax.Identifier) {
       utils.append('.', state);
       process(traverse, node.callee.property, path, state);
@@ -59,12 +44,7 @@ function visitCallSpread(traverse, node, path, state) {
       process(traverse, node.callee.property, path, state);
       utils.append(']', state);
     }
-    if (isTemporaryVariableRequired) {
-      utils.append('.apply(' + tempVar, state);
-    } else {
-      utils.append('.apply(', state);
-      process(traverse, node.callee.object, path, state);
-    }
+    utils.append('.apply(' + tempVar, state);
   } else {
     // Input  = max(1, 2, ...list)
     // Output = max.apply(null, [1, 2].concat(list))
