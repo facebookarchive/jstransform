@@ -36,6 +36,16 @@ describe('es6-call-spread-visitors', function() {
       .toEqual('max.apply(null, [1, 2].concat(list))');
   });
 
+  it('should handle computed method names', function() {
+    expect(transform('Math["m" + (0 ? "in" : "ax")](1, 2, ...list)'))
+      .toEqual('Math["m" + (0 ? "in" : "ax")].apply(Math, [1, 2].concat(list))');
+  });
+
+  it('should handle immediately invoked function expressions', function() {
+    expect(transform('(function(a, b, c) { return a+b+c; })(1, 2, ...more)'))
+      .toEqual('(function(a, b, c) { return a+b+c; }).apply(null, [1, 2].concat(more))');
+  });
+
   it('should spread while creating new instances', function() {
     expect(transform('new Set(1, 2, ...list)'))
       .toEqual('new (Function.prototype.bind.apply(Set, [null, 1, 2].concat(list)))');
