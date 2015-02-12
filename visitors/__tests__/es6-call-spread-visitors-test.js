@@ -1,0 +1,85 @@
+/**
+ * @emails sema@fb.com
+ */
+
+/*jshint evil:true*/
+
+require('mock-modules').autoMockOff();
+
+describe('es6-call-spread-visitors', function() {
+  var transformFn;
+  var visitors;
+
+  beforeEach(function() {
+    require('mock-modules').dumpCache();
+    transformFn = require('../../src/jstransform').transform;
+
+    visitors = require('../es6-call-spread-visitors').visitorList;
+  });
+
+  function transform(code, options) {
+    return transformFn(visitors, code, options).code;
+  }
+
+  it('should spread given data with context', function() {
+    expect(transform('Math.max(1,\t[2], 3, ...[4, 5, 6])'))
+      .toEqual('Math.max.apply(Math, [1,\t[2], 3].concat([4, 5, 6]))');
+  });
+
+  it('should avoid unnecessary concat call', function() {
+    expect(transform('window.Math.max(...list)'))
+      .toEqual('window.Math.max.apply(window.Math, list)');
+  });
+
+  it('should default to null context', function() {
+    expect(transform('max(1, 2, ...list)'))
+      .toEqual('max.apply(null, [1, 2].concat(list))');
+  });
+
+  it('should spread while creating new instances', function() {
+    expect(transform('new Set(1, 2, ...list)'))
+      .toEqual('new (Function.prototype.bind.apply(Set, [null, 1, 2].concat(list)))');
+  });
+
+  it('should create temporary variables when necessary in program scope', function() {
+    expect(transform('foo().bar(arg1, arg2, ...more)'))
+      .toEqual('var $__0;($__0 = foo()).bar.apply($__0, [arg1, arg2].concat(more))');
+  });
+
+  it('should create temporary variables when necessary in function scope', function() {
+    expect(transform('function fn(){ return foo().bar(arg1, arg2, ...more); }'))
+      .toEqual('function fn(){var $__0; return ($__0 = foo()).bar.apply($__0, [arg1, arg2].concat(more)); }');
+  });
+
+  it('should not evaluate context more than once', function() {
+    var code = transform([
+      'var x = 3;',
+      'function foo() {',
+      '  x++;',
+      '  return {',
+      '    bar: function(x, y) {',
+      '      return [x, y, this.z];',
+      '    },',
+      '    z: 3,',
+      '  };',
+      '}',
+      'foo().bar(...[1, 2]).concat(x).join(" ");',
+    ].join('\n'));
+    expect(eval(code)).toEqual("1 2 3 4");
+  });
+
+  it('should transform nested spread expressions', function() {
+    var code = transform([
+      'function getBase() {',
+      '  return {',
+      '    getParams: function(a, b) {',
+      '      return [a, b];',
+      '    }',
+      '  };',
+      '}',
+      '[].concat(...getBase().getParams(...[1, 2, 3])).join(" ");',
+    ].join('\n'));
+    expect(eval(code)).toEqual("1 2");
+  });
+
+});
