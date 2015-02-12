@@ -103,7 +103,7 @@ visitCallSpread.test = function(node, path, state) {
     node.arguments.length > 0 &&
     node.arguments[node.arguments.length - 1].type === Syntax.SpreadElement
   );
-}
+};
 
 exports.visitorList = [
   visitCallSpread,
