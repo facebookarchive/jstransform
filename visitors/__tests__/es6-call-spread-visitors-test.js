@@ -74,7 +74,7 @@ describe('es6-call-spread-visitors', function() {
       '};',
       'var nums = [1, 2];',
       'obj.context.add(...nums);',
-      'obj.calls === 1; // this will actually be 2',
+      'obj.calls === 1;',
     ].join('\n'));
     expect(eval(code)).toEqual(true);
   });
