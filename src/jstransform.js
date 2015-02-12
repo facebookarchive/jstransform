@@ -67,6 +67,7 @@ function traverse(node, path, state) {
   /*jshint -W004*/
   // Create a scope stack entry if this is the first node we've encountered in
   // its local scope
+  var startIndex = null;
   var parentNode = path[0];
   if (!Array.isArray(node) && state.localScope.parentNode !== parentNode) {
     if (_nodeIsClosureScopeBoundary(node, parentNode)) {
@@ -82,16 +83,19 @@ function traverse(node, path, state) {
       }
 
       if (node.type === Syntax.Program) {
+        startIndex = state.g.buffer.length;
         state = utils.updateState(state, {
           scopeIsStrict: scopeIsStrict
         });
       } else {
+        startIndex = state.g.buffer.length + 1;
         state = utils.updateState(state, {
           localScope: {
             parentNode: parentNode,
             parentScope: state.localScope,
             identifiers: {},
-            tempVarIndex: 0
+            tempVarIndex: 0,
+            tempVars: []
           },
           scopeIsStrict: scopeIsStrict
         });
@@ -138,11 +142,14 @@ function traverse(node, path, state) {
     }
 
     if (_nodeIsBlockScopeBoundary(node, parentNode)) {
+      startIndex = state.g.buffer.length;
       state = utils.updateState(state, {
         localScope: {
           parentNode: parentNode,
           parentScope: state.localScope,
-          identifiers: {}
+          identifiers: {},
+          tempVarIndex: 0,
+          tempVars: []
         }
       });
 
@@ -166,6 +173,11 @@ function traverse(node, path, state) {
   }
 
   utils.analyzeAndTraverse(walker, traverser, node, path, state);
+
+  // Inject temp variables into the scope.
+  if (startIndex !== null) {
+    utils.injectTempVarDeclarations(state, startIndex);
+  }
 }
 
 function collectClosureIdentsAndTraverse(node, path, state) {
