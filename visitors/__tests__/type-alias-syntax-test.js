@@ -15,6 +15,7 @@
  */
 
 /*jshint evil:true*/
+/*jshint -W117*/
 
 require('mock-modules').autoMockOff();
 
@@ -47,7 +48,6 @@ describe('static type syntax syntax', function() {
 
   describe('type alias', () => {
     it('strips type aliases', () => {
-      /*global type*/
       var code = transform([
         'var type = 42;',
         'type FBID = number;',
@@ -56,6 +56,17 @@ describe('static type syntax syntax', function() {
       ]);
       eval(code);
       expect(type).toBe(84);
+    });
+
+    it('catches up correctly', () => {
+      var code = transform([
+        "var X = require('X');",
+        'type FBID = number;',
+      ]);
+      expect(code).toBe([
+        "var X = require('X');",
+        '                   '
+      ].join('\n'));
     });
   });
 });

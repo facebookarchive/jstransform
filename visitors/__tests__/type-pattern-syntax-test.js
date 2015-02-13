@@ -29,7 +29,7 @@ describe('static type pattern syntax', function() {
     flowSyntaxVisitors = require('../type-syntax.js').visitorList;
     jstransform = require('jstransform');
     destructuringVisitors =
-      require('../es6-destructuring-visitors');
+      require('jstransform/visitors/es6-destructuring-visitors');
 
     visitorList = destructuringVisitors.visitorList;
   });
