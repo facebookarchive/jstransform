@@ -143,9 +143,19 @@ visitMethod.test = function(node, path, state) {
       || (node.type === "MethodDefinition");
 };
 
+function visitImportType(traverse, node, path, state) {
+  utils.catchupWhiteOut(node.range[1], state);
+  return false;
+}
+visitImportType.test = function(node, path, state) {
+  return node.type === 'ImportDeclaration'
+         && node.isType;
+};
+
 exports.visitorList = [
   visitClassProperty,
   visitDeclare,
+  visitImportType,
   visitInterfaceDeclaration,
   visitFunctionParametricAnnotation,
   visitFunctionReturnAnnotation,
