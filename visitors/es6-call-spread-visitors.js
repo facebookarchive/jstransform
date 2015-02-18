@@ -47,7 +47,7 @@ function visitCallSpread(traverse, node, path, state) {
     utils.append('.apply(' + tempVar, state);
   } else {
     // Input  = max(1, 2, ...list)
-    // Output = max.apply(null, [1, 2].concat(list))
+    // Output = max.apply(undefined, [1, 2].concat(list))
     var needsToBeWrappedInParenthesis =
       node.callee.type === Syntax.FunctionDeclaration ||
       node.callee.type === Syntax.FunctionExpression;
@@ -58,7 +58,7 @@ function visitCallSpread(traverse, node, path, state) {
     if (needsToBeWrappedInParenthesis) {
       utils.append(')', state);
     }
-    utils.append('.apply(null', state);
+    utils.append('.apply(undefined', state);
   }
   utils.append(', ', state);
 

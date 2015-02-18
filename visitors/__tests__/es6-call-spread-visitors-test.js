@@ -1,5 +1,5 @@
 /**
- * @emails sema@fb.com
+ * @emails dmitrys@fb.com
  */
 
 /*jshint evil:true*/
@@ -31,9 +31,9 @@ describe('es6-call-spread-visitors', function() {
       .toEqual('var $__0;($__0 = window.Math).max.apply($__0, list)');
   });
 
-  it('should default to null context', function() {
+  it('should default to undefined context', function() {
     expect(transform('max(1, 2, ...list)'))
-      .toEqual('max.apply(null, [1, 2].concat(list))');
+      .toEqual('max.apply(undefined, [1, 2].concat(list))');
   });
 
   it('should handle computed method names', function() {
@@ -43,7 +43,7 @@ describe('es6-call-spread-visitors', function() {
 
   it('should handle immediately invoked function expressions', function() {
     expect(transform('(function(a, b, c) { return a+b+c; })(1, 2, ...more)'))
-      .toEqual('(function(a, b, c) { return a+b+c; }).apply(null, [1, 2].concat(more))');
+      .toEqual('(function(a, b, c) { return a+b+c; }).apply(undefined, [1, 2].concat(more))');
   });
 
   it('should spread while creating new instances', function() {
