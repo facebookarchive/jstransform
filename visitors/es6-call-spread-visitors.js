@@ -62,7 +62,7 @@ function visitCallSpread(traverse, node, path, state) {
   }
   utils.append(', ', state);
 
-  var args = node.arguments;
+  var args = node.arguments.slice();
   var spread = args.pop();
   if (args.length || node.type === Syntax.NewExpression) {
     utils.append('[', state);
