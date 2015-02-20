@@ -42,7 +42,8 @@ function createState(source, rootNode, transformOptions) {
       parentNode: rootNode,
       parentScope: null,
       identifiers: {},
-      tempVarIndex: 0
+      tempVarIndex: 0,
+      tempVars: []
     },
     /**
      * The name (and, if applicable, expression) of the super class
@@ -661,8 +662,20 @@ function getTempVar(tempVarIndex) {
   return '$__' + tempVarIndex;
 }
 
-function getTempVarWithValue(tempVarIndex, tempVarValue) {
-  return getTempVar(tempVarIndex) + '=' + tempVarValue;
+function injectTempVar(state) {
+  var tempVar = '$__' + (state.localScope.tempVarIndex++);
+  state.localScope.tempVars.push(tempVar);
+  return tempVar;
+}
+
+function injectTempVarDeclarations(state, index) {
+  if (state.localScope.tempVars.length) {
+    state.g.buffer =
+      state.g.buffer.slice(0, index) +
+      'var ' + state.localScope.tempVars.join(', ') + ';' +
+      state.g.buffer.slice(index);
+    state.localScope.tempVars = [];
+  }
 }
 
 exports.analyzeAndTraverse = analyzeAndTraverse;
@@ -683,11 +696,12 @@ exports.getNextSyntacticCharOffset = getNextSyntacticCharOffset;
 exports.getNodeSourceText = getNodeSourceText;
 exports.getOrderedChildren = getOrderedChildren;
 exports.getTempVar = getTempVar;
-exports.getTempVarWithValue = getTempVarWithValue;
 exports.identInLocalScope = identInLocalScope;
 exports.identWithinLexicalScope = identWithinLexicalScope;
 exports.indentBefore = indentBefore;
 exports.initScopeMetadata = initScopeMetadata;
+exports.injectTempVar = injectTempVar;
+exports.injectTempVarDeclarations = injectTempVarDeclarations;
 exports.move = move;
 exports.scopeTypes = scopeTypes;
 exports.updateIndent = updateIndent;

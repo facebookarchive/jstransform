@@ -119,7 +119,7 @@ function getDestructuredComponents(node, state) {
     } else {
       // Complex sub-structure.
       components.push(
-        utils.getTempVarWithValue(++state.localScope.tempVarIndex, accessor) +
+        utils.getTempVar(++state.localScope.tempVarIndex) + '=' + accessor +
         ',' + getDestructuredComponents(value, state)
       );
     }

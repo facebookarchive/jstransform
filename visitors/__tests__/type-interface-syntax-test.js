@@ -57,5 +57,16 @@ describe('static type interface syntax', function() {
       eval(code);
       expect(interface).toBe(126);
     });
+
+    it('catches up correctly', () => {
+      var code = transform([
+        "var X = require('X');",
+        'interface A { foo: () => number; }',
+      ]);
+      expect(code).toBe([
+        "var X = require('X');",
+        '                                  '
+      ].join('\n'));
+    });
   });
 });
