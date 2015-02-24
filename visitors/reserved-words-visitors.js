@@ -42,7 +42,7 @@ visitProperty.test = function(node) {
     !node.method &&
     !node.shorthand &&
     !node.computed &&
-    reserverdWordsHelper.isReservedWord(node.key.name);
+    reserverdWordsHelper.isES3ReservedWord(node.key.name);
 };
 
 function visitMemberExpression(traverse, node, path, state) {
@@ -59,7 +59,7 @@ function visitMemberExpression(traverse, node, path, state) {
 visitMemberExpression.test = function(node) {
   return node.type === Syntax.MemberExpression &&
     node.property.type === Syntax.Identifier &&
-    reserverdWordsHelper.isReservedWord(node.property.name);
+    reserverdWordsHelper.isES3ReservedWord(node.property.name);
 };
 
 exports.visitorList = [

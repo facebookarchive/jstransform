@@ -50,13 +50,25 @@ describe('reserved-words', function() {
 
       expect(transform(code)).toEqual('foo["return"]();');
     });
+
+    it('should only quote ES3 reserved words', function() {
+      var code = 'foo.await();';
+
+      expect(transform(code)).toEqual('foo.await();');
+    });
   });
 
   describe('reserved words in properties', function() {
-    it('should qoute reserved words in properties', function() {
+    it('should quote reserved words in properties', function() {
       var code = 'var x = {null: 1};';
 
       expect(transform(code)).toEqual('var x = {"null": 1};');
+    });
+
+    it('should only quote ES3 reserved words', function() {
+      var code = 'var x = {await: 1};';
+
+      expect(transform(code)).toEqual('var x = {await: 1};');
     });
   });
 });
