@@ -159,6 +159,7 @@ if (!!module.parent) {
         '((xxx) => xxx + 1: (xxx: number) => number)',
         // parens disambiguate groups from casts
         '((xxx: number), (yyy: string))',
+        '((xxx: any): number)',
     ],
   };
 } else {

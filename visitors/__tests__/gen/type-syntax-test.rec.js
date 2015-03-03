@@ -824,5 +824,11 @@ module.exports = {
             eval: 'xxx is not defined',
 
         },
+        '((xxx: any): number)': {
+            raworiginal: '((xxx: any): number)',
+            transformed: '((xxx     )        )',
+            eval: 'xxx is not defined',
+
+        },
     },
 };
