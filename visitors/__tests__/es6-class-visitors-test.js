@@ -148,11 +148,7 @@ describe('es6-classes', function() {
         ].join('\n');
 
         var expected = [
-          'for(var Bar____Key in Bar){' +
-            'if(Bar.hasOwnProperty(Bar____Key)){' +
-              'Foo[Bar____Key]=Bar[Bar____Key];' +
-            '}' +
-          '}' +
+          'Object.assign(Foo,Bar);' +
           'var ____SuperProtoOfBar=' +
             'Bar===null' +
               '?null:' +
@@ -209,11 +205,7 @@ describe('es6-classes', function() {
 
         var expected = [
           'var ____Class0=mixin(Bar, Baz);' +
-          'for(var ____Class0____Key in ____Class0){' +
-            'if(____Class0.hasOwnProperty(____Class0____Key)){' +
-              'Foo[____Class0____Key]=____Class0[____Class0____Key];' +
-            '}' +
-          '}' +
+          'Object.assign(Foo,____Class0);' +
           'var ____SuperProtoOf____Class0=' +
             '____Class0===null' +
               '?null' +
@@ -1327,11 +1319,7 @@ describe('es6-classes', function() {
 
         var expected = [
           'var Foo = (function(){' +
-          'for(var Bar____Key in Bar){' +
-            'if(Bar.hasOwnProperty(Bar____Key)){' +
-              '____Class0[Bar____Key]=Bar[Bar____Key];' +
-            '}' +
-          '}' +
+          'Object.assign(____Class0,Bar);' +
           'var ____SuperProtoOfBar=' +
             'Bar===null' +
               '?null' +
@@ -1389,11 +1377,7 @@ describe('es6-classes', function() {
         var expected = [
           'var Foo = (function(){' +
           'var ____Class1=mixin(Bar, Baz);' +
-          'for(var ____Class1____Key in ____Class1){' +
-            'if(____Class1.hasOwnProperty(____Class1____Key)){' +
-              '____Class0[____Class1____Key]=____Class1[____Class1____Key];' +
-            '}' +
-          '}' +
+          'Object.assign(____Class0,____Class1);' +
           'var ____SuperProtoOf____Class1=' +
             '____Class1===null' +
               '?null' +

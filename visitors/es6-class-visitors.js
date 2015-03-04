@@ -342,12 +342,7 @@ function _renderClassBody(traverse, node, path, state) {
       declareIdentInLocalScope(keyName, initScopeMetadata(node), state);
     }
     utils.append(
-      'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
-        'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
-          className + '[' + keyName + ']=' +
-            superClass.name + '[' + keyName + '];' +
-        '}' +
-      '}',
+      'Object.assign(' + className + ',' + superClass.name + ');',
       state
     );
 
