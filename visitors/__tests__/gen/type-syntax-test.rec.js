@@ -108,6 +108,12 @@ module.exports = {
             eval: 'No error',
 
         },
+        'function foo<T: Foo>() {}': {
+            raworiginal: 'function foo<T: Foo>() {}',
+            transformed: 'function foo        () {}',
+            eval: 'No error',
+
+        },
         'function foo<T,S>() {}': {
             raworiginal: 'function foo<T,S>() {}',
             transformed: 'function foo     () {}',
@@ -255,6 +261,12 @@ module.exports = {
         'class Foo<T> {}': {
             raworiginal: 'class Foo<T> {}',
             transformed: 'class Foo<T> {}',
+            eval: 'Unexpected reserved word',
+
+        },
+        'class Foo<T: Bar> {}': {
+            raworiginal: 'class Foo<T: Bar> {}',
+            transformed: 'class Foo<T     > {}',
             eval: 'Unexpected reserved word',
 
         },
