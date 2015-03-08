@@ -59,17 +59,18 @@ function getRestFunctionCall(source, exclusion) {
   return restFunction + '(' + source + ',' + exclusion + ')';
 }
 
-function getSimpleShallowCopy(accessorExpression) {
-  // This could be faster with 'Object.assign({}, ' + accessorExpression + ')'
-  // but to unify code paths and avoid a ES6 dependency we use the same
-  // helper as for the exclusion case.
-  return getRestFunctionCall(accessorExpression, '{}');
+function getSimpleShallowCopy(accessorExpression, polyfilled) {
+  if (polyfilled) {
+    return 'Object.assign({}, ' + accessorExpression + ')';
+  } else {
+    return getRestFunctionCall(accessorExpression, '{}');
+  }
 }
 
-function renderRestExpression(accessorExpression, excludedProperties) {
+function renderRestExpression(accessorExpression, excludedProperties, polyfilled) {
   var excludedNames = getPropertyNames(excludedProperties);
   if (!excludedNames.length) {
-    return getSimpleShallowCopy(accessorExpression);
+    return getSimpleShallowCopy(accessorExpression, polyfilled);
   }
   return getRestFunctionCall(
     accessorExpression,
