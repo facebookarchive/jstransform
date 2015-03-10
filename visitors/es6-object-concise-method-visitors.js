@@ -38,9 +38,7 @@ function visitObjectConciseMethod(traverse, node, path, state) {
   if (isGenerator) {
     utils.catchupWhiteSpace(node.range[0] + 1, state);
   }
-  if (node.computed) { // [<expr>]() { ...}
-    utils.catchup(node.key.range[1] + 1, state);
-  } else if (reservedWordsHelper.isReservedWord(node.key.name)) {
+  if (reservedWordsHelper.isReservedWord(node.key.name)) {
     utils.catchup(node.key.range[0], state);
     utils.append('"', state);
     utils.catchup(node.key.range[1], state);
@@ -48,14 +46,23 @@ function visitObjectConciseMethod(traverse, node, path, state) {
   }
 
   utils.catchup(node.key.range[1], state);
-  utils.append(
-    ':function' + (isGenerator ? '*' : ''),
-    state
-  );
-  path.unshift(node);
-  traverse(node.value, path, state);
-  path.shift();
+  utils.append(':', state);
+  renderConciseMethod(traverse, node, path, state);
   return false;
+}
+
+// This method is also used by es6-object-computed-property-visitor to render
+// the method for concise computed properties.
+function renderConciseMethod(traverse, property, path, state) {
+  if (property.computed) {
+    var closingSquareBracketIndex = state.g.source.indexOf(']', property.key.range[1]);
+    utils.catchup(closingSquareBracketIndex, state);
+    utils.move(closingSquareBracketIndex + 1, state);
+  }
+  utils.append("function" + (property.value.generator ? "*" : ""), state);
+  path.unshift(property);
+  traverse(property.value, path, state);
+  path.shift();
 }
 
 visitObjectConciseMethod.test = function(node, path, state) {
@@ -64,6 +71,7 @@ visitObjectConciseMethod.test = function(node, path, state) {
     node.method === true;
 };
 
+exports.renderConciseMethod = renderConciseMethod;
 exports.visitorList = [
   visitObjectConciseMethod
 ];

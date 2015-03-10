@@ -24,10 +24,36 @@ function visitObjectLiteralSpread(traverse, node, path, state) {
   // Skip the original {
   utils.move(node.range[0] + 1, state);
 
-  var previousWasSpread = false;
+  var lastWasSpread = renderSpreadProperties(
+    traverse,
+    node.properties,
+    path,
+    state,
+    false // previousWasSpread
+  );
 
-  for (var i = 0; i < node.properties.length; i++) {
-    var property = node.properties[i];
+  // Strip any non-whitespace between the last item and the end.
+  // We only catch up on whitespace so that we ignore any trailing commas which
+  // are stripped out for IE8 support. Unfortunately, this also strips out any
+  // trailing comments.
+  utils.catchupWhiteSpace(node.range[1] - 1, state);
+
+  // Skip the trailing }
+  utils.move(node.range[1], state);
+
+  if (!lastWasSpread) {
+    utils.append('}', state);
+  }
+
+  utils.append(')', state);
+  return false;
+}
+
+// This method is also used by es6-object-computed-property-visitor.
+function renderSpreadProperties(traverse, properties, path, state, previousWasSpread) {
+
+  for (var i = 0; i < properties.length; i++) {
+    var property = properties[i];
     if (property.type === Syntax.SpreadProperty) {
 
       // Close the previous object or initial object
@@ -69,21 +95,7 @@ function visitObjectLiteralSpread(traverse, node, path, state) {
     }
   }
 
-  // Strip any non-whitespace between the last item and the end.
-  // We only catch up on whitespace so that we ignore any trailing commas which
-  // are stripped out for IE8 support. Unfortunately, this also strips out any
-  // trailing comments.
-  utils.catchupWhiteSpace(node.range[1] - 1, state);
-
-  // Skip the trailing }
-  utils.move(node.range[1], state);
-
-  if (!previousWasSpread) {
-    utils.append('}', state);
-  }
-
-  utils.append(')', state);
-  return false;
+  return previousWasSpread;
 }
 
 visitObjectLiteralSpread.test = function(node, path, state) {
@@ -103,6 +115,7 @@ visitObjectLiteralSpread.test = function(node, path, state) {
   return hasAtLeastOneSpreadProperty;
 };
 
+exports.renderSpreadProperties = renderSpreadProperties;
 exports.visitorList = [
   visitObjectLiteralSpread
 ];
