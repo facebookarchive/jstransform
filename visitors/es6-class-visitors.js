@@ -341,15 +341,32 @@ function _renderClassBody(traverse, node, path, state) {
       keyNameDeclarator = 'var ';
       declareIdentInLocalScope(keyName, initScopeMetadata(node), state);
     }
-    utils.append(
-      'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
-        'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
-          className + '[' + keyName + ']=' +
-            superClass.name + '[' + keyName + '];' +
-        '}' +
-      '}',
-      state
-    );
+    if (state.g.opts.es3) {
+      utils.append(
+        'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
+          'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
+            className + '[' + keyName + ']=' +
+              superClass.name + '[' + keyName + '];' +
+          '}' +
+        '}',
+        state
+      );
+    } else {
+      var keysName = superClass.name + '____StaticKeys';
+      var keysNameDeclarator = '';
+      if (!utils.identWithinLexicalScope(keysName, state)) {
+        keysNameDeclarator = 'var ';
+        declareIdentInLocalScope(keysName, initScopeMetadata(node), state);
+      }
+      utils.append(
+        keysNameDeclarator + keysName + '=Object.getOwnPropertyNames(' + superClass.name + ').filter(function(key){return ["callee", "caller", "arguments"].indexOf(key)<0;});' +
+        'for(' + keyNameDeclarator + keyName + '=0;' + keyName + '<' + keysName + '.length;' + keyName + '++){' +
+          className + '[' + keysName + '[' + keyName + ']]=' +
+            superClass.name + '[' + keysName + '[' + keyName + ']];' +
+        '}',
+        state
+      );
+    }
 
     var superProtoIdentStr = SUPER_PROTO_IDENT_PREFIX + superClass.name;
     if (!utils.identWithinLexicalScope(superProtoIdentStr, state)) {
