@@ -219,6 +219,20 @@ describe('es6-destructuring-visitors', function() {
       .toEqual(60);
   });
 
+  it('should work with arrows without other arguments', function() {
+    var code = transform([
+      'var foo = ({x, y}) => x + y;',
+      'var bar = ([x, y]) => x + y;'
+    ].join('\n'));
+
+    eval(code);
+
+    expect(foo({x: 10, y: 20}))
+      .toEqual(30);
+    expect(bar([10, 20]))
+      .toEqual(30);
+  });
+
   // Auto-generated temp vars test.
   it('should allocate correct temp index', function() {
     var code = transform([
