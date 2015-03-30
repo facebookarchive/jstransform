@@ -341,15 +341,23 @@ function _renderClassBody(traverse, node, path, state) {
       keyNameDeclarator = 'var ';
       declareIdentInLocalScope(keyName, initScopeMetadata(node), state);
     }
-    utils.append(
-      'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
-        'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
-          className + '[' + keyName + ']=' +
-            superClass.name + '[' + keyName + '];' +
-        '}' +
-      '}',
-      state
-    );
+
+    if (state.g.opts.useObjectAssign) {
+      utils.append(
+        'Object.assign(' + className + ', ' + superClass.name + ');',
+        state
+      );
+    } else {
+      utils.append(
+        'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
+          'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
+            className + '[' + keyName + ']=' +
+              superClass.name + '[' + keyName + '];' +
+          '}' +
+        '}',
+        state
+      );
+    }
 
     var superProtoIdentStr = SUPER_PROTO_IDENT_PREFIX + superClass.name;
     if (!utils.identWithinLexicalScope(superProtoIdentStr, state)) {
