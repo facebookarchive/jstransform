@@ -73,7 +73,6 @@ describe('es6-computed-property-visitors', function() {
   });
 
   it('should evaluate complex objects with computed properties', function() {
-    var complex;
     eval(transform([
       'var spread = {identifier: 1, "literal": 2, ["comp"+"uted"]: "overwritten"};',
       'var short = "value";',
