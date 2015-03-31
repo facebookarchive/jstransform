@@ -47,7 +47,14 @@ visitProperty.test = function(node) {
 
 function visitMemberExpression(traverse, node, path, state) {
   traverse(node.object, path, state);
-  utils.catchup(node.property.range[0] - 1, state);
+  // Member expression range does not include parenthesis, so simply specifying
+  // node.object.range[1] as the start position doesn't work. Neither does
+  // node.property.range[0] - 1 as that won't catch expressions that span
+  // newlines (period on previous line). So instead we'll catchup and remove
+  // any periods.
+  utils.catchup(node.property.range[0], state, function(s) {
+    return s.replace('.', '');
+  });
   utils.append('[', state);
   utils.catchupWhiteSpace(node.property.range[0], state);
   utils.append('"', state);

@@ -40,9 +40,14 @@ describe('reserved-words', function() {
       var code = 'foo.delete;';
 
       expect(transform(code)).toEqual('foo["delete"];');
+    });
 
-      code = '(foo++).delete;';
+    it('should handle parenthesis', function() {
+      var code = '(foo++).delete;';
       expect(transform(code)).toEqual('(foo++)["delete"];');
+
+      code = '(foo.bar()).delete;';
+      expect(transform(code)).toEqual('(foo.bar())["delete"];');
     });
 
     it('should handle call expressions', function() {
@@ -55,6 +60,21 @@ describe('reserved-words', function() {
       var code = 'foo.await();';
 
       expect(transform(code)).toEqual('foo.await();');
+    });
+
+    it('should work with newlines', function() {
+      var code = 'foo.\ncatch();';
+      expect(transform(code)).toEqual('foo\n["catch"]();');
+
+      // This one is weird but it works.
+      code = 'foo.\n  catch();';
+      expect(transform(code)).toEqual('foo\n  ["catch"]();');
+
+      code = 'foo\n.catch();';
+      expect(transform(code)).toEqual('foo\n["catch"]();');
+
+      code = 'foo\n  .catch();';
+      expect(transform(code)).toEqual('foo\n  ["catch"]();');
     });
   });
 
