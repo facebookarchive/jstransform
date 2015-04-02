@@ -9,12 +9,14 @@ require('mock-modules').autoMockOff();
 describe('es6-call-spread-visitors', function() {
   var transformFn;
   var visitors;
+  var results;
 
   beforeEach(function() {
     require('mock-modules').dumpCache();
     transformFn = require('../../src/jstransform').transform;
 
     visitors = require('../es6-for-of-visitors').visitorList;
+    results = undefined;
   });
 
   function transform(code, options) {
@@ -46,6 +48,7 @@ describe('es6-call-spread-visitors', function() {
 
 
   it('should correctly run a simple for of without a var', function() {
+    var x;
     eval(transform([
       'var results = [];',
       'var x;',
@@ -88,6 +91,8 @@ describe('es6-call-spread-visitors', function() {
         };
       }
     };
+    // dummy statement to appease lint.
+    foo;
 
     eval(transform([
       'var results = [];',
