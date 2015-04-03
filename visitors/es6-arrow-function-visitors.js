@@ -77,7 +77,7 @@ function visitArrowFunction(traverse, node, path, state) {
       return node.type === Syntax.ThisExpression
              || (node.type === Syntax.Identifier
                  && node.name === "super")
-             || (node.type === Syntax.XJSIdentifier
+             || (node.type === Syntax.JSXIdentifier
                  && node.name === 'this');
     });
 
