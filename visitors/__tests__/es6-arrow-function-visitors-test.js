@@ -234,6 +234,12 @@ describe('es6ArrowFunctionsTransform', function() {
       '(/*string*/foo, /*bool*/bar) => foo;',
       '(function(/*string*/foo, /*bool*/bar)  {return foo;});'
     );
+
+    // Binds this for arrows containing <this />
+    expectTransform(
+      '(() => <this />)',
+      '((function()  {return <this />;}.bind(this)))'
+    );
   });
 });
 

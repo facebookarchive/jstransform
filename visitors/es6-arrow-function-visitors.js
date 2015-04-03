@@ -76,7 +76,9 @@ function visitArrowFunction(traverse, node, path, state) {
     utils.containsChildMatching(node.body, function(node) {
       return node.type === Syntax.ThisExpression
              || (node.type === Syntax.Identifier
-                 && node.name === "super");
+                 && node.name === "super")
+             || (node.type === Syntax.XJSIdentifier
+                 && node.name === 'this');
     });
 
   if (containsBindingSyntax) {
