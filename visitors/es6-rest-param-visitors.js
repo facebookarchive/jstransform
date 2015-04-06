@@ -63,6 +63,7 @@ function visitFunctionParamsWithRestParam(traverse, node, path, state) {
     utils.catchup(node.rest.range[0] - 3, state);
   }
   utils.catchupWhiteSpace(node.rest.range[1], state);
+  utils.catchup(node.body.range[0], state);
 
   path.unshift(node);
   traverse(node.body, path, state);
