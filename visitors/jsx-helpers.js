@@ -8,8 +8,8 @@
  */
 /*global exports:true*/
 'use strict';
-var Syntax = require('jstransform').Syntax;
-var utils = require('jstransform/src/utils');
+var Syntax = require('esprima-fb').Syntax;
+var utils = require('../src/utils');
 
 function commaAfterLastParen(value) {
   var state = 'normal';

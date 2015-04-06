@@ -3,7 +3,7 @@
  */
 
 var Syntax = require('esprima-fb').Syntax;
-var utils = require('jstransform/src/utils');
+var utils = require('../src/utils');
 
 /**
  * Strips trailing commas from function calls. Transforms:
