@@ -35,12 +35,14 @@ describe('es6-rest-param-visitors', () => {
     arrowFuncVisitors = require('../es6-arrow-function-visitors').visitorList;
     classVisitors = require('../es6-class-visitors').visitorList;
     restParamVisitors = require('../es6-rest-param-visitors').visitorList;
+    callSpreadVisitors = require('../es6-call-spread-visitors').visitorList;
     transformFn = require('../../src/jstransform').transform;
 
     visitorSet =
       arrowFuncVisitors
         .concat(classVisitors)
-        .concat(restParamVisitors);
+        .concat(restParamVisitors)
+        .concat(callSpreadVisitors);
   });
 
   function transform(code) {
@@ -123,6 +125,22 @@ describe('es6-rest-param-visitors', () => {
       eval(code);
 
       expect(test()).toBe(true);
+    });
+
+    it('should work with temp var injections', () => {
+      // Use call spread as example. It injects a temp var into function scope.
+      var code = transform([
+        'function test(bar, ...args) {',
+        '  return bar(...args);',
+        '}'
+      ].join('\n'));
+
+      eval(code);
+
+      var fn = function() {
+        return Array.prototype.slice.call(arguments).map(i => i + 1);
+      };
+      expect(test(fn, 1, 2, 3)).toEqual([2, 3, 4]);
     });
   });
 
