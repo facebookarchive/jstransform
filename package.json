@@ -26,12 +26,7 @@
     "esprima-fb": "^14001.1.0-dev-harmony-fb",
     "source-map": "^0.4.2"
   },
-  "licenses": [
-    {
-      "type": "Apache-2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ],
+  "license": "BSD-3-Clause",
   "engines": {
     "node": ">=0.8.8"
   },
