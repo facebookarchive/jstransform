@@ -63,6 +63,10 @@ function transform(code, options) {
     visitorSets.push('es7');
   }
 
+  if (options.utility) {
+    visitorSets.push('utility');
+  }
+
   if (options.target === 'es3') {
     visitorSets.push('target:es3');
   }

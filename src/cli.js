@@ -17,6 +17,9 @@ require('commoner').version(
   '--harmony',
   'Shorthand to enable all ES6 and ES7 transforms'
 ).option(
+  '--utility',
+  'Turns on available utility transforms'
+).option(
   '--target [version]',
   'Specify your target version of ECMAScript. Valid values are "es3" and ' +
   '"es5". The default is "es5". "es3" will avoid uses of defineProperty and ' +

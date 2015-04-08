@@ -18,6 +18,8 @@ var es7TrailingComma = require('./es7-trailing-comma-visitors');
 var reactDisplayName = require('./react-display-name-visitors');
 var reactJSX = require('./react-jsx-visitors');
 var reservedWords = require('./reserved-words-visitors');
+var trailingComma = require('./trailing-comma-visitors');
+var undefinedToVoid0 = require('./undefined-to-void-0-visitors');
 
 // Map from transformName => orderedListOfVisitors.
 var transformVisitors = {
@@ -35,7 +37,9 @@ var transformVisitors = {
   'es7-trailing-comma': es7TrailingComma.visitorList,
   'react-display-name': reactDisplayName.visitorList,
   'react-jsx': reactJSX.visitorList,
-  'reserved-words': reservedWords.visitorList
+  'reserved-words': reservedWords.visitorList,
+  'trailing-comma': trailingComma.visitorList,
+  'undefined-to-void-0': undefinedToVoid0.visitorList
 };
 
 
@@ -62,7 +66,11 @@ var transformSets = {
     'react-display-name'
   ],
   'target:es3': [
-    'reserved-words'
+    'reserved-words',
+    'trailing-comma'
+  ],
+  'utility': [
+    'undefined-to-void-0'
   ]
 };
 // harmony is all newer transforms. Define it here so we don't duplicate.
@@ -84,9 +92,13 @@ var transformRunOrder = [
   'es6-call-spread',
   'es6-for-of',
   'es7-spread-property',
+  // These are 2 distinct transforms - 'trailing-comma' handles array & object
+  // literals. 'es7-trailing-comma' handles extra arguments in function calls.
+  'trailing-comma',
   'es7-trailing-comma',
   'react-jsx',
-  'react-display-name'
+  'react-display-name',
+  'undefined-to-void-0'
 ];
 
 /**
