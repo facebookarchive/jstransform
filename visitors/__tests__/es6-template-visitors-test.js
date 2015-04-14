@@ -185,6 +185,13 @@ describe('ES6 Template Visitor', function() {
     expectEval("`foo\n${bar}\nbaz`", 'foo\nabc\nbaz', 'var bar = "abc";');
   });
 
+  it('should handle numeric expressions', function() {
+    expectEval("`foo${1}bar${2}`", 'foo1bar2');
+    expectEval("`foo${1}${2}bar`", 'foo12bar');
+    expectEval("`${1}${2}foo`", '12foo');
+    expectEval("`${1}${2}`", '12');
+  });
+
   it('should canonicalize line endings', function() {
     // TODO: should this be '("foo\\nbar"\r\n)' to maintain the number of lines
     // for editors that break on \r\n? I don't think we care in the transformed
