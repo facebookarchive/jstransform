@@ -1251,6 +1251,37 @@ describe('es6-classes', function() {
           '(line: 2, col: 2)'
         );
       });
+
+      it('properly handles computed static methods', function() {
+        var code = transform([
+          'var bar = "foobar";',
+          'class Foo {',
+          '  static [bar]() {',
+          '    return 42;',
+          '  }',
+          '}'
+        ].join('\n'));
+
+        eval(code);
+
+        expect(Foo.foobar()).toBe(42);
+      });
+
+      it('properly handles computed instance methods', function() {
+        var code = transform([
+          'var bar = "foobar";',
+          'class Foo {',
+          '  [bar]() {',
+          '    return 42;',
+          '  }',
+          '}'
+        ].join('\n'));
+
+        eval(code);
+
+        var fooInst = new Foo();
+        expect(fooInst.foobar()).toBe(42);
+      });
     });
   });
 
