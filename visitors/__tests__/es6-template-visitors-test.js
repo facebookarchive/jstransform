@@ -85,20 +85,21 @@ describe('ES6 Template Visitor', function() {
 
   it('should transform simple substitutions', function() {
     expectTransform('`foo ${bar}`', '("foo " + bar)');
-    expectTransform('`${foo} bar`', '(foo + " bar")');
-    expectTransform('`${foo} ${bar}`', '(foo + " " + bar)');
-    expectTransform('`${foo}${bar}`', '(foo + bar)');
+    expectTransform('`${foo} bar`', '("" + foo + " bar")');
+    expectTransform('`${foo} ${bar}`', '("" + foo + " " + bar)');
+    expectTransform('`${foo}${bar}`', '("" + foo + bar)');
   });
 
   it('should transform expressions', function() {
     expectTransform('`foo ${bar()}`', '("foo " + bar())');
     expectTransform('`foo ${bar.baz}`', '("foo " + bar.baz)');
     expectTransform('`foo ${bar + 5}`', '("foo " + (bar + 5))');
-    expectTransform('`${foo + 5} bar`', '((foo + 5) + " bar")');
-    expectTransform('`${foo + 5} ${bar}`', '((foo + 5) + " " + bar)');
+    expectTransform('`${foo + 5} bar`', '("" + (foo + 5) + " bar")');
+    expectTransform('`${foo + 5} ${bar}`', '("" + (foo + 5) + " " + bar)');
     expectTransform(
       '`${(function(b) {alert(4);})(a)}`',
-      '((function(b) {alert(4);})(a))');
+      '("" + (function(b) {alert(4);})(a))');
+    expectTransform("`${4 + 5}`", '("" + (4 + 5))');
   });
 
   it('should transform tags with simple templates', function() {
@@ -191,6 +192,24 @@ describe('ES6 Template Visitor', function() {
     expectEval("`${1}${2}foo`", '12foo');
     expectEval("`${1}${2}`", '12');
   });
+
+  it('should handle primitive literals', function() {
+    expectTransform("`${42}`", '("" + 42)');
+    expectEval("`${42}`", '42');
+
+    expectTransform("`${'42'}`", '("" + \'42\')');
+    expectEval("`${'42'}`", '42');
+
+    expectTransform("`${true}`", '("" + true)');
+    expectEval("`${true}`", 'true');
+
+    expectTransform("`${null}`", '("" + null)');
+    expectEval("`${null}`", 'null');
+
+    // undefined is actually an Identifier but it falls into the same category
+    expectTransform("`${undefined}`", '("" + undefined)');
+    expectEval("`${undefined}`", 'undefined');
+  }),
 
   it('should canonicalize line endings', function() {
     // TODO: should this be '("foo\\nbar"\r\n)' to maintain the number of lines

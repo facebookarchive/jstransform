@@ -46,6 +46,9 @@ function visitTemplateLiteral(traverse, node, path, state) {
       // Concatenat adjacent substitutions, e.g. `${x}${y}`. Empty templates
       // appear before the first and after the last element - nothing to add in
       // those cases.
+      if (ii === 0) {
+        utils.append('"" + ', state);
+      }
       if (ii > 0 && !templateElement.tail) {
         // + between substitution and substitution
         utils.append(' + ', state);
@@ -56,6 +59,7 @@ function visitTemplateLiteral(traverse, node, path, state) {
     if (!templateElement.tail) {
       var substitution = node.expressions[ii];
       if (substitution.type === Syntax.Identifier ||
+          substitution.type === Syntax.Literal ||
           substitution.type === Syntax.MemberExpression ||
           substitution.type === Syntax.CallExpression) {
         utils.catchup(substitution.range[1], state);
