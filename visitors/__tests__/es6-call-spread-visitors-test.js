@@ -51,6 +51,11 @@ describe('es6-call-spread-visitors', function() {
       .toEqual('new (Function.prototype.bind.apply(Set, [null, 1, 2].concat(list)))');
   });
 
+  it('should spread `arguments` while creating new instances', function() {
+    expect(transform('function fn(){ new Set(...arguments); }'))
+      .toEqual('function fn(){ new (Function.prototype.bind.apply(Set, [null].concat(Array.prototype.slice.call(arguments)))); }');
+  });
+
   it('should create temporary variables when necessary in program scope', function() {
     expect(transform('foo().bar(arg1, arg2, ...more)'))
       .toEqual('var $__0;($__0 = foo()).bar.apply($__0, [arg1, arg2].concat(more))');
