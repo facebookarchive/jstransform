@@ -148,7 +148,7 @@ describe('es6-classes', function() {
         ].join('\n');
 
         var expected = [
-          'var Bar____StaticKeys=Object.getOwnPropertyNames(Bar).filter(function(key){return ["callee", "caller", "arguments"].indexOf(key)<0;});' +
+          'var Bar____StaticKeys=Object.getOwnPropertyNames(Bar).filter(function(key){return ["callee", "caller", "arguments", "length", "name"].indexOf(key)<0;});' +
           'for(var Bar____Key=0;Bar____Key<Bar____StaticKeys.length;Bar____Key++){' +
             'Foo[Bar____StaticKeys[Bar____Key]]=Bar[Bar____StaticKeys[Bar____Key]];' +
           '}' +
@@ -208,7 +208,7 @@ describe('es6-classes', function() {
 
         var expected = [
           'var ____Class0=mixin(Bar, Baz);' +
-          'var ____Class0____StaticKeys=Object.getOwnPropertyNames(____Class0).filter(function(key){return ["callee", "caller", "arguments"].indexOf(key)<0;});' +
+          'var ____Class0____StaticKeys=Object.getOwnPropertyNames(____Class0).filter(function(key){return ["callee", "caller", "arguments", "length", "name"].indexOf(key)<0;});' +
           'for(var ____Class0____Key=0;____Class0____Key<____Class0____StaticKeys.length;____Class0____Key++){' +
             'Foo[____Class0____StaticKeys[____Class0____Key]]=____Class0[____Class0____StaticKeys[____Class0____Key]];' +
           '}' +
@@ -1340,7 +1340,7 @@ describe('es6-classes', function() {
 
         var expected = [
           'var Foo = (function(){' +
-          'var Bar____StaticKeys=Object.getOwnPropertyNames(Bar).filter(function(key){return ["callee", "caller", "arguments"].indexOf(key)<0;});' +
+          'var Bar____StaticKeys=Object.getOwnPropertyNames(Bar).filter(function(key){return ["callee", "caller", "arguments", "length", "name"].indexOf(key)<0;});' +
           'for(var Bar____Key=0;Bar____Key<Bar____StaticKeys.length;Bar____Key++){' +
             '____Class0[Bar____StaticKeys[Bar____Key]]=Bar[Bar____StaticKeys[Bar____Key]];' +
           '}' +
@@ -1401,7 +1401,7 @@ describe('es6-classes', function() {
         var expected = [
           'var Foo = (function(){' +
           'var ____Class1=mixin(Bar, Baz);' +
-          'var ____Class1____StaticKeys=Object.getOwnPropertyNames(____Class1).filter(function(key){return ["callee", "caller", "arguments"].indexOf(key)<0;});' +
+          'var ____Class1____StaticKeys=Object.getOwnPropertyNames(____Class1).filter(function(key){return ["callee", "caller", "arguments", "length", "name"].indexOf(key)<0;});' +
           'for(var ____Class1____Key=0;____Class1____Key<____Class1____StaticKeys.length;____Class1____Key++){' +
             '____Class0[____Class1____StaticKeys[____Class1____Key]]=____Class1[____Class1____StaticKeys[____Class1____Key]];' +
           '}' +
