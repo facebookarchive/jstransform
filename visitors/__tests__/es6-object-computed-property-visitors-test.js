@@ -25,6 +25,7 @@ describe('es6-computed-property-visitors', function() {
   }
 
   it('should transforms simple computed properties', function() {
+    var result;
     eval(transform([
       'var x = "foo", q = "bar";',
       'var result = {[x]: 1, y: 2, "z": 3, [x + q]: 4};',
