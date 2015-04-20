@@ -359,7 +359,7 @@ function _renderClassBody(traverse, node, path, state) {
         declareIdentInLocalScope(keysName, initScopeMetadata(node), state);
       }
       utils.append(
-        keysNameDeclarator + keysName + '=Object.getOwnPropertyNames(' + superClass.name + ').filter(function(key){return ["callee", "caller", "arguments"].indexOf(key)<0;});' +
+        keysNameDeclarator + keysName + '=Object.getOwnPropertyNames(' + superClass.name + ').filter(function(key){return ["callee", "caller", "arguments", "length", "name"].indexOf(key)<0;});' +
         'for(' + keyNameDeclarator + keyName + '=0;' + keyName + '<' + keysName + '.length;' + keyName + '++){' +
           className + '[' + keysName + '[' + keyName + ']]=' +
             superClass.name + '[' + keysName + '[' + keyName + ']];' +
