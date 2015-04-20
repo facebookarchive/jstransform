@@ -73,7 +73,8 @@ function es6ObjectComputedProperties(traverse, node, path, state) {
     // short notation / dot access
     } else if (
       property.type === Syntax.Property &&
-      property.key.type === Syntax.Identifier
+      property.key.type === Syntax.Identifier &&
+      !property.computed
     ) {
       utils.append(obj + '.' + property.key.name + '=', state);
 

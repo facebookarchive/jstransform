@@ -24,6 +24,15 @@ describe('es6-computed-property-visitors', function() {
     return transformFn(visitors, code, options).code;
   }
 
+  it('should transforms simple computed properties', function() {
+    eval(transform([
+      'var x = "foo", q = "bar";',
+      'var result = {[x]: 1, y: 2, "z": 3, [x + q]: 4};',
+    ].join('\n')));
+
+    expect(result).toEqual({foo: 1, y: 2, z: 3, foobar: 4});
+  });
+
   it('should transform computed property', function() {
     expect(transform('var x = {alpha: 12, \'beta\': 34, [\'gam\' + \'ma\']: 56};'))
       .toEqual('var $__0;var x = ($__0={},$__0.alpha= 12,$__0[ \'beta\']= 34,$__0[ \'gam\' + \'ma\']= 56,$__0);');
