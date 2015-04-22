@@ -162,12 +162,21 @@ function visitImportType(traverse, node, path, state) {
 }
 visitImportType.test = function(node, path, state) {
   return node.type === 'ImportDeclaration'
-         && node.isType;
+         && (node.importKind === 'type' || node.importKind === 'typeof');
+};
+
+function visitExportType(traverse, node, path, state) {
+  utils.catchupWhiteOut(node.range[1], state);
+}
+visitExportType.test = function(node, path, state) {
+  return node.type === 'ExportDeclaration'
+         && node.declaration.type === 'TypeAlias';
 };
 
 exports.visitorList = [
   visitClassProperty,
   visitDeclare,
+  visitExportType,
   visitImportType,
   visitInterfaceDeclaration,
   visitFunctionParametricAnnotation,
