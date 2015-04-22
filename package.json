@@ -8,6 +8,7 @@
       "email": "jeffmo@fb.com"
     }
   ],
+  "bin": "bin/jstransform",
   "main": "src/jstransform",
   "repository": {
     "type": "git",
@@ -20,22 +21,18 @@
     "visitor"
   ],
   "dependencies": {
-    "base62": "0.1.1",
+    "base62": "^1.1.0",
+    "commoner": "^0.10.1",
     "esprima-fb": "^14001.1.0-dev-harmony-fb",
-    "source-map": "0.1.31"
+    "source-map": "^0.4.2"
   },
-  "licenses": [
-    {
-      "type": "Apache-2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ],
+  "license": "BSD-3-Clause",
   "engines": {
     "node": ">=0.8.8"
   },
   "devDependencies": {
-    "jest-cli": "^0.2",
-    "jshint": "^2.5.10"
+    "jest-cli": "^0.4.0",
+    "jshint": "^2.6.3"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/jestPreprocessor.js",
