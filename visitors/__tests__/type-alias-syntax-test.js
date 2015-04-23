@@ -23,17 +23,15 @@ describe('static type syntax syntax', function() {
   });
 
   function transform(code, visitors) {
+    var opts = {sourceType: 'nonStrictModule'};
     code = jstransform.transform(
       flowSyntaxVisitors,
       code.join('\n'),
-      {sourceType: 'nonStrictModule'}
+      opts
     ).code;
 
     if (visitors) {
-      code = jstransform.transform(
-        visitors,
-        code
-      ).code;
+      code = jstransform.transform(visitors, code, opts).code;
     }
 
     return code;
@@ -53,9 +51,18 @@ describe('static type syntax syntax', function() {
       expect(type).toBe(84);
     });
 
-    it('strips import-type declarations', () => {
+    it('strips import-type statements', () => {
       var code = transform([
         'import type DefaultExport from "MyModule";',
+        'var sanityCheck = 42;',
+      ]);
+      eval(code);
+      expect(sanityCheck).toBe(42);
+    });
+
+    it('strips export-type statements', () => {
+      var code = transform([
+        'export type foo = number;',
         'var sanityCheck = 42;',
       ]);
       eval(code);
