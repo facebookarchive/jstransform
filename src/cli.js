@@ -55,6 +55,6 @@ require('commoner').version(
   // We don't do any pre-processing of options so that the command line and the
   // JS API both expose the same set of options.
   var result = transform(source, this.options);
-  return this.options.sourceMapInline ? result.sourceMapInline : result.code;
+  return result.code;
 });
 

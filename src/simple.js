@@ -24,13 +24,16 @@ var fs = require('fs');
  * @return {object}
  */
 function transform(code, options) {
+  if (!options) {
+    options = {};
+  }
   // Process options
   var transformOptions = {};
 
-  // transformOptions.harmony = options.harmony;
-  // transformOptions.stripTypes = options.stripTypes;
-  // transformOptions.sourceMap = options.sourceMap;
-  transformOptions.filename = options.sourceFilename;
+  if (options.sourceMap || options.sourceMapInline) {
+    transformOptions.sourceMap = true;
+    transformOptions.filename = options.sourceFilename || 'source.js';
+  }
 
   if (options.es6module) {
     transformOptions.sourceType = 'module';
@@ -87,15 +90,35 @@ function transform(code, options) {
   var visitorList = visitors.getVisitorsBySet(visitorSets);
   var result = jstransform.transform(visitorList, code, transformOptions);
 
-  if (options.sourceMapInline) {
-    result.inlineSourceMap = inlineSourceMap(
-      result.sourceMap,
-      code,
-      options.fileName
-    );
+  // Only copy some things off.
+  var output = {
+    code: result.code,
+    sourceMap: null
+  };
+
+  // Convert sourceMap to JSON.
+  var sourceMap;
+  if (result.sourceMap) {
+    sourceMap = result.sourceMap.toJSON();
+    sourceMap.sources = transformOptions.filename;
+    sourceMap.sourcesContent = [code];
   }
 
-  return result;
+  // This differentiates options.sourceMap from options.sourceMapInline.
+  if (options.sourceMap) {
+    output.sourceMap = sourceMap;
+  }
+
+  if (options.sourceMapInline) {
+    var map = inlineSourceMap(
+      result.sourceMap,
+      code,
+      transformOptions.fileName
+    );
+    output.code = output.code + '\n' + map;
+  }
+
+  return output;
 }
 
 function transformFile(file, options, callback) {
