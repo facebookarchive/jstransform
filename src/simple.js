@@ -148,7 +148,7 @@ function transformFile(file, options, callback) {
     }
 
     var result = transform(contents, options);
-    callback(result);
+    callback(null, result);
   });
 }
 
