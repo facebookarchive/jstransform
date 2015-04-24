@@ -9,6 +9,7 @@
 
 'use strict';
 /*eslint-disable no-undef*/
+var assign = require('object-assign');
 var visitors = require('../visitors');
 var jstransform = require('./jstransform');
 var typesSyntax = require('../visitors/type-syntax');
@@ -16,6 +17,20 @@ var inlineSourceMap = require('./inline-source-map');
 
 var fs = require('fs');
 
+var DEFAULT_OPTIONS = {
+  react: false,
+  es6: false,
+  es7: false,
+  harmony: false,
+  utility: false,
+  target: 'es5',
+  stripTypes: false,
+  sourceMap: false,
+  sourceMapInline: false,
+  sourceFilename: 'source.js',
+  es6module: false,
+  nonStrictEs6module: false
+};
 /**
  * Transforms the given code with the given options.
  *
@@ -24,9 +39,8 @@ var fs = require('fs');
  * @return {object}
  */
 function transform(code, options) {
-  if (!options) {
-    options = {};
-  }
+  options = assign({}, DEFAULT_OPTIONS, options);
+
   // Process options
   var transformOptions = {};
 
@@ -126,6 +140,7 @@ function transformFile(file, options, callback) {
     callback = options;
     options = {};
   }
+  options = assign({sourceFilename: file}, options);
 
   fs.readFile(file, 'utf-8', function(err, contents) {
     if (err) {
@@ -138,6 +153,7 @@ function transformFile(file, options, callback) {
 }
 
 function transformFileSync(file, options) {
+  options = assign({sourceFilename: file}, options);
   var contents = fs.readFileSync(file, 'utf-8');
   return transform(contents, options);
 }
