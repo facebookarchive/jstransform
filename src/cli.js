@@ -7,6 +7,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+var assign = require('object-assign');
 var transform = require('./simple').transform;
 
 require('commoner').version(
@@ -50,11 +51,22 @@ require('commoner').version(
 ).option(
   '--source-map-inline',
   'Embed inline sourcemap in transformed source'
+).option(
+  '--source-filename',
+  'Filename to use when generating the inline sourcemap. Will default to ' +
+  'filename when processing files'
 ).process(function(id, source) {
   // This is where JSX, ES6, etc. desugaring happens.
   // We don't do any pre-processing of options so that the command line and the
-  // JS API both expose the same set of options.
-  var result = transform(source, this.options);
-  return this.options.sourceMapInline ? result.sourceMapInline : result.code;
+  // JS API both expose the same set of options. We will set the sourceFilename
+  // to something more correct than "source.js".
+  var options;
+  if (id !== '<stdin>') {
+    options = assign({sourceFilename: id + '.js'}, this.options);
+  } else {
+    options = this.options;
+  }
+  var result = transform(source, options);
+  return result.code;
 });
 
