@@ -1,6 +1,8 @@
 language: node_js
+sudo: false
 node_js:
- - "0.10"
+- '0.10'
+- '0.12'
 # Because of package.json dependency versions that start with '^', it's not
 # possible to `npm install` using the version of npm packaged with node 0.8
 # As a result, travis *always* fails for 0.8 now -- and thus it's not possible 
