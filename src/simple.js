@@ -127,7 +127,7 @@ function transform(code, options) {
     var map = inlineSourceMap(
       result.sourceMap,
       code,
-      transformOptions.fileName
+      transformOptions.filename
     );
     output.code = output.code + '\n' + map;
   }
