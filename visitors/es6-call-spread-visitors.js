@@ -108,5 +108,5 @@ visitCallSpread.test = function(node, path, state) {
 };
 
 exports.visitorList = [
-  visitCallSpread,
+  visitCallSpread
 ];
