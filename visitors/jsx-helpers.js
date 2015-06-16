@@ -76,7 +76,7 @@ function renderJSXLiteral(object, isLast, state, start, end) {
     if (trimmedLine || isLastNonEmptyLine) {
       utils.append(
         JSON.stringify(trimmedLine) +
-        (!isLastNonEmptyLine ? ' + \' \' +' : ''),
+        (!isLastNonEmptyLine ? ' + " " +' : ''),
         state);
 
       if (isLastNonEmptyLine) {
