@@ -80,7 +80,7 @@ describe('jsx', function() {
       true);
 
     expect(state.g.buffer).toEqual(
-      '"  sdfsdfsdf" + \' \' +\n' +
+      '"  sdfsdfsdf" + " " +\n' +
       '  "sdlkfjsdfljs"\n' +
       '   ');
   });
@@ -93,7 +93,7 @@ describe('jsx', function() {
       false);
 
     expect(state.g.buffer).toEqual(
-      '"  sdfsdfsdf" + \' \' +\n' +
+      '"  sdfsdfsdf" + " " +\n' +
       '  "sdlkfjsdfljs", \n' +
       '   ');
   });
