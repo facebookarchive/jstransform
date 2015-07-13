@@ -114,7 +114,7 @@ function transform(code, options) {
   var sourceMap;
   if (result.sourceMap) {
     sourceMap = result.sourceMap.toJSON();
-    sourceMap.sources = transformOptions.filename;
+    sourceMap.sources = [transformOptions.filename];
     sourceMap.sourcesContent = [code];
   }
 
@@ -163,4 +163,3 @@ module.exports = {
   transformFile: transformFile,
   transformFileSync: transformFileSync
 };
-
