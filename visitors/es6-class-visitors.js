@@ -495,10 +495,21 @@ visitPrivateIdentifier.test = function(node, path, state) {
  */
 function visitSuperCallExpression(traverse, node, path, state) {
   var superClassName = state.superClass.name;
+  // We'll use this to handle a simplified super(...args) case.
+  var isSuperSpreadCall = false;
 
   if (node.callee.type === Syntax.Identifier) {
     if (_isConstructorMethod(state.methodNode)) {
-      utils.append(superClassName + '.call(', state);
+      // We already know we're in the simple super() case, so now just look to
+      // see if there is a single spread arg.
+      isSuperSpreadCall =
+        node.arguments.length === 1 &&
+        node.arguments[0].type === Syntax.SpreadElement;
+
+      utils.append(
+        superClassName + (isSuperSpreadCall ? '.apply(' : '.call('),
+        state
+      );
     } else {
       var protoProp = SUPER_PROTO_IDENT_PREFIX + superClassName;
       if (state.methodNode.key.type === Syntax.Identifier) {
@@ -529,7 +540,19 @@ function visitSuperCallExpression(traverse, node, path, state) {
   if (node.arguments.length > 0) {
     utils.append(',', state);
     utils.catchupWhiteSpace(node.arguments[0].range[0], state);
-    traverse(node.arguments, path, state);
+    if (isSuperSpreadCall) {
+      if (node.arguments[0].argument.type === Syntax.Identifier) {
+        utils.append(node.arguments[0].argument.name, state);
+      } else {
+        throw new Error(
+          'This transform only supports spread calls with super with a ' +
+          'single argument that is an identifier. (line: ' +
+          node.loc.start.line + ', col: ' + node.loc.start.column + ')'
+        );
+      }
+    } else {
+      traverse(node.arguments, path, state);
+    }
   }
 
   utils.catchupWhiteSpace(node.range[1], state);
