@@ -620,6 +620,42 @@ describe('es6-classes', function() {
         expect(childInst.barRan).toBe(true);
       });
 
+      it('handles spread calls to super', function() {
+        var code = [
+          'class Bar extends Foo {',
+          '  constructor() {',
+          '    super(...args);',
+          '  }',
+          '}',
+        ].join('\n');
+        var expected = [
+          'for(var Foo____Key in Foo){if(Foo.hasOwnProperty(Foo____Key)){Bar[Foo____Key]=Foo[Foo____Key];}}var ____SuperProtoOfFoo=Foo===null?null:Foo.prototype;Bar.prototype=Object.create(____SuperProtoOfFoo);Bar.prototype.constructor=Bar;Bar.__superConstructor__=Foo;',
+          '  function Bar() {"use strict";',
+          '    Foo.apply(this,args);',
+          '  }',
+          '',
+        ].join('\n');
+
+        expect(transform(code)).toBe(expected);
+      });
+
+      it('throws on spread calls to super with literals', function() {
+        var code = [
+          'class Bar extends Foo {',
+          '  constructor() {',
+          '    super(...[1,2]);',
+          '  }',
+          '}',
+        ].join('\n');
+
+        expect(function() {
+          transform(code);
+        }).toThrow(
+          'This transform only supports spread calls with super with a ' +
+          'single argument that is an identifier. (line: 3, col: 4)'
+        );
+      });
+
       it('consistently munges private property identifiers', function() {
         var code = transform([
           'class Foo {',
