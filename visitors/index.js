@@ -25,6 +25,7 @@ var es6Template = require('./es6-template-visitors');
 var es7SpreadProperty = require('./es7-spread-property-visitors');
 var es7TrailingComma = require('./es7-trailing-comma-visitors');
 var reactDisplayName = require('./react-display-name-visitors');
+var reactJSXModule = require('./react-jsx-module-visitors');
 var reactJSX = require('./react-jsx-visitors');
 var reservedWords = require('./reserved-words-visitors');
 var trailingComma = require('./trailing-comma-visitors');
@@ -46,6 +47,7 @@ var transformVisitors = {
   'es7-trailing-comma': es7TrailingComma.visitorList,
   'react-display-name': reactDisplayName.visitorList,
   'react-jsx': reactJSX.visitorList,
+  'react-jsx': reactJSXModule.visitorList,
   'reserved-words': reservedWords.visitorList,
   'trailing-comma': trailingComma.visitorList,
   'undefined-to-void-0': undefinedToVoid0.visitorList
@@ -72,7 +74,8 @@ var transformSets = {
   ],
   'react': [
     'react-jsx',
-    'react-display-name'
+    'react-display-name',
+    'react-jsx-module'
   ],
   'target:es3': [
     'reserved-words',
@@ -106,6 +109,7 @@ var transformRunOrder = [
   'trailing-comma',
   'es7-trailing-comma',
   'react-jsx',
+  'react-jsx-module',
   'react-display-name',
   'undefined-to-void-0'
 ];
