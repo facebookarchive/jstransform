@@ -47,7 +47,7 @@ var transformVisitors = {
   'es7-trailing-comma': es7TrailingComma.visitorList,
   'react-display-name': reactDisplayName.visitorList,
   'react-jsx': reactJSX.visitorList,
-  'react-jsx': reactJSXModule.visitorList,
+  'react-jsx-module': reactJSXModule.visitorList,
   'reserved-words': reservedWords.visitorList,
   'trailing-comma': trailingComma.visitorList,
   'undefined-to-void-0': undefinedToVoid0.visitorList
