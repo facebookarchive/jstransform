@@ -1,5 +1,69 @@
 # JSTransform [![Build Status](https://travis-ci.org/facebook/jstransform.svg?branch=master)](https://travis-ci.org/facebook/jstransform)
 
+This is a fork for propose JSX modules like this:
+
+```html
+<!DOCTYPE JSX>
+
+<ReactClass name="Timer">
+  <div>Seconds Elapsed: {secondsElapsed}</div>
+
+  <script>
+    function getInitialState() {
+      return { secondsElapsed = 0 };
+    }
+    function tick(){
+      this.setState({secondsElapsed: secondsElapsed + 1});
+    }
+    function componentDidMount() {
+      this.interval = setInterval(this.tick, 1000);
+    }
+    function componentWillUnmount() {
+      clearInterval(this.interval);
+    }
+  </script>
+</ReactClass>
+
+React.render(<Timer />, mountNode);
+```
+
+=== 
+Why
+* Better look and feel (I think so)
+* Better compatibility with IDE's, linters...
+* 100% compatible with React legacy code
+
+=== 
+Done
+* Enabling tag `<!DOCTYPE JSX>`. I don't like it, and maybe it's not necessary because JSXModule just works when JSX is as statement (not expression), but i'm worry with legacy code.
+* Parser for script, link and style tags.
+* visitors for jstransform
+* visitors for react
+* the code above works well
+
+=== 
+Todo
+* avoid this from all know (class internals) identifiers
+> how detect setState when invoking methods? (like push, shift, splice...)
+* Transform css script into javascript objects.
+> Rename css classes to allow local scope
+> autoprex vendor tags
+** I18N
+** Docs
+
+===
+Repositories:
+https://github.com/thr0w/esprima
+https://github.com/thr0w/jstransform
+https://github.com/thr0w/react
+
+===
+References:
+* https://muut.com/riotjs/
+* https://github.com/undoZen/htmlxify
+
+===
+
 A simple utility for pluggable JS syntax transforms using the esprima parser.
 
 * Makes it simple to write and plug-in syntax transformations
