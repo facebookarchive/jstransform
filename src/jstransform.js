@@ -275,6 +275,7 @@ function transform(visitors, source, options) {
   if (options.sourceMap) {
     var SourceMapGenerator = require('source-map').SourceMapGenerator;
     state.g.sourceMap = new SourceMapGenerator({file: options.filename || 'transformed.js'});
+    state.g.sourceMapFilename = options.sourceName;
   }
 
   traverse(ast, [], state);
@@ -282,6 +283,9 @@ function transform(visitors, source, options) {
 
   var ret = {code: state.g.buffer, extra: state.g.extra};
   if (options.sourceMap) {
+    if(options.sourceContent) {
+      state.g.sourceMap.setSourceContent(options.filename, ret.code);
+    }
     ret.sourceMap = state.g.sourceMap;
     ret.sourceMapFilename =  options.filename || 'source.js';
   }
