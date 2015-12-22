@@ -85,7 +85,13 @@ function visitCallSpread(traverse, node, path, state) {
       }
     }
     utils.append('].concat(', state);
-    process(traverse, spread.argument, path, state);
+    if (spread.argument.name === 'arguments') {
+      // Input  = function fn() { new Set(...arguments) }
+      // Output = new (Function.prototype.bind.apply(Set, [null].concat(Array.prototype.slice.call(arguments))))
+      utils.append('Array.prototype.slice.call(arguments)', state);
+    } else {
+      process(traverse, spread.argument, path, state);
+    }
     utils.append(')', state);
   } else {
     process(traverse, spread.argument, path, state);
