@@ -13,6 +13,7 @@
 
 var esprima = require('esprima-fb');
 var utils = require('./utils');
+var errorContext = require('error-context');
 
 var getBoundaryNode = utils.getBoundaryNode;
 var declareIdentInScope = utils.declareIdentInLocalScope;
@@ -265,8 +266,9 @@ function transform(visitors, source, options) {
   var ast;
   try {
     ast = getAstForSource(source, options);
-    } catch (e) {
-    e.message = 'Parse Error: ' + e.message;
+  } catch (e) {
+    e.message = 'Parse Error: ' + e.message + '\n\n' +
+      errorContext(source, e.lineNumber, e.column) + '\n';
     throw e;
   }
   var state = utils.createState(source, ast, options);
