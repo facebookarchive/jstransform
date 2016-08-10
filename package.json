@@ -23,6 +23,7 @@
   "dependencies": {
     "base62": "^1.1.0",
     "commoner": "^0.10.1",
+    "error-context": "^1.0.0",
     "esprima-fb": "^15001.1.0-dev-harmony-fb",
     "object-assign": "^2.0.0",
     "source-map": "^0.4.2"
