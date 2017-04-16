@@ -378,7 +378,7 @@ function _renderClassBody(traverse, node, path, state) {
     if (superClass.name) {
       utils.append(
         'if(' + superClass.name + '!==null){' +
-        superClass.name + '.apply(this,arguments);}',
+        'return ' + superClass.name + '.apply(this,arguments);}',
         state
       );
     }
