@@ -95,7 +95,8 @@ function getDestructuredComponents(node, state) {
     if (item.type === Syntax.SpreadProperty) {
       var restExpression = restPropertyHelpers.renderRestExpression(
         utils.getTempVar(tmpIndex),
-        patternItems
+        patternItems,
+        state.g.opts.polyfilled
       );
       components.push(item.argument.name + '=' + restExpression);
       continue;

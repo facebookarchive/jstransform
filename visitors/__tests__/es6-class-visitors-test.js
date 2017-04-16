@@ -179,6 +179,66 @@ describe('es6-classes', function() {
         expect(transform(code)).toBe(expected);
       });
 
+      it('preserves lines with inheritance from identifier (polyfilled)', function() {
+        var code = [
+          'class Foo extends Bar {',
+          '  foo() {',
+          '    ',
+          '    ',
+          '    super(p1,',
+          '          p2);',
+          '  }',
+          '',
+          '  constructor(p1,',
+          '              p2) {',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '    super.blah(p1,',
+          '               p2);',
+          '  }',
+          '',
+          '  bar(){}',
+          '  static baz() {',
+          '}',
+          '}'
+        ].join('\n');
+
+        var expected = [
+          'Object.assign(Foo,Bar);' +
+          'var ____SuperProtoOfBar=' +
+            'Bar===null' +
+              '?null:' +
+              'Bar.prototype;' +
+          'Foo.prototype=Object.create(____SuperProtoOfBar);' +
+          'Foo.prototype.constructor=Foo;' +
+          'Foo.__superConstructor__=Bar;',
+
+          '  Object.defineProperty(Foo.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
+          '    ',
+          '    ',
+          '    ____SuperProtoOfBar.foo.call(this,p1,',
+          '          p2);',
+          '  }});',
+          '',
+          '  function Foo(p1,',
+          '              p2) {"use strict";',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '    ____SuperProtoOfBar.blah.call(this,p1,',
+          '               p2);',
+          '  }',
+          '',
+          '  Object.defineProperty(Foo.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(Foo,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
+          ''
+        ].join('\n');
+
+        expect(transform(code, {polyfilled: true})).toBe(expected);
+      });
+
       it('preserves lines with inheritance from expression', function() {
         var code = [
           'class Foo extends mixin(Bar, Baz) {',
@@ -235,7 +295,61 @@ describe('es6-classes', function() {
 
         expect(transform(code)).toBe(expected);
       });
+
+      it('preserves lines with inheritance from expression (polyfilled)', function() {
+        var code = [
+          'class Foo extends mixin(Bar, Baz) {',
+          '  foo() {',
+          '    ',
+          '    ',
+          '  }',
+          '',
+          '  constructor(p1,',
+          '              p2) {',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '  }',
+          '',
+          '  bar(){}',
+          '  static baz() {',
+          '}',
+          '}'
+        ].join('\n');
+
+        var expected = [
+          'var ____Class0=mixin(Bar, Baz);' +
+          'Object.assign(Foo,____Class0);' +
+          'var ____SuperProtoOf____Class0=' +
+            '____Class0===null' +
+              '?null' +
+              ':____Class0.prototype;' +
+          'Foo.prototype=Object.create(____SuperProtoOf____Class0);' +
+          'Foo.prototype.constructor=Foo;' +
+          'Foo.__superConstructor__=____Class0;',
+
+          '  Object.defineProperty(Foo.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
+          '    ',
+          '    ',
+          '  }});',
+          '',
+          '  function Foo(p1,',
+          '              p2) {"use strict";',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '  }',
+          '',
+          '  Object.defineProperty(Foo.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(Foo,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
+          ''
+        ].join('\n');
+
+        expect(transform(code, {polyfilled: true})).toBe(expected);
+      });
     });
+
 
     describe('functional tests', function() {
       it('handles an empty body', function() {
@@ -369,6 +483,29 @@ describe('es6-classes', function() {
         expect(childInst.protoProp).toBe('protoProp');
       });
 
+      it('handles extension from an identifier (polyfilled)', function() {
+        var code = transform([
+          'function Parent() {}',
+          'Parent.prototype.protoProp = "protoProp";',
+          'Parent.staticProp = "staticProp";',
+
+          'class Child extends Parent {}'
+        ].join('\n'), {polyfilled: true});
+
+        var exports = new Function(
+          code + 'return {Child: Child, Parent: Parent};'
+        )();
+        var Child = exports.Child;
+        var Parent = exports.Parent;
+
+        expect(Child.protoProp).toBe(undefined);
+        expect(Child.staticProp).toBe('staticProp');
+        var childInst = new Child();
+        expect(childInst instanceof Child).toBe(true);
+        expect(childInst instanceof Parent).toBe(true);
+        expect(childInst.protoProp).toBe('protoProp');
+      });
+
       // ES6 draft section 14.5
       it('handles extension from a left hand expression', function() {
         var code = transform([
@@ -380,6 +517,32 @@ describe('es6-classes', function() {
 
           'class Child extends (true ? Parent1 : Parent2) {}'
         ].join('\n'));
+
+        var exports = new Function(
+          code + 'return {Parent1: Parent1, Child: Child};'
+        )();
+        var Child = exports.Child;
+        var Parent1 = exports.Parent1;
+
+        expect(Child.protoProp).toBe(undefined);
+        expect(Child.staticProp).toBe('staticProp');
+        var childInst = new Child();
+        expect(childInst instanceof Child).toBe(true);
+        expect(childInst instanceof Parent1).toBe(true);
+        expect(childInst.protoProp).toBe('protoProp');
+        expect(childInst.staticProp).toBe(undefined);
+      });
+
+      it('handles extension from a left hand expression (polyfilled)', function() {
+        var code = transform([
+          'function Parent1() {}',
+          'Parent1.prototype.protoProp = "protoProp";',
+          'Parent1.staticProp = "staticProp";',
+
+          'function Parent2() {}',
+
+          'class Child extends (true ? Parent1 : Parent2) {}'
+        ].join('\n'), {polyfilled: true});
 
         var exports = new Function(
           code + 'return {Parent1: Parent1, Child: Child};'
@@ -1425,6 +1588,67 @@ describe('es6-classes', function() {
         expect(transform(code)).toBe(expected);
       });
 
+      it('preserves lines with inheritance from identifier (polyfilled)', function() {
+        var code = [
+          'var Foo = class extends Bar {',
+          '  foo() {',
+          '    ',
+          '    ',
+          '    super(p1,',
+          '          p2);',
+          '  }',
+          '',
+          '  constructor(p1,',
+          '              p2) {',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '    super.blah(p1,',
+          '               p2);',
+          '  }',
+          '',
+          '  bar(){}',
+          '  static baz() {',
+          '}',
+          '}'
+        ].join('\n');
+
+        var expected = [
+          'var Foo = (function(){' +
+          'Object.assign(____Class0,Bar);' +
+          'var ____SuperProtoOfBar=' +
+            'Bar===null' +
+              '?null' +
+              ':Bar.prototype;' +
+          '____Class0.prototype=Object.create(____SuperProtoOfBar);' +
+          '____Class0.prototype.constructor=____Class0;' +
+          '____Class0.__superConstructor__=Bar;',
+
+          '  Object.defineProperty(____Class0.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
+          '    ',
+          '    ',
+          '    ____SuperProtoOfBar.foo.call(this,p1,',
+          '          p2);',
+          '  }});',
+          '',
+          '  function ____Class0(p1,',
+          '              p2) {"use strict";',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '    ____SuperProtoOfBar.blah.call(this,p1,',
+          '               p2);',
+          '  }',
+          '',
+          '  Object.defineProperty(____Class0.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(____Class0,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
+          'return ____Class0;})()'
+        ].join('\n');
+
+        expect(transform(code, {polyfilled: true})).toBe(expected);
+      });
+
       it('preserves lines with inheritance from expression', function() {
         var code = [
           'var Foo = class extends mixin(Bar, Baz) {',
@@ -1481,6 +1705,60 @@ describe('es6-classes', function() {
         ].join('\n');
 
         expect(transform(code)).toBe(expected);
+      });
+
+      it('preserves lines with inheritance from expression (polyfilled)', function() {
+        var code = [
+          'var Foo = class extends mixin(Bar, Baz) {',
+          '  foo() {',
+          '    ',
+          '    ',
+          '  }',
+          '',
+          '  constructor(p1,',
+          '              p2) {',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '  }',
+          '',
+          '  bar(){}',
+          '  static baz() {',
+          '}',
+          '}'
+        ].join('\n');
+
+        var expected = [
+          'var Foo = (function(){' +
+          'var ____Class1=mixin(Bar, Baz);' +
+          'Object.assign(____Class0,____Class1);' +
+          'var ____SuperProtoOf____Class1=' +
+            '____Class1===null' +
+              '?null' +
+              ':____Class1.prototype;' +
+          '____Class0.prototype=Object.create(____SuperProtoOf____Class1);' +
+          '____Class0.prototype.constructor=____Class0;' +
+          '____Class0.__superConstructor__=____Class1;',
+
+          '  Object.defineProperty(____Class0.prototype,"foo",{writable:true,configurable:true,value:function() {"use strict";',
+          '    ',
+          '    ',
+          '  }});',
+          '',
+          '  function ____Class0(p1,',
+          '              p2) {"use strict";',
+          '',
+          '    this.p1 = p1;',
+          '    this.p2 = p2;',
+          '  }',
+          '',
+          '  Object.defineProperty(____Class0.prototype,"bar",{writable:true,configurable:true,value:function(){"use strict";}});',
+          '  Object.defineProperty(____Class0,"baz",{writable:true,configurable:true,value:function() {"use strict";',
+          '}});',
+          'return ____Class0;})()'
+        ].join('\n');
+
+        expect(transform(code, {polyfilled: true})).toBe(expected);
       });
     });
 

@@ -140,6 +140,13 @@ JSTransform now ships with a CLI. It was taken from the `react-tools` CLI so sho
     --source-filename                        Filename to use when generating the inline sourcemap. Will default to filename when processing files
 ```
 
+## Polyfill requirements
+
+| Transform | [`Object.assign`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign) |
+| ----------| :-------------: |
+| `class` | **X** |
+| Spread properties | **X** |
+
 ## Examples
 
 ### Advanced API

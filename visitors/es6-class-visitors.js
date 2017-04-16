@@ -328,21 +328,28 @@ function _renderClassBody(traverse, node, path, state) {
       );
     }
 
-    var keyName = superClass.name + '____Key';
-    var keyNameDeclarator = '';
-    if (!utils.identWithinLexicalScope(keyName, state)) {
-      keyNameDeclarator = 'var ';
-      declareIdentInLocalScope(keyName, initScopeMetadata(node), state);
+    if (state.g.opts.polyfilled) {
+      utils.append(
+        'Object.assign(' + className + ',' + superClass.name + ');',
+        state
+      );
+    } else {
+      var keyName = superClass.name + '____Key';
+      var keyNameDeclarator = '';
+      if (!utils.identWithinLexicalScope(keyName, state)) {
+        keyNameDeclarator = 'var ';
+        declareIdentInLocalScope(keyName, initScopeMetadata(node), state);
+      }
+      utils.append(
+        'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
+          'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
+            className + '[' + keyName + ']=' +
+              superClass.name + '[' + keyName + '];' +
+          '}' +
+        '}',
+        state
+      );
     }
-    utils.append(
-      'for(' + keyNameDeclarator + keyName + ' in ' + superClass.name + '){' +
-        'if(' + superClass.name + '.hasOwnProperty(' + keyName + ')){' +
-          className + '[' + keyName + ']=' +
-            superClass.name + '[' + keyName + '];' +
-        '}' +
-      '}',
-      state
-    );
 
     var superProtoIdentStr = SUPER_PROTO_IDENT_PREFIX + superClass.name;
     if (!utils.identWithinLexicalScope(superProtoIdentStr, state)) {
