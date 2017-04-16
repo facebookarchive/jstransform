@@ -179,6 +179,30 @@ describe('es6-classes', function() {
         expect(transform(code)).toBe(expected);
       });
 
+      it('uses Object.assign if the option is specified', function() {
+        var code = [
+          'class Foo extends Bar {}'
+        ].join('\n');
+
+        var expected = [
+          'Object.assign(Foo, Bar);' +
+          'var ____SuperProtoOfBar=' +
+            'Bar===null' +
+              '?null:' +
+              'Bar.prototype;' +
+          'Foo.prototype=Object.create(____SuperProtoOfBar);' +
+          'Foo.prototype.constructor=Foo;' +
+          'Foo.__superConstructor__=Bar;' +
+          'function Foo(){' +
+          '"use strict";if(Bar!==null){Bar.apply(this,arguments);}' +
+          '}'
+        ].join('\n');
+
+        expect(transform(code, {
+          useObjectAssign: true,
+        })).toBe(expected);
+      });
+
       it('preserves lines with inheritance from expression', function() {
         var code = [
           'class Foo extends mixin(Bar, Baz) {',
